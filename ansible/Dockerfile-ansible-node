@@ -1,0 +1,33 @@
+# Start with a lightweight Linux base image
+FROM ubuntu:20.04
+
+# Set environment variables to suppress interactive prompts
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Update package list and install OpenSSH Server
+RUN apt-get update && apt-get install -y \
+    openssh-server \
+    && mkdir /var/run/sshd \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set up a user for SSH access (replace 'user' and 'password' with desired credentials)
+RUN useradd -m -s /bin/bash user \
+    && echo "user:password" | chpasswd \
+    && usermod -aG sudo user
+
+# Allow password authentication for simplicity (not recommended for production)
+RUN sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config
+
+# install sudo and assign user to the group
+RUN apt update \
+    && apt install sudo \
+    && usermod -aG sudo user
+
+# allow sudo without password
+RUN echo user ALL=\(ALL\) NOPASSWD:ALL > /etc/sudoers.d/users
+
+# Expose SSH port
+EXPOSE 22
+
+# Start the SSH service
+CMD ["/usr/sbin/sshd", "-D"]

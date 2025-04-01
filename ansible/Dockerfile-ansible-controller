@@ -1,0 +1,33 @@
+# Use the official Python 3.10.6 slim image as the base
+FROM python:3.10.6-slim
+
+# Set environment variables
+ENV PYTHONUNBUFFERED=1 \
+    DEBIAN_FRONTEND=noninteractive
+
+# Update packages and install required dependencies
+RUN apt-get update && apt-get install -y \
+    sshpass \
+    openssh-client \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Ansible via pip and add the nvidia role
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir ansible && \
+    ansible-galaxy install nvidia.nvidia_driver
+
+# DO NOT SET THIS IN PRODUCTION
+ENV ANSIBLE_HOST_KEY_CHECKING=False
+
+
+# Set working directory
+WORKDIR /ansible
+
+# Default command
+CMD ["bash"]
+
+
+
+
+

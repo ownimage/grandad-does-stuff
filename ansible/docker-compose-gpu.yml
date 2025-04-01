@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  ansible-gpu-node:
+    image: ansible-gpu-node:1.0.0
+    container_name: ansible_gpu_node
+    stdin_open: true
+    tty: true
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [ gpu ]
+
+

@@ -1,0 +1,17 @@
+---
+- name: Playbook for a single controlled node
+  hosts: all
+  become: yes  # Escalates privileges to root
+  tasks:
+    # Update the package index
+    - name: Update APT package index
+      apt:
+        update_cache: yes
+
+    # Install a package (curl, in this case)
+    - name: Install curl
+      apt:
+        name: curl
+        state: present
+  roles:
+  - nvidia.nvidia_driver
