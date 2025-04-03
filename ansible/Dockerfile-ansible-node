@@ -29,5 +29,5 @@ RUN echo user ALL=\(ALL\) NOPASSWD:ALL > /etc/sudoers.d/users
 # Expose SSH port
 EXPOSE 22
 
-# Start the SSH service
+# Start with the SSH service
 CMD ["/usr/sbin/sshd", "-D"]

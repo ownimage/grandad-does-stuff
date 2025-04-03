@@ -1,16 +1,16 @@
-## Ansible and GPU
+# Ansible and GPU
 
-# Objective
+## Objective
 What I want to do is to set up the framework for using ansible to commission new images on either a docker container or 
 later on a RaspberryPi.
 
-# Notes
-There is a Commands.md which when I open in PyCharm allows me to:
+## Notes
+When I open this file in PyCharm allows me to:
 . run the commands for Windows
 . copy and paste the commands for inside the containers
 
 
-# Overview of files
+## Overview of files
 Dockerfile-ansible-controller defines an image with ansible installed \
 It installs ansbile and the nvidia role we will use later 
 
@@ -27,7 +27,7 @@ docker-compose-gpu.yml allows the image that we will build to be started with do
 note that the gpu is mapped through to the image
 
 
-# Create the docker images
+## Create the docker images
 ```sh
 docker build -f Dockerfile-ansible-controller -t ansible-controller:1.0.0 .
 ```
@@ -36,12 +36,12 @@ docker build -f Dockerfile-ansible-controller -t ansible-controller:1.0.0 .
 docker build -f Dockerfile-ansible-node -t ansible-node:1.0.0 .
 ```
 
-# Start the containers
+## Start the containers
 ```sh
 docker compose -f docker-compose-ansible.yml up -d
 ```
 
-# Log into the ansible containers and run ansbile to configure node
+## Log into the ansible containers and run ansbile to configure node
 ```shell
 docker exec -it ansible_controller bash
 ```
@@ -54,13 +54,13 @@ ansible-playbook playbook.yml -i inventory.ini
 exit
 ```
 
-# Commit the changes
+## Commit the changes
 We have made changes to the ansible-node which we want to be able to save as an image to start a new container from.
 ```sh
 docker commit ansible_node ansible-gpu-node:1.0.0
 ```
 
-# Start the gpu node and log into the container and check it workd
+## Start the gpu node and log into the container and check it workd
 ```sh
 docker compose -f docker-compose-gpu.yml up -d
 ```
