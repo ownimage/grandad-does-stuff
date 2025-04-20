@@ -1,9 +1,7 @@
-version: '3.8'
-
 services:
-  stable-virtual-camera-build:
-    image: stable-virtual-camera:build
-    container_name: stable-virtual-camera-build
+  stable-virtual-camera-build-debian:
+    image: stable-virtual-camera:build-debian
+    container_name: stable-virtual-camera-build-debian
     stdin_open: true
     tty: true
     command: tail -F /dev/null
@@ -15,14 +13,16 @@ services:
               count: 1
               capabilities: [ gpu ]
 
-  stable-virtual-camera:
-    image: stable-virtual-camera:1.0.0
-    container_name: stable-virtual-camera
+  stable-virtual-camera-debian:
+    image: stable-virtual-camera:2.0.0
+    container_name: stable-virtual-camera-debian
     stdin_open: true
     tty: true
     user: user
     working_dir: /home/user/stable-virtual-camera
-    command: python demo_gr.py
+    command: python demo_gr.py --no-share
+    ports:
+      - "7860:7860"
     deploy:
       resources:
         reservations:

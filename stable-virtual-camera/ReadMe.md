@@ -20,9 +20,6 @@ docker build -t stable-virtual-camera:build .
 ```sh
 docker compose up -d stable-virtual-camera-build
 ```
-```sh
-docker compose down
-```
 # Log into container
 ```shell
 docker exec -it --user user stable-virtual-camera-build bash
