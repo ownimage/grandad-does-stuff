@@ -16,7 +16,7 @@ docker inspect stable-virtual-camera-buildOpen this file in PyCharm allow click 
 docker build -t stable-virtual-camera:build .
 ```
 
-## Start/stop the container
+## Start the container
 ```sh
 docker compose up -d stable-virtual-camera-build
 ```

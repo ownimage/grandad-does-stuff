@@ -1,8 +1,5 @@
 FROM python:3.10.17-slim-bookworm
 
-# Set environment variables to suppress interactive prompts
-ENV DEBIAN_FRONTEND=noninteractive
-
 # Start loop
 CMD ["sleep", "infinite"]
 

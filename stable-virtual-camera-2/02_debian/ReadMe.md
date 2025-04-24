@@ -8,7 +8,7 @@ based.)
 docker build -t stable-virtual-camera:build-debian .
 ```
 
-## Start/stop the container
+## Start the container
 ```sh
 docker compose up -d stable-virtual-camera-build-debian
 ```
@@ -18,7 +18,7 @@ docker exec -it --user user stable-virtual-camera-build-debian bash
 ```
 
 # Next steps
-'''
+```
 cd stable-virtual-camera
 
 /home/user/.local/bin/huggingface-cli login
@@ -26,8 +26,18 @@ cd stable-virtual-camera
 Add token as git credential? (Y/n) n
 
 python demo_gr.py --no-share
-'''
-Now wait a very long time ... 7GB+ download
+```
+Now wait a very long time ... 11GB+ download
+
+You will see something like this 
+```
+* Running on local URL:  http://0.0.0.0:7860
+INFO:httpx:HTTP Request: GET http://localhost:7860/gradio_api/startup-events "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: HEAD http://localhost:7860/ "HTTP/1.1 200 OK"
+
+To create a public link, set `share=True` in `launch()`.
+INFO:httpx:HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+```
 
 You can exit out of the container ... but do not stop it.  
 Ctrl-C to stop the running process, `exit` to exit out of the bash shell and return to the host machine.
@@ -43,6 +53,8 @@ docker compose down
 ```shell
 docker compose up stable-virtual-camera-debian
 ```
+
+You should then be able to access the UI on http://localhost:7860/
 
 ## Problems
 
