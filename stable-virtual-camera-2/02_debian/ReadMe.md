@@ -3,7 +3,7 @@
 I want to use a debian base image for python, (I'm planning a few Raspberry Pi projects and the default OS is debian 
 based.)
 
-## Create the docker images
+## Create the docker image
 ```sh
 docker build -t stable-virtual-camera:build-debian .
 ```
