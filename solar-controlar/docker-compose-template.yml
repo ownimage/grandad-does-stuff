@@ -1,0 +1,12 @@
+services:
+  app:
+    image: solar-controlar:latest
+    container_name: solar-controlar
+    environment:
+      - SOLCAST_API_KEY=solcast_api_key
+      - SOLCAST_SITE_ID=solcast_site_id
+      - GIVENERGY_API_KEY=givenergy_api_key
+      - GIVENERGY_INVERTER_ID=your_inverter_id
+    volumes:
+      - .:/app
+    command: ["bash", "-c", "tail -f /dev/null"]
