@@ -1,0 +1,7 @@
+services:
+  app:
+    image: solar-controlar:latest
+    container_name: solarcontrolar
+    volumes:
+      - .:/app
+    command: ["cron", "-f"]

@@ -1,7 +1,7 @@
 services:
   app:
     image: solar-controlar:latest
-    container_name: solar-controlar
+    container_name: solarcontrolar
     environment:
       - SOLCAST_API_KEY=solcast_api_key
       - SOLCAST_SITE_ID=solcast_site_id

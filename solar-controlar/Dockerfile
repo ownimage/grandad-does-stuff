@@ -8,5 +8,7 @@ RUN useradd -m -s /bin/bash user \
 
 RUN pip install --upgrade pip
 RUN pip install -r /app/requirements.txt
-#
-#USER user
+
+RUN apt update \
+    && apt install -y cron
+
