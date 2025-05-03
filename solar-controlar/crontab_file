@@ -1,2 +1,2 @@
-* * * * * cd /app && source envfile && /usr/local/bin/python config_apply.py >> config_apply.log 2>&1
-* * * * * cd /app && echo 'Hello' >> config_apply.log
+
+* * * * * cd /app && bash -c "source envfile && /usr/local/bin/python config_apply.py" >> config_apply.log 2>&1

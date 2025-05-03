@@ -34,6 +34,9 @@ DO NOT CHECK THIS INTO SOURCE CONTROL - unless you know what you are doing.
 
 ## Start the container and exec into it
 ```shell
+docker login
+```
+```shell
 docker compose up -d
 ```
 

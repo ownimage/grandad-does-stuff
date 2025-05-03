@@ -61,11 +61,16 @@ class GivEnergy:
         return self.post(f"{self.base_url}/inverter/{self.inverter_id}/settings/{setting_id}/write", payload)
 
     def setting_write_validate(self, setting_id, value, function_name):
-        self.setting_write(setting_id, value)
-        new_value = self.setting_read(setting_id)['data']['value']
-        if new_value != value:
-            raise RuntimeError(f'Givnergy::{function_name}({value} failed')
-        return new_value
+        current_value = self.setting_read(setting_id)['data']['value']
+        if current_value == value:
+            return False
+        else:
+            self.setting_write(setting_id, value)
+            updated_value = self.setting_read(setting_id)['data']['value']
+            if updated_value != value:
+                raise RuntimeError(f'Givnergy::{function_name}({value}) failed')
+            return True
+
 
 
     def get_timed_charge(self):
