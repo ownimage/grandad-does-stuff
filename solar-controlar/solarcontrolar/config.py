@@ -9,7 +9,7 @@ class Config:
 
         if data is None:
             with open("config.json", "r") as file:
-                self.__data = json.load(file)  # Deserialize JSON into a Python dictionary
+                self.__data = json.load(file)
 
     def get_data(self):
         return copy.deepcopy(self.__data)

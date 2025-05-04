@@ -27,7 +27,7 @@ docker build -t solar-controlar:latest .
 
 ## First time configuration
 ```shell
-copy docker-compose-template.yml docker-compose.yml
+copy envfile_template envflie
 ```
 **Edit the values of docker-compose.yml to reflect your environment.**  
 DO NOT CHECK THIS INTO SOURCE CONTROL - unless you know what you are doing.
@@ -44,6 +44,11 @@ docker compose up -d
 docker exec -it -u user -w /app solarcontrolar bash
 ```
 Note this is cmd not PowerShell
+
+## INstall crontabs
+```shell
+crontab crontab_file
+```
 
 ## Run tests
 ```shell

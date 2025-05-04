@@ -65,6 +65,7 @@ class GivEnergy:
         if current_value == value:
             return False
         else:
+            print(f'{function_name} current value {current_value} being set to {value}')
             self.setting_write(setting_id, value)
             updated_value = self.setting_read(setting_id)['data']['value']
             if updated_value != value:
