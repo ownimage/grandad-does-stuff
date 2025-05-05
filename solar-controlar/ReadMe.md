@@ -64,7 +64,7 @@ python solar_forecast_fetch.py > solar_forecast.json
 ```
 ### 2 process the json file
 ```shell
-python solar_forecast.py
+python solar_forecast_generate.py
 ```
 
 
