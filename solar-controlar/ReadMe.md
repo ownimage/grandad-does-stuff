@@ -78,9 +78,9 @@ This is still at the design phase.
 | File                     | Description                                                                                                                                           |
 |--------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
 | usage_daily_average.json | This is the base usage for each day of the week, and what a holiday day looks like.                                                                   |
-| usage_daily_average.py   ||
-| usage_forcast.json       | This allows for variations to be made, e.g. mark day as holiday, or mark extra/less KWh.                                                              |
-| usage_forecast.py        || 
+| usage_daily_average.py   |                                                                                                                                                       |
+| usage_forcast.json       | This allows for variations to be made, e.g. mark day as holiday, or mark extra/less kWh.                                                              |
+| usage_forecast.py        |                                                                                                                                                       | 
 | solar_forecast.json      | This is the forcast from solcast.  It will be updated on a running basis for the history too. This will be based on half hourly values.               |
 | solar_forecast.py        | This is the file that manages ths json file.  It will have things such as read, write (includes backup), get forcast for date, add forecast for date. |
 | solar_actuals.json       | This will be the actual solar values from givenergy. This will be based on half hourly values, and updated on a running basis.                        |
@@ -106,8 +106,8 @@ Samples
 ### usage_forcast.json
 ```json lines
 {
-    "2025-05-01": { "holiday": false, "KWh_adjustment": -1 },
-    "2025-05-02": { "holiday": false, "KWh_adjustment": 1 }
+    "2025-05-01": { "holiday": false, "kWh_adjustment": -1 },
+    "2025-05-02": { "holiday": false, "kWh_adjustment": 1 }
 }
 ```
 
