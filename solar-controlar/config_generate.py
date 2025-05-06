@@ -15,15 +15,22 @@ def get_solar_forecast(key):
     with open('solar_forecast.json', 'r') as file:
         return json.load(file)[key]
 
-def get_usage_forecast(key):
-    with open('usage_forecast.json', 'r') as file:
-        return json.load(file)[key]
+def get_usage_forecast(iso, weekday):
+    try:
+        with open('usage_forecast.json', 'r') as file:
+            return json.load(file)[iso]
+    except:
+        with open('usage_baseline.json', 'r') as file:
+            return json.load(file)[weekday]
+
 
 local_tz = pytz.timezone('Europe/London')
-tomorrow = (datetime.now(local_tz) + timedelta(days=1)).date().isoformat()
+tomorrow = (datetime.now(local_tz) + timedelta(days=1)).date()
+tomorrow_iso = tomorrow.isoformat()
+tomorrow_day = tomorrow.strftime('%A')
 
-solar_forecast = get_solar_forecast(tomorrow)
-usage_forecast = get_usage_forecast(tomorrow)
+solar_forecast = get_solar_forecast(tomorrow_iso)
+usage_forecast = get_usage_forecast(tomorrow_iso, tomorrow_day)
 
 # KWh
 charge_for_100_peak = battery_capacity_kWh - solar_forecast['day'] + usage_forecast['day']

@@ -1,4 +1,4 @@
 
 */5 * * * * cd /app && bash -c "source envfile && /usr/local/bin/python config_apply.py" >> config_apply.log 2>&1
-30 15 * * * cd /app && bash -c "source envfile && /usr/local/bin/python solar_forecast_generate.py && /usr/local/bin/python config_generate.py"
+30 19 * * * cd /app && bash -c "source envfile && /usr/local/bin/python solar_forecast_generate.py && /usr/local/bin/python config_generate.py"
 
