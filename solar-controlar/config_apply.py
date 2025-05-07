@@ -40,6 +40,8 @@ def process_timed_action(config_key, comparator, action):
             print(f'{formatted_date} battery_leval={battery_level} target_percentage={target_percentage} CHANGE {action.__name__}({enabled})')
         else:
             print(f'{formatted_date} battery_leval={battery_level} target_percentage={target_percentage} {action.__name__}({enabled})')
+    else:
+        print(f'{formatted_date} battery_leval={battery_level} is within tolerance={tolerance} of target_percentage={target_percentage} NO CHANGE')
 
 
 
