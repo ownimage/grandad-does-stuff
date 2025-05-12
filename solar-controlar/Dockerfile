@@ -1,4 +1,7 @@
-FROM python:3.10.17-slim-bookworm
+FROM python:3.11-bookworm
+
+# Create a link so python appears in the same place as the RPi
+RUN ln -s /usr/local/bin/python /usr/bin/python
 
 RUN mkdir /app
 COPY requirements.txt /app/requirements.txt

@@ -1,4 +1,4 @@
 {
-  "charge_to_percentage": 20,
-  "discharge_to_percentage": 30
+    "charge_to_percentage": 10,
+    "discharge_to_percentage": 24
 }

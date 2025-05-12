@@ -3,7 +3,7 @@
 I have solar panels and a GivEnergyInverter and battery.  
 
 My tariff means that it is better to charge my battery during the day with excess PV energy (which I could sell at about 9p/unit)
-rather than overnight (where it costs me 15p/unit).
+rather than from the Grid overnight (where it costs me 15p/unit).
 
 But I also want my battery to be 100% full at the start of the peak discharge price time where it can cost me 36p per unit to use
 and I can sell for 26p.
@@ -18,7 +18,21 @@ We are going to get our solar prediction from https://solcast.com/
 You need to create a login and define your solar installation there to get a forcast.
 API documentation https://docs.solcast.com.au/
 
-# Create the docker image
+# Overview
+
+## Development process
+Develop in Docker, deploy on Raspberry Pi.
+
+This limits the number of times I need to do clean builds and pull cards out of RPis etc.
+
+## Doing the stuff
+Every 5 mins we will apply the values from the config.json to limit the charging and discharging of the battery.
+
+Once the discharge period is over in the evening we will:
+1) fetch a new solar forcast
+2) generate a config file
+
+# Create the docker image for development
 ```sh
 docker build -t solar-controlar:latest .
 ```
@@ -45,7 +59,7 @@ docker exec -it -u user -w /app solarcontrolar bash
 ```
 Note this is cmd not PowerShell
 
-## INstall crontabs
+## Install crontabs
 ```shell
 crontab crontab_file
 ```
@@ -56,13 +70,7 @@ python -m unittest discover -s tests
 ```
 
 ## Getting a Forcast
-Currently 2 stage process:
 
-### 1 get the forecast to a json file
-```shell
-python solar_forecast_fetch.py > solar_forecast.json
-```
-### 2 process the json file
 ```shell
 python solar_forecast_generate.py
 ```
@@ -73,24 +81,25 @@ python solar_forecast_generate.py
 
 
 ## Files
-This is still at the design phase.
 
-| File                     | Description                                                                                                                                           |
-|--------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
-| usage_daily_average.json | This is the base usage for each day of the week, and what a holiday day looks like.                                                                   |
-| usage_daily_average.py   |                                                                                                                                                       |
-| usage_forcast.json       | This allows for variations to be made, e.g. mark day as holiday, or mark extra/less kWh.                                                              |
-| usage_forecast.py        |                                                                                                                                                       | 
-| solar_forecast.json      | This is the forcast from solcast.  It will be updated on a running basis for the history too. This will be based on half hourly values.               |
-| solar_forecast.py        | This is the file that manages ths json file.  It will have things such as read, write (includes backup), get forcast for date, add forecast for date. |
-| solar_actuals.json       | This will be the actual solar values from givenergy. This will be based on half hourly values, and updated on a running basis.                        |
-| solar_actuals.py         | This is the file that manages the json files. It will have things such as read, write (includes backup), get actuals for date, add actuals for date.  |
-| config_generator.py      | Will run daily at 20:00 and use all of the above json files to generate a config.json (see below)                                                     |
-| config.json              | Stores the charge/discharge values for the battery                                                                                                    |
-| config_apply.py          | Runs every minute and turns the givenergy battery charge from mains, or discharge to grid on or off.                                                  |
-| givenergy.py             | This is the interface to the givenergy API for actuals and                                                                                            |
-| solcast.py               | This is the interface to the solcast API for solar forecasts.                                                                                         |
-
+| File                        | Description                                                                                                                             |
+|-----------------------------|-----------------------------------------------------------------------------------------------------------------------------------------|
+| usage_baseline.json         | .This gives a day of week and holiday baseline usage as a fallback if there is no specific usage_forecast.json entry                    |
+| usage_forcast.json          | .This allows for variations to be made, e.g. mark day as holiday, or mark extra/less kWh.                                               |
+| solar_forecast.json         | This is the forcast from solcast.  It will be updated on a running basis for the history too. This will be based on half hourly values. |
+| settings.json               | The battery size, min charge, how much to multiply the solar forecast by etc.                                                           |
+| config_generator.py         | Will run daily at 20:30 and use the above json files to generate a config.json (see below)                                              |
+| config.json                 | Stores the charge/discharge values for the battery                                                                                      |
+| solar_forecast_generate.py  | Logs into solcast and fetched the forecast                                                                                              |
+| config_apply.py             | Runs every minute and turns the givenergy battery charge from mains, or discharge to grid on or off.                                    |
+| config_apply.log            | Stores the result of the config_apply.py                                                                                                |
+| crontab_file                | The time shedule file for running stuff                                                                                                 |
+| envfile_template            | Used to generate envfile                                                                                                                |
+| requirements.txt            | The pip requirements                                                                                                                    |
+| solarcontrolar/givenergy.py | This is the interface to the givenergy API for actuals and                                                                              |
+| solarcontrolar/solcast.py   | This is the interface to the solcast API for solar forecasts.                                                                           |
+| solarcontrolar/config.py    | This an accessor/manager for the config.json file                                                                                       |   
+| Dockerfile                  | The build script for our development image                                                                                              |
 Samples
 
 ### usage_daily_averages.json

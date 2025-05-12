@@ -6,7 +6,7 @@ import pytz
 
 from solarcontrolar.solcast import SolCast
 
-local_tz = pytz.timezone('Europe/London')
+local_tz = pytz.timezone('Europe/London') # TODO put in settings
 tomorrow = (datetime.now(local_tz) + timedelta(days=1)).date()
 tomorrow_key = tomorrow.isoformat()
 
@@ -15,13 +15,13 @@ def fetch_forecast():
     return solcast.forecast()
 
 def check_already_exists(key):
-    file_name = 'solar_forecast.json'
+    file_name = 'solar_forecast.json' # TODO put as constant
     with open(file_name, 'r+') as file:
         history = json.load(file)
         return key in history
 
 def add_to_history(data):
-    file_name = 'solar_forecast.json'
+    file_name = 'solar_forecast.json' # TODO put as constant
     with open(file_name, 'r+') as file:
         history = json.load(file)
         history[data['date']] = data['data']
@@ -48,7 +48,7 @@ def summarise(data):
         and datetime.fromisoformat(entry['period_end'].split('.')[0]).hour > 19
     ) / 2
 
-    return {'date': f'{tomorrow}', 'data': {'day': day, 'peak': peak, 'late': late}}
+    return {'date': f'{tomorrow}', 'data': {'day':  day, 'peak': peak, 'late': late}}
 
 if not check_already_exists(tomorrow_key):
     forecast = fetch_forecast()

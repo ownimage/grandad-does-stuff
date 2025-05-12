@@ -4,10 +4,11 @@ from datetime import datetime, timedelta
 
 import pytz
 
-with (open("battery.json", "r") as file):
-    battery = json.load(file)
-    battery_capacity_kWh = battery["battery_capacity_kWh"]
-    battery_min_kWh = battery["battery_min_kWh"]
+with (open("settings.json", "r") as file):
+    settings = json.load(file)
+    battery_capacity_kWh = settings["battery_capacity_kWh"]
+    battery_min_kWh = settings["battery_min_kWh"]
+    solar_forecast_multiplier = settings["solar_forecast_multiplier"]
 
 battery_min_percentage = 100.0 * battery_min_kWh / battery_capacity_kWh
 
@@ -33,14 +34,14 @@ solar_forecast = get_solar_forecast(tomorrow_iso)
 usage_forecast = get_usage_forecast(tomorrow_iso, tomorrow_day)
 
 # KWh
-charge_for_100_peak = battery_capacity_kWh - solar_forecast['day'] + usage_forecast['day']
+charge_for_100_peak = battery_capacity_kWh - solar_forecast_multiplier * solar_forecast['day'] + usage_forecast['day']
 charge_for_before_sun = usage_forecast['early']
 charge_requirement = max(charge_for_100_peak, charge_for_before_sun)
 
 charge_to_unlimited = charge_requirement * 100 / battery_capacity_kWh
 charge_to_percentage = int(max(battery_min_percentage, min(charge_to_unlimited, 100)))
 
-discharge_to_unlimited = (battery_min_kWh - solar_forecast['late'] + usage_forecast['late']) * 100 / battery_capacity_kWh
+discharge_to_unlimited = (battery_min_kWh - solar_forecast_multiplier * solar_forecast['late'] + usage_forecast['late']) * 100 / battery_capacity_kWh
 discharge_to_percentage = int(max(battery_min_percentage, min(discharge_to_unlimited, 100)))
 
 config = {
