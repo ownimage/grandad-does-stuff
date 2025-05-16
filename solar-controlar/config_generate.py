@@ -42,6 +42,7 @@ charge_to_unlimited = charge_requirement * 100 / battery_capacity_kWh
 charge_to_percentage = int(max(battery_min_percentage, min(charge_to_unlimited, 100)))
 
 discharge_to_unlimited = (battery_min_kWh - solar_forecast_multiplier * solar_forecast['late'] + usage_forecast['late']) * 100 / battery_capacity_kWh
+discharge_to_unlimited = 0
 discharge_to_percentage = int(max(battery_min_percentage, min(discharge_to_unlimited, 100)))
 
 config = {
