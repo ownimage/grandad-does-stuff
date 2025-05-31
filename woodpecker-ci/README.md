@@ -70,3 +70,5 @@ copy the .env_template to .env and fill in the values
 
 As we have self signed certs GitHub will reject the webhook on a cert error.
 You  need to navigate to your repo, and settings, webhook and disable SSL verification.
+
+I also check the box to say send me everything as I was not getting events for pushes to my branch.
