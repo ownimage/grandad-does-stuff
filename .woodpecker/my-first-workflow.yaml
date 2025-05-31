@@ -8,6 +8,6 @@ steps:
     commands:
       - echo "Testing ...."
       - cd solar-controlar
-      - python -m unittest discover .
+      - python -m unittest discover tests
       - pwd
       - ls
