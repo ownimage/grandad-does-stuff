@@ -6,7 +6,7 @@ steps:
   - name: test
     image: python:3.11-bookworm
     commands:
-      - echo "Testing ......"
+      - echo "Testing ......."
       - cd solar-controlar
       - python -m unittest discover tests
       - pwd
