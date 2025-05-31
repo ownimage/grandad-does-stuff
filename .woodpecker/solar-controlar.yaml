@@ -1,6 +1,8 @@
 when:
   - event: push
-
+  - paths:
+      include:
+        - solar-controlar/**
 steps:
   - name: test
     image: python:3.11-bookworm
