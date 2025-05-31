@@ -63,3 +63,10 @@ Self-sign the certificate:
 openssl x509 -req -days 365 -in .\server.csr -signkey .\server.key -out .\server.crt
 ```
 
+# 3 Configure the env file
+copy the .env_template to .env and fill in the values
+
+# 4 Fix Webhook
+
+As we have self signed certs GitHub will reject the webhook on a cert error.
+You  need to navigate to your repo, and settings, webhook and disable SSL verification.

@@ -3,13 +3,9 @@ when:
     branch: main
 
 steps:
-  - name: build
-    image: debian
-    commands:
-      - echo "This is the build step"
-      - echo "binary-data-123" > executable
-  - name: a-test-step
-    image: golang:1.16
+  - name: test
+    image: python:3.11-bookworm
     commands:
       - echo "Testing ...."
-      - ./executable
+      - cd solar-controlar
+      - python -m unittest discover .
