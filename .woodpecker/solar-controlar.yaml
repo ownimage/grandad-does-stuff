@@ -1,14 +1,12 @@
 when:
   - event: push
+  - path:
+      include:
+       - solar-controlar/**
 
 steps:
   - name: test
     image: python:3.11-bookworm
-    when:
-      - path:
-          include:
-           - solar-controlar/**
-           - .woodpecker/solar-controlar.yaml
     commands:
       - echo "Testing ........."
       - cd solar-controlar
