@@ -1,8 +1,7 @@
 when:
   - event: push
   - path:
-      include:
-       - solar-controlar/**
+      include: ['solar-controlar/**']
 
 steps:
   - name: test
