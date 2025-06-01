@@ -58,7 +58,7 @@ A challenge password []:
 An optional company name []:
 ```
 
-Self-sign the certificate:
+Self-sign the certificate: 
 ```shell
 openssl x509 -req -days 365 -in .\server.csr -signkey .\server.key -out .\server.crt
 ```
