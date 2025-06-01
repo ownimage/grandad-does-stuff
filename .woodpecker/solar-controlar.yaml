@@ -3,6 +3,7 @@ when:
   - paths:
       include:
         - solar-controlar/**
+        - .woodpecker/solar-controlar.yaml
 steps:
   - name: test
     image: python:3.11-bookworm

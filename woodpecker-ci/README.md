@@ -30,7 +30,7 @@ First generate the key
 openssl genpkey -algorithm RSA -out .\server.key -pkeyopt rsa_keygen_bits:2048
 
 ```
-Then generate the certificate
+Then generate the certificate signing request file
 ```shell
 openssl req -new -key .\server.key -out .\server.csr
 ```
