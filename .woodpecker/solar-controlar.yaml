@@ -1,6 +1,6 @@
 when:
   - event: push
-  - paths:
+  - path:
       include:
         - solar-controlar/**
         - .woodpecker/solar-controlar.yaml
@@ -11,5 +11,3 @@ steps:
       - echo "Testing ........."
       - cd solar-controlar
       - python -m unittest discover tests
-      - pwd
-      - ls
