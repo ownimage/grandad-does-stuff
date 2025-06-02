@@ -1,6 +1,7 @@
 when:
   - event: push
-    branch: main
+  - path:
+      include: ['solar-controlar/**']
 
 steps:
   - name: test
@@ -9,5 +10,3 @@ steps:
       - echo "Testing ........."
       - cd solar-controlar
       - python -m unittest discover tests
-      - pwd
-      - ls

@@ -30,7 +30,7 @@ First generate the key
 openssl genpkey -algorithm RSA -out .\server.key -pkeyopt rsa_keygen_bits:2048
 
 ```
-Then generate the certificate
+Then generate the certificate signing request file
 ```shell
 openssl req -new -key .\server.key -out .\server.csr
 ```
@@ -58,7 +58,7 @@ A challenge password []:
 An optional company name []:
 ```
 
-Self-sign the certificate:
+Self-sign the certificate:    
 ```shell
 openssl x509 -req -days 365 -in .\server.csr -signkey .\server.key -out .\server.crt
 ```
