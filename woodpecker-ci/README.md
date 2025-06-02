@@ -27,7 +27,7 @@ choco -v
 ## 2 Generate certificates
 First generate the key
 ```shell
-openssl genpkey -algorithm RSA -out .\server.key -pkeyopt rsa_keygen_bits:2048
+openssl genpkey -algorithm RSA -out .\server.key -pkeyopt rsa_keygen_bits:2048 
 
 ```
 Then generate the certificate signing request file
