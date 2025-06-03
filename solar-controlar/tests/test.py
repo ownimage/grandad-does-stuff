@@ -11,7 +11,7 @@ class TestSum(unittest.TestCase):
         self.assertEqual(1, 1)
 
     def test_list_int4(self):
-        self.assertEqual(1, 1)
+        self.assertEqual(1, 2)
 
 if __name__ == '__main__':
     unittest.main()
