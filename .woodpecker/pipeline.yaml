@@ -9,5 +9,4 @@ steps:
     commands:
       - echo "Testing ........."
       - cd solar-controlar
-      - ls
       - python -m unittest discover test
