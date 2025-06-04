@@ -1,10 +1,11 @@
 when:
   - event: push
-  - path: 'solar-controlar/**'
 
 steps:
-  - name: test
+  - name: solar-controlar
     image: python:3.11-bookworm
+    when:
+      - path: ['solar-controlar/**', '.woodpecker/**']
     commands:
       - echo "Testing ........."
       - cd solar-controlar
