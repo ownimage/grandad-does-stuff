@@ -3,12 +3,15 @@ from unittest.mock import MagicMock, patch
 import datetime
 from solarcontrolar.config import Config
 from solarcontrolar.givenergy import GivEnergy
-from config_apply import get_config, get_givenergy, get_current_time, apply_config
+import config_apply
 
 
 class TestConfigApply(unittest.TestCase):
 
     def setUp(self):
+        self.now = datetime.datetime(2025, 6, 5, 12, 0, 0)
+        self.formatted_date = "2025-06-05 12:00:00"
+
         self.mock_config = MagicMock()
         self.mock_config.get_data.return_value = {"charge_to_percentage": 80, "discharge_to_percentage": 20}
 
@@ -19,22 +22,28 @@ class TestConfigApply(unittest.TestCase):
         self.mock_givenergy.set_timed_charge.__name__ = "set_timed_charge"
         self.mock_givenergy.set_timed_export.__name__ = "set_timed_export"
 
-        self.now = datetime.datetime(2025, 6, 5, 12, 0, 0)
-        self.formatted_date = "2025-06-05 12:00:00"
+        self.formatted_date = self.now.strftime("%Y-%m-%d %H:%M:%S")
 
-    @patch("config_apply.pytz.timezone")
-    @patch("config_apply.datetime.datetime")
-    def test_get_current_time(self, mock_datetime, mock_pytz):
-        mock_tz = MagicMock()
-        mock_pytz.return_value = mock_tz
-        mock_now = datetime.datetime(2025, 6, 5, 12, 0, 0)
-        mock_now.strftime.return_value = self.formatted_date
-        mock_datetime.now.return_value = mock_now
+        self.now = MagicMock()
+        self.now.strftime.return_value = self.formatted_date
 
-        now, formatted_date = get_current_time()
+        config_apply.pytz = MagicMock()
+        config_apply.pytz.timezone.return_value = MagicMock()
 
-        self.assertEqual(now, mock_now)
+        config_apply.datetime = MagicMock()
+        config_apply.datetime.datetime = MagicMock()
+        config_apply.datetime.datetime.now.return_value = self.now
+        config_apply.datetime.datetime.strftime.return_value = self.formatted_date
+
+    def test_get_current_time(self):
+        now, formatted_date = config_apply.get_current_time()
+
+        self.assertEqual(now, self.now)
         self.assertEqual(formatted_date, self.formatted_date)
+
+        config_apply.pytz.timezone.assert_called_with("Europe/London")
+        config_apply.datetime.datetime.now.assert_called_with(config_apply.pytz.timezone.return_value)
+        self.now.strftime.assert_called_with("%Y-%m-%d %H:%M:%S")
 
 
     def test_apply_config_charge(self):
@@ -73,7 +82,7 @@ class TestConfigApply(unittest.TestCase):
             self.mock_givenergy.battery_level.return_value = battery_level
             self.mock_givenergy.set_timed_charge.return_value = value_changed
 
-            msg = apply_config(self.mock_config, self.mock_givenergy, "charge_to_percentage",
+            msg = config_apply.apply_config(self.mock_config, self.mock_givenergy, "charge_to_percentage",
                                lambda lvl, tgt: lvl <= tgt, self.mock_givenergy.set_timed_charge,
                                tolerance, self.now, self.formatted_date)
 
@@ -111,7 +120,7 @@ class TestConfigApply(unittest.TestCase):
             self.mock_givenergy.battery_level.return_value = battery_level
             self.mock_givenergy.set_timed_export.return_value = value_changed
 
-            msg = apply_config(self.mock_config, self.mock_givenergy, "discharge_to_percentage",
+            msg = config_apply.apply_config(self.mock_config, self.mock_givenergy, "discharge_to_percentage",
                                lambda lvl, tgt: lvl >= tgt, self.mock_givenergy.set_timed_export,
                                tolerance, self.now, self.formatted_date)
 
