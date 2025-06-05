@@ -3,7 +3,7 @@ when:
 
 steps:
   - name: solar-controlar
-    image: python:3.11-bookworm
+    image: solar-controlar-build-agent:latest
     when:
       - path: ['solar-controlar/**', '.woodpecker/**']
     commands:
