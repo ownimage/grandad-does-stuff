@@ -3,10 +3,11 @@ when:
 
 steps:
   - name: solar-controlar
-    image: solar-controlar-build-agent:latest
+    image: FROM python:3.11-bookworm
     when:
       - path: ['solar-controlar/**', '.woodpecker/**']
     commands:
       - echo "Testing ........."
       - cd solar-controlar
+      - pip install -r requirements.txt
       - python -m unittest discover test

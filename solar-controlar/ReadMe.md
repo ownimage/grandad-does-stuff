@@ -37,12 +37,6 @@ Once the discharge period is over in the evening we will:
 docker build -t solar-controlar:latest .
 ```
 
-# Create the Woodpecker build agent
-If you are going to follow the Woodpecker CI instructions then you will need this builder image
-```shell
-docker build -f Dockerfile-woodpecker-builder -t solar-controlar-build-agent:latest .
-```
-
 # Running the Container
 
 ## First time configuration
