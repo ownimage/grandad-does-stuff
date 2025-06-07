@@ -46,7 +46,7 @@ class TestConfigApply(unittest.TestCase):
         self.now.strftime.assert_called_with("%Y-%m-%d %H:%M:%S")
 
 
-    def test_apply_config_charge(self):
+    def test_charge_to_percentage(self):
         """Tests different battery levels and tolerance settings for charge."""
         test_cases = [
             (True, 70, 80, 5, "2025-06-05 12:00:00 battery_level=70 target_percentage=80 CHANGE set_timed_charge(True)"),
@@ -81,49 +81,64 @@ class TestConfigApply(unittest.TestCase):
             self.mock_config.get_data.return_value["charge_to_percentage"] = target
             self.mock_givenergy.battery_level.return_value = battery_level
             self.mock_givenergy.set_timed_charge.return_value = value_changed
-
-            msg = config_apply.apply_config(self.mock_config, self.mock_givenergy, "charge_to_percentage",
-                               lambda lvl, tgt: lvl <= tgt, self.mock_givenergy.set_timed_charge,
-                               tolerance, self.now, self.formatted_date)
-
+            # WHEN
+            msg = config_apply.charge_to_percentage(self.mock_config, self.mock_givenergy, tolerance, self.formatted_date)
+            # THEN
             self.assertEqual(expected_msg, msg)
 
-    def test_apply_config_discharge(self):
-        """Tests different battery levels and tolerance settings for discharge."""
+    def test_limit_timed_export(self):
+        """Tests different battery levels and tolerance settings for charge."""
         test_cases = [
-            (True, 10, 20, 5, "2025-06-05 12:00:00 battery_level=10 target_percentage=20 CHANGE set_timed_export(False)"),
-            (False, 10, 20, 5, "2025-06-05 12:00:00 battery_level=10 target_percentage=20 set_timed_export(False)"),
-            (True, 14, 20, 5, "2025-06-05 12:00:00 battery_level=14 target_percentage=20 CHANGE set_timed_export(False)"),
-            (False, 14, 20, 5, "2025-06-05 12:00:00 battery_level=14 target_percentage=20 set_timed_export(False)"),
-            (True, 15, 20, 5, "2025-06-05 12:00:00 battery_level=15 is within tolerance=5 of target_percentage=20 NO CHANGE"),
-            (True, 20, 20, 5, "2025-06-05 12:00:00 battery_level=20 is within tolerance=5 of target_percentage=20 NO CHANGE"),
-            (True, 25, 20, 5, "2025-06-05 12:00:00 battery_level=25 is within tolerance=5 of target_percentage=20 NO CHANGE"),
-            (True, 26, 20, 5, "2025-06-05 12:00:00 battery_level=26 target_percentage=20 CHANGE set_timed_export(True)"),
-            (False, 26, 20, 5, "2025-06-05 12:00:00 battery_level=26 target_percentage=20 set_timed_export(True)"),
-            (True, 30, 20, 5, "2025-06-05 12:00:00 battery_level=30 target_percentage=20 CHANGE set_timed_export(True)"),
-            (False, 30, 20, 5, "2025-06-05 12:00:00 battery_level=30 target_percentage=20 set_timed_export(True)"),
+            (16, 0, 100, 5, True, "2025-06-05 12:00:00 battery_level=100 is within tolerance=5 of target_percentage=100 NO CHANGE"),
+            (16, 0, 99, 5, True, "2025-06-05 12:00:00 battery_level=99 is within tolerance=5 of target_percentage=100 NO CHANGE"),
+            (16, 0, 95, 5, True, "2025-06-05 12:00:00 battery_level=95 is within tolerance=5 of target_percentage=100 NO CHANGE"),
+            (16, 0, 94, 5, True, "2025-06-05 12:00:00 battery_level=94 target_percentage=100 CHANGE set_timed_export(False)"),
+            (16, 0, 90, 5, True, "2025-06-05 12:00:00 battery_level=90 target_percentage=100 CHANGE set_timed_export(False)"),
+            (16, 0, 10, 5, True, "2025-06-05 12:00:00 battery_level=10 target_percentage=100 CHANGE set_timed_export(False)"),
+            (16, 0, 0, 5, True, "2025-06-05 12:00:00 battery_level=0 target_percentage=100 CHANGE set_timed_export(False)"),
 
-            (True, 10, 20, 3, "2025-06-05 12:00:00 battery_level=10 target_percentage=20 CHANGE set_timed_export(False)"),
-            (False, 10, 20, 3, "2025-06-05 12:00:00 battery_level=10 target_percentage=20 set_timed_export(False)"),
-            (True, 16, 20, 3, "2025-06-05 12:00:00 battery_level=16 target_percentage=20 CHANGE set_timed_export(False)"),
-            (False, 16, 20, 3, "2025-06-05 12:00:00 battery_level=16 target_percentage=20 set_timed_export(False)"),
-            (True, 17, 20, 3, "2025-06-05 12:00:00 battery_level=17 is within tolerance=3 of target_percentage=20 NO CHANGE"),
-            (True, 20, 20, 3, "2025-06-05 12:00:00 battery_level=20 is within tolerance=3 of target_percentage=20 NO CHANGE"),
-            (True, 23, 20, 3, "2025-06-05 12:00:00 battery_level=23 is within tolerance=3 of target_percentage=20 NO CHANGE"),
-            (True, 24, 20, 3, "2025-06-05 12:00:00 battery_level=24 target_percentage=20 CHANGE set_timed_export(True)"),
-            (False, 24, 20, 3, "2025-06-05 12:00:00 battery_level=24 target_percentage=20 set_timed_export(True)"),
-            (True, 30, 20, 3, "2025-06-05 12:00:00 battery_level=30 target_percentage=20 CHANGE set_timed_export(True)"),
-            (False, 30, 20, 3, "2025-06-05 12:00:00 battery_level=30 target_percentage=20 set_timed_export(True)"),        ]
+            (16, 0, 100, 5, False, "2025-06-05 12:00:00 battery_level=100 is within tolerance=5 of target_percentage=100 NO CHANGE"),
+            (16, 0, 99, 5, False, "2025-06-05 12:00:00 battery_level=99 is within tolerance=5 of target_percentage=100 NO CHANGE"),
+            (16, 0, 95, 5, False, "2025-06-05 12:00:00 battery_level=95 is within tolerance=5 of target_percentage=100 NO CHANGE"),
+            (16, 0, 94, 5, False, "2025-06-05 12:00:00 battery_level=94 target_percentage=100 set_timed_export(False)"),
+            (16, 0, 90, 5, False, "2025-06-05 12:00:00 battery_level=90 target_percentage=100 set_timed_export(False)"),
+            (16, 0, 10, 5, False, "2025-06-05 12:00:00 battery_level=10 target_percentage=100 set_timed_export(False)"),
+            (16, 0, 0, 5, False, "2025-06-05 12:00:00 battery_level=0 target_percentage=100 set_timed_export(False)"),
 
-        for value_changed, battery_level, target, tolerance, expected_msg in test_cases:
-            self.mock_config.get_data.return_value["discharge_to_percentage"] = target
+            (17, 30, 100, 5, True, "2025-06-05 12:00:00 battery_level=100 target_percentage=50 CHANGE set_timed_export(True)"),
+            (17, 30, 56, 5, True, "2025-06-05 12:00:00 battery_level=56 target_percentage=50 CHANGE set_timed_export(True)"),
+            (17, 30, 55, 5, True, "2025-06-05 12:00:00 battery_level=55 is within tolerance=5 of target_percentage=50 NO CHANGE"),
+            (17, 30, 50, 5, True, "2025-06-05 12:00:00 battery_level=50 is within tolerance=5 of target_percentage=50 NO CHANGE"),
+            (17, 30, 50, 5, True, "2025-06-05 12:00:00 battery_level=50 is within tolerance=5 of target_percentage=50 NO CHANGE"),
+            (17, 30, 45, 5, True, "2025-06-05 12:00:00 battery_level=45 is within tolerance=5 of target_percentage=50 NO CHANGE"),
+            (17, 30, 44, 5, True, "2025-06-05 12:00:00 battery_level=44 target_percentage=50 CHANGE set_timed_export(False)"),
+            (17, 30, 10, 5, True, "2025-06-05 12:00:00 battery_level=10 target_percentage=50 CHANGE set_timed_export(False)"),
+            (17, 30, 0, 5, True, "2025-06-05 12:00:00 battery_level=0 target_percentage=50 CHANGE set_timed_export(False)"),
+
+            (17, 30, 100, 5, False, "2025-06-05 12:00:00 battery_level=100 target_percentage=50 set_timed_export(True)"),
+            (17, 30, 56, 5, False, "2025-06-05 12:00:00 battery_level=56 target_percentage=50 set_timed_export(True)"),
+            (17, 30, 55, 5, False, "2025-06-05 12:00:00 battery_level=55 is within tolerance=5 of target_percentage=50 NO CHANGE"),
+            (17, 30, 50, 5, False, "2025-06-05 12:00:00 battery_level=50 is within tolerance=5 of target_percentage=50 NO CHANGE"),
+            (17, 30, 50, 5, False, "2025-06-05 12:00:00 battery_level=50 is within tolerance=5 of target_percentage=50 NO CHANGE"),
+            (17, 30, 45, 5, False, "2025-06-05 12:00:00 battery_level=45 is within tolerance=5 of target_percentage=50 NO CHANGE"),
+            (17, 30, 44, 5, False, "2025-06-05 12:00:00 battery_level=44 target_percentage=50 set_timed_export(False)"),
+            (17, 30, 10, 5, False, "2025-06-05 12:00:00 battery_level=10 target_percentage=50 set_timed_export(False)"),
+            (17, 30, 0, 5, False, "2025-06-05 12:00:00 battery_level=0 target_percentage=50 set_timed_export(False)"),
+
+            (17, 30, 52, 1, False, "2025-06-05 12:00:00 battery_level=52 target_percentage=50 set_timed_export(True)"),
+            (17, 30, 51, 1, False, "2025-06-05 12:00:00 battery_level=51 is within tolerance=1 of target_percentage=50 NO CHANGE"),
+            (17, 30, 50, 1, False, "2025-06-05 12:00:00 battery_level=50 is within tolerance=1 of target_percentage=50 NO CHANGE"),
+            (17, 30, 49, 1, False, "2025-06-05 12:00:00 battery_level=49 is within tolerance=1 of target_percentage=50 NO CHANGE"),
+            (17, 30, 48, 1, False, "2025-06-05 12:00:00 battery_level=48 target_percentage=50 set_timed_export(False)"),
+         ]
+
+        for hour, minute, battery_level, tolerance, value_changed, expected_msg in test_cases:
+            # GIVEN
             self.mock_givenergy.battery_level.return_value = battery_level
             self.mock_givenergy.set_timed_export.return_value = value_changed
-
-            msg = config_apply.apply_config(self.mock_config, self.mock_givenergy, "discharge_to_percentage",
-                               lambda lvl, tgt: lvl >= tgt, self.mock_givenergy.set_timed_export,
-                               tolerance, self.now, self.formatted_date)
-
+            # WHEN
+            msg = config_apply.limit_timed_export(self.mock_givenergy, hour, minute, tolerance, self.formatted_date)
+            # THEN
             self.assertEqual(expected_msg, msg)
 
 if __name__ == "__main__":

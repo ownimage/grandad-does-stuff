@@ -30,17 +30,37 @@ def get_current_time(timezone_str="Europe/London"):
     return now, now.strftime("%Y-%m-%d %H:%M:%S")
 
 @retry(stop=stop_after_attempt(3), wait=wait_fixed(10))
-def apply_config(config, givenergy, config_key, comparator, action, tolerance, now, formatted_date):
-    target_percentage = config.get_data()[config_key]
+def charge_to_percentage(config, givenergy, tolerance, formatted_date):
+    target_percentage = config.get_data()["charge_to_percentage"]
     battery_level = givenergy.battery_level()
-    enabled = comparator(battery_level, target_percentage)
+    enabled = battery_level <= target_percentage
 
     if abs(battery_level - target_percentage) > tolerance:
-        result = action(enabled)
+        result = givenergy.set_timed_charge(enabled)
         if result:
-            msg = f"{formatted_date} battery_level={battery_level} target_percentage={target_percentage} CHANGE {action.__name__}({enabled})"
+            msg = f"{formatted_date} battery_level={battery_level} target_percentage={target_percentage} CHANGE set_timed_charge({enabled})"
         else:
-            msg = f"{formatted_date} battery_level={battery_level} target_percentage={target_percentage} {action.__name__}({enabled})"
+            msg = f"{formatted_date} battery_level={battery_level} target_percentage={target_percentage} set_timed_charge({enabled})"
+    else:
+        msg = f"{formatted_date} battery_level={battery_level} is within tolerance={tolerance} of target_percentage={target_percentage} NO CHANGE"
+
+    logger.info(msg)
+    return msg  # Allows assertion in unit tests
+
+def limit_timed_export(givenergy, hour, minute, tolerance, formatted_date):
+    slot_duration = (19 - 16) * 60
+    elapsed_minutes = (hour - 16) * 60 + minute
+    target_percentage = int( (1 - (elapsed_minutes / slot_duration)) * 100)
+
+    battery_level = givenergy.battery_level()
+    enabled = battery_level >= target_percentage
+
+    if abs(battery_level - target_percentage) > tolerance:
+        result = givenergy.set_timed_export(enabled)
+        if result:
+            msg = f"{formatted_date} battery_level={battery_level} target_percentage={target_percentage} CHANGE set_timed_export({enabled})"
+        else:
+            msg = f"{formatted_date} battery_level={battery_level} target_percentage={target_percentage} set_timed_export({enabled})"
     else:
         msg = f"{formatted_date} battery_level={battery_level} is within tolerance={tolerance} of target_percentage={target_percentage} NO CHANGE"
 
@@ -55,11 +75,12 @@ def main():
 
     now, formatted_date = get_current_time()
     hour = now.hour
+    minute = now.minute
 
     if 2 <= hour < 5:
-        apply_config(config, givenergy, "charge_to_percentage", lambda lvl, tgt: lvl <= tgt, givenergy.set_timed_charge, tolerance, now, formatted_date)
+        apply_config(config, givenergy, tolerance, formatted_date)
     elif 16 <= hour < 19:
-        apply_config(config, givenergy, "discharge_to_percentage", lambda lvl, tgt: lvl >= tgt, givenergy.set_timed_export, tolerance, now, formatted_date)
+        limit_timed_export(givenergy, hour, minute, tolerance, formatted_date)
     else:
         logger.info(f"{formatted_date} no action")
 
