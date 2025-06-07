@@ -9,4 +9,5 @@ steps:
     commands:
       - echo "Testing ........."
       - cd solar-controlar
-      - python -m unittest discover tests
+      - pip install -r requirements.txt
+      - python -m unittest discover test
