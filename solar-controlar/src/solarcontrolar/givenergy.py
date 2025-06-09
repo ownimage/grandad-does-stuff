@@ -62,7 +62,7 @@ class GivEnergy:
 
     def setting_write_validate(self, setting_id, value, function_name):
         current_value = self.setting_read(setting_id)['data']['value']
-        if current_value == value or ( isnstance(value, bool) and bool(current_value) == value):
+        if current_value == value:
             return False
         else:
             print(f'{function_name} current value {current_value} being set to {value}')

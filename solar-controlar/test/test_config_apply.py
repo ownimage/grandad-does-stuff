@@ -12,9 +12,6 @@ class TestConfigApply(unittest.TestCase):
         self.now = datetime.datetime(2025, 6, 5, 12, 0, 0)
         self.formatted_date = "2025-06-05 12:00:00"
 
-        self.mock_config = MagicMock()
-        self.mock_config.get_data.return_value = {"charge_to_percentage": 80}
-
         self.mock_givenergy = MagicMock()
         self.mock_givenergy.battery_level.return_value = 50
         self.mock_givenergy.set_timed_charge.return_value = True
@@ -26,6 +23,16 @@ class TestConfigApply(unittest.TestCase):
 
         self.now = MagicMock()
         self.now.strftime.return_value = self.formatted_date
+
+        config_apply.get_config = MagicMock(return_value={"charge_to_percentage": 80})
+        settings = {
+            "battery_capacity_kWh": 9.6,
+            "battery_min_kWh": 0.4,
+            "solar_forecast_multiplier": 0.9,
+            "tolerance_percent": 1,
+            "last_30mins_discharge_target": 16
+        }
+        config_apply.get_settings = MagicMock(return_value=settings)
 
         config_apply.pytz = MagicMock()
         config_apply.pytz.timezone.return_value = MagicMock()
@@ -44,7 +51,6 @@ class TestConfigApply(unittest.TestCase):
         config_apply.pytz.timezone.assert_called_with("Europe/London")
         config_apply.datetime.datetime.now.assert_called_with(config_apply.pytz.timezone.return_value)
         self.now.strftime.assert_called_with("%Y-%m-%d %H:%M:%S")
-
 
     def test_charge_to_percentage(self):
         """Tests different battery levels and tolerance settings for charge."""
@@ -74,15 +80,18 @@ class TestConfigApply(unittest.TestCase):
             (True, 86, 80, 3, "2025-06-05 12:00:00 battery_level=86 target_percentage=80 CHANGE set_timed_charge(False)"),
             (False, 86, 80, 3, "2025-06-05 12:00:00 battery_level=86 target_percentage=80 set_timed_charge(False)"),
             (True, 90, 80, 3, "2025-06-05 12:00:00 battery_level=90 target_percentage=80 CHANGE set_timed_charge(False)"),
-            (False, 90, 80, 3, "2025-06-05 12:00:00 battery_level=90 target_percentage=80 set_timed_charge(False)"),
+            (False, 90, 81, 3, "2025-06-05 12:00:00 battery_level=90 target_percentage=81 set_timed_charge(False)"),
         ]
 
         for value_changed, battery_level, target, tolerance, expected_msg in test_cases:
-            self.mock_config.get_data.return_value["charge_to_percentage"] = target
+            config_apply.givEnergy = MagicMock()
+            config_apply.givEnergy.battery_level.return_value = battery_level
+            config_apply.get_config = MagicMock(return_value={"charge_to_percentage": target})
+
             self.mock_givenergy.battery_level.return_value = battery_level
             self.mock_givenergy.set_timed_charge.return_value = value_changed
             # WHEN
-            msg = config_apply.charge_to_percentage(self.mock_config, self.mock_givenergy, tolerance, self.formatted_date)
+            msg = config_apply.charge_to_percentage(self.mock_givenergy, tolerance, self.formatted_date)
             # THEN
             self.assertEqual(expected_msg, msg)
 
@@ -113,7 +122,7 @@ class TestConfigApply(unittest.TestCase):
             (16, 20, 3, False, "2025-06-05 12:00:00 battery_level=16 target_percentage=20 set_timed_export(False)"),
             (6, 20, 3, False, "2025-06-05 12:00:00 battery_level=6 target_percentage=20 set_timed_export(False)"),
 
-         ]
+        ]
 
         for battery_level, target_percentage, tolerance, value_changed, expected_msg in test_cases:
             # GIVEN
@@ -136,6 +145,7 @@ class TestConfigApply(unittest.TestCase):
 
         for hour, minute, expected_msg in test_cases:
             # GIVEN
+            config_apply.get_givenergy = MagicMock()
             working_datetime = datetime.datetime(2025, 6, 5, hour, minute, 0)
             config_apply.get_current_time = MagicMock()
             config_apply.get_current_time.return_value = datetime.datetime(2025, 6, 5, hour, minute, 0), working_datetime.strftime("%Y-%m-%d %H:%M:%S")
@@ -149,6 +159,7 @@ class TestConfigApply(unittest.TestCase):
             msg = config_apply.main()
             # THEN
             self.assertEqual(expected_msg, msg)
+
 
 if __name__ == "__main__":
     unittest.main()
