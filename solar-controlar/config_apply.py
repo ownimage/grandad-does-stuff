@@ -1,8 +1,7 @@
-#!/usr/bin/env python
-
 import os
 import datetime
 import logging
+import json
 
 import pytz
 from tenacity import retry, stop_after_attempt, wait_fixed
@@ -16,7 +15,11 @@ logging.basicConfig(level=logging.INFO, format="%(message)s")
 
 # Configuration injection
 def get_config():
-    return Config()
+    return Config().get_data()
+
+def get_settings():
+    with open("settings.json", "r") as file:
+        return json.load(file)
 
 def get_givenergy():
     api_key = os.getenv("GIVENERGY_API_KEY")
@@ -30,8 +33,8 @@ def get_current_time(timezone_str="Europe/London"):
     return now, now.strftime("%Y-%m-%d %H:%M:%S")
 
 @retry(stop=stop_after_attempt(3), wait=wait_fixed(10))
-def charge_to_percentage(config, givenergy, tolerance, formatted_date):
-    target_percentage = config.get_data()["charge_to_percentage"]
+def charge_to_percentage(givenergy, tolerance, formatted_date):
+    target_percentage = get_config()["charge_to_percentage"]
     battery_level = givenergy.battery_level()
     enabled = battery_level <= target_percentage
 
@@ -47,11 +50,8 @@ def charge_to_percentage(config, givenergy, tolerance, formatted_date):
     logger.info(msg)
     return msg  # Allows assertion in unit tests
 
-def limit_timed_export(givenergy, hour, minute, tolerance, formatted_date):
-    slot_duration = (19 - 16) * 60
-    elapsed_minutes = (hour - 16) * 60 + minute
-    target_percentage = int( (1 - (elapsed_minutes / slot_duration)) * 100)
-
+@retry(stop=stop_after_attempt(3), wait=wait_fixed(10))
+def limit_timed_export(givenergy, target_percentage, tolerance, formatted_date):
     battery_level = givenergy.battery_level()
     enabled = battery_level >= target_percentage
 
@@ -67,22 +67,43 @@ def limit_timed_export(givenergy, hour, minute, tolerance, formatted_date):
     logger.info(msg)
     return msg  # Allows assertion in unit tests
 
+@retry(stop=stop_after_attempt(3), wait=wait_fixed(10))
+def full_discharge(givenergy, formatted_date):
+    battery_level = givenergy.battery_level()
+
+    result = givenergy.set_timed_export(True)
+    if result:
+        msg = f"{formatted_date} battery_level={battery_level} target_percentage=0 CHANGE set_timed_export(True)"
+    else:
+        msg = f"{formatted_date} battery_level={battery_level} target_percentage=0 set_timed_export(True)"
+
+    logger.info(msg)
+    return msg  # Allows assertion in unit tests
+
 # Main function for better testability
 def main():
     config = get_config()
     givenergy = get_givenergy()
-    tolerance = 1  # TODO should be in settings
+    settings = get_settings()
+    tolerance = settings["tolerance_percent"]
+    init_discharge_target = settings["last_30mins_discharge_target"]
 
     now, formatted_date = get_current_time()
     hour = now.hour
     minute = now.minute
 
     if 2 <= hour < 5:
-        apply_config(config, givenergy, tolerance, formatted_date)
+        return charge_to_percentage(givenergy, tolerance, formatted_date)
     elif 16 <= hour < 19:
-        limit_timed_export(givenergy, hour, minute, tolerance, formatted_date)
+        if hour < 18 or minute < 30: # not last half-hour drain immediately to init_discharge_target
+            return limit_timed_export(givenergy, init_discharge_target, tolerance, formatted_date)
+        else: # last half-hour drain to floor
+            return full_discharge(givenergy, formatted_date)
+
     else:
-        logger.info(f"{formatted_date} no action")
+        msg = f"{formatted_date} no action"
+        logger.info(msg)
+        return msg
 
 if __name__ == "__main__":
     main()
