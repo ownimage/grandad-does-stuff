@@ -69,7 +69,7 @@ class GivEnergy:
             self.setting_write(setting_id, value)
             updated_value = self.setting_read(setting_id)['data']['value']
             if updated_value != value:
-                raise RuntimeError(f'Givnergy::{function_name}({value}) failed')
+                raise RuntimeError(f'Givnergy::{function_name}({value}) failed, updated_value={updated_value} != value={value}')
             return True
 
 
