@@ -127,3 +127,43 @@ class TestConfigApply(unittest.TestCase):
             msg = subject.charge_to_percentage(mock_givenergy_instance, tolerance, self.FIXED_DATETIME.strftime(self.DATE_FORMAT))
             # THEN
             self.assertEqual(expected_msg, msg)
+
+    def test_limit_timed_export(self):
+        """Tests different battery levels and tolerance settings for charge."""
+        test_cases = [
+            (100, 20, 5, True, "2025-06-05 12:34:56 battery_level=100 target_percentage=20 CHANGE set_timed_export(True)"),
+            (26, 20, 5, True, "2025-06-05 12:34:56 battery_level=26 target_percentage=20 CHANGE set_timed_export(True)"),
+            (25, 20, 5, True, "2025-06-05 12:34:56 battery_level=25 is within tolerance=5 of target_percentage=20 NO CHANGE"),
+            (20, 20, 5, True, "2025-06-05 12:34:56 battery_level=20 is within tolerance=5 of target_percentage=20 NO CHANGE"),
+            (15, 20, 5, True, "2025-06-05 12:34:56 battery_level=15 is within tolerance=5 of target_percentage=20 NO CHANGE"),
+            (14, 20, 5, True, "2025-06-05 12:34:56 battery_level=14 target_percentage=20 CHANGE set_timed_export(False)"),
+            (6, 20, 5, True, "2025-06-05 12:34:56 battery_level=6 target_percentage=20 CHANGE set_timed_export(False)"),
+
+            (100, 20, 5, False, "2025-06-05 12:34:56 battery_level=100 target_percentage=20 set_timed_export(True)"),
+            (26, 20, 5, False, "2025-06-05 12:34:56 battery_level=26 target_percentage=20 set_timed_export(True)"),
+            (25, 20, 5, False, "2025-06-05 12:34:56 battery_level=25 is within tolerance=5 of target_percentage=20 NO CHANGE"),
+            (20, 20, 5, False, "2025-06-05 12:34:56 battery_level=20 is within tolerance=5 of target_percentage=20 NO CHANGE"),
+            (15, 20, 5, False, "2025-06-05 12:34:56 battery_level=15 is within tolerance=5 of target_percentage=20 NO CHANGE"),
+            (14, 20, 5, False, "2025-06-05 12:34:56 battery_level=14 target_percentage=20 set_timed_export(False)"),
+            (6, 20, 5, False, "2025-06-05 12:34:56 battery_level=6 target_percentage=20 set_timed_export(False)"),
+
+            (100, 20, 3, False, "2025-06-05 12:34:56 battery_level=100 target_percentage=20 set_timed_export(True)"),
+            (24, 20, 3, False, "2025-06-05 12:34:56 battery_level=24 target_percentage=20 set_timed_export(True)"),
+            (23, 20, 3, False, "2025-06-05 12:34:56 battery_level=23 is within tolerance=3 of target_percentage=20 NO CHANGE"),
+            (20, 20, 3, False, "2025-06-05 12:34:56 battery_level=20 is within tolerance=3 of target_percentage=20 NO CHANGE"),
+            (17, 20, 3, False, "2025-06-05 12:34:56 battery_level=17 is within tolerance=3 of target_percentage=20 NO CHANGE"),
+            (16, 20, 3, False, "2025-06-05 12:34:56 battery_level=16 target_percentage=20 set_timed_export(False)"),
+            (6, 20, 3, False, "2025-06-05 12:34:56 battery_level=6 target_percentage=20 set_timed_export(False)"),
+        ]
+
+        for battery_level, target_percentage, tolerance, value_changed, expected_msg in test_cases:
+            # GIVEN
+            mock_givenergy, mock_givenergy_instance = self._mock_givenergy(battery_level=battery_level)
+            mock_givenergy_instance.set_timed_export.return_value = value_changed
+            subject = ConfigApply(pytz=self.mock_pytz, datetime=self.mock_datetime, GivEnergy=mock_givenergy)
+            # WHEN
+            msg = subject.limit_timed_export(mock_givenergy_instance, target_percentage, tolerance, self.FIXED_DATETIME.strftime(self.DATE_FORMAT))
+            # THEN
+            self.assertEqual(expected_msg, msg)
+
+
