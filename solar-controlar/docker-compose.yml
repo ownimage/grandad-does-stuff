@@ -1,6 +1,9 @@
 services:
   app:
-    image: solar-controlar:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+      no_cache: true
     container_name: solarcontrolar
     volumes:
       - .:/app
