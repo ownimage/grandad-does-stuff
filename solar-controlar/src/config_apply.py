@@ -13,8 +13,8 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 
 class ConfigApply:
-    def __init__(self, config=Config(), os=os, json=json, GivEnergy=GivEnergy, pytz=pytz, datetime=datetime, logger=logger):
-        self.__config = config
+    def __init__(self, Config=Config(), os=os, json=json, GivEnergy=GivEnergy, pytz=pytz, datetime=datetime, logger=logger ):
+        self.__Config = Config
         self.__os = os
         self.__json = json
         self.__GivEnergy = GivEnergy
@@ -23,7 +23,7 @@ class ConfigApply:
         self.__logger = logger
 
     def get_config(self):
-        return self.__config.get_data()
+        return self.__Config.get_data()
 
     def get_settings(self):
         with open("settings.json", "r") as file:

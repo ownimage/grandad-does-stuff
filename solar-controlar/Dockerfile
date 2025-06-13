@@ -6,10 +6,6 @@ RUN ln -s /usr/local/bin/python /usr/bin/python
 RUN mkdir /app
 COPY requirements.txt /app/requirements.txt
 COPY pyproject.toml /app/pyproject.toml
-COPY test /app/test
-COPY src /app/src
-COPY *.json /app/
-WORKDIR /app
 # Create user and Prerequisites
 RUN useradd -m -s /bin/bash user \
     && echo "user:password" | chpasswd
