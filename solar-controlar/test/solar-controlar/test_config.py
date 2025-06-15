@@ -24,29 +24,15 @@ class TestConfig(unittest.TestCase):
         self.assertEqual(config.get_data(), initial_data)
         self.assertIsNot(config.get_data(), initial_data)  # Ensure deep copy
 
-    def test_with_data(self):
-        """Ensure with_data creates a new instance with a modified copy."""
-        config = Config(filename=str(self.config_path))
-        new_data = config.get_data()
-        new_data["extra"] = "test"
-
-        new_config = config.with_data(new_data)
-
-        # Verify new instance retains copied data but isn't the same object
-        self.assertEqual(new_config.get_data(), new_data)
-        self.assertIsNot(new_config.get_data(), config.get_data())
-
     def test_save_config(self):
-        """Verify that save() correctly writes data to the file."""
-        config = Config(filename=str(self.config_path))
-        modified_data = config.get_data()
-        modified_data["new_key"] = "new_value"
-
-        new_config = config.with_data(modified_data)
-        new_config.save()
-
-        # Verify file now contains updated data
-        self.assertEqual(json.loads(self.config_path.read_text())["new_key"], "new_value")
+        # GIVEN
+        initial_data = {"setting": "enabled", "threshold": 42}
+        config = Config(filename=str(self.config_path), data=initial_data)
+        # WHEN
+        config.save()
+        # THEN
+        file_data = json.loads(self.config_path.read_text())
+        self.assertEqual(file_data, initial_data)
 
     @classmethod
     def tearDownClass(cls):

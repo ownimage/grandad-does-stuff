@@ -15,6 +15,7 @@ class TestConfigApply(unittest.TestCase):
     INVALID_PARAM_ERROR = "Invalid parameter given"
     FIXED_DATETIME = datetime.datetime(2025, 6, 5, 12, 34, 56)
     DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
+    FORMATTED_DATE = FIXED_DATETIME.strftime(DATE_FORMAT)
 
     def setUp(self):
         self.mock_config = self._mock_config()
@@ -124,7 +125,7 @@ class TestConfigApply(unittest.TestCase):
             mock_givenergy_instance.set_timed_charge.return_value = value_changed
             subject = ConfigApply(pytz=self.mock_pytz, datetime=self.mock_datetime, GivEnergy=mock_givenergy, config=self._mock_config({"charge_to_percentage": target}))
             # WHEN
-            msg = subject.charge_to_percentage(mock_givenergy_instance, tolerance, self.FIXED_DATETIME.strftime(self.DATE_FORMAT))
+            msg = subject.charge_to_percentage(mock_givenergy_instance, tolerance, self.FORMATTED_DATE)
             # THEN
             self.assertEqual(expected_msg, msg)
 
@@ -162,7 +163,24 @@ class TestConfigApply(unittest.TestCase):
             mock_givenergy_instance.set_timed_export.return_value = value_changed
             subject = ConfigApply(pytz=self.mock_pytz, datetime=self.mock_datetime, GivEnergy=mock_givenergy)
             # WHEN
-            msg = subject.limit_timed_export(mock_givenergy_instance, target_percentage, tolerance, self.FIXED_DATETIME.strftime(self.DATE_FORMAT))
+            msg = subject.limit_timed_export(mock_givenergy_instance, target_percentage, tolerance, self.FORMATTED_DATE)
+            # THEN
+            self.assertEqual(expected_msg, msg)
+
+    def test_full_discharge(self):
+        """Tests different battery levels and tolerance settings for charge."""
+        test_cases = [
+            (True, "2025-06-05 12:34:56 battery_level=50 target_percentage=0 CHANGE set_timed_export(True)"),
+            (False, "2025-06-05 12:34:56 battery_level=50 target_percentage=0 set_timed_export(True)"),
+        ]
+
+        for value_changed, expected_msg in test_cases:
+            # GIVEN
+            mock_givenergy, mock_givenergy_instance = self._mock_givenergy()
+            mock_givenergy_instance.set_timed_export.return_value = value_changed
+            subject = ConfigApply(pytz=self.mock_pytz, datetime=self.mock_datetime, GivEnergy=mock_givenergy)
+            # WHEN
+            msg = subject.full_discharge(mock_givenergy_instance, self.FORMATTED_DATE)
             # THEN
             self.assertEqual(expected_msg, msg)
 
