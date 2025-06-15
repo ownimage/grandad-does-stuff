@@ -17,11 +17,19 @@ def fetch_forecast():
 def check_already_exists(key):
     file_name = 'solar_forecast.json' # TODO put as constant
     with open(file_name, 'r+') as file:
-        history = json.load(file)
-        return key in history
+        forecast = json.load(file)
+        return key in forecast
+
+def add_to_forecast(summary):
+    file_name = 'solar_forecast.json' # TODO put as constant
+    with open(file_name, 'r+') as file:
+        forecast = json.load(file)
+        forecast[summary['date']] = summary['data']
+        file.seek(0)
+        json.dump(forecast, file, indent=4)
 
 def add_to_history(data):
-    file_name = 'solar_forecast.json' # TODO put as constant
+    file_name = 'solar_forecast_history.json' # TODO put as constant
     with open(file_name, 'r+') as file:
         history = json.load(file)
         history[data['date']] = data['data']
@@ -29,7 +37,7 @@ def add_to_history(data):
         json.dump(history, file, indent=4)
 
 
-def summarise(data):
+def summarise_forecast(data):
     day = sum(
         entry['pv_estimate'] for entry in data['forecasts']
         if datetime.fromisoformat(entry['period_end'].split('.')[0]).date() == tomorrow
@@ -50,8 +58,26 @@ def summarise(data):
 
     return {'date': f'{tomorrow}', 'data': {'day':  day, 'peak': peak, 'late': late}}
 
+def half_hourly_forecast(data):
+    half_hourly_values = []
+    for entry in data['forecasts']:
+        entry_date = datetime.fromisoformat(entry['period_end'].split('.')[0]) - timedelta(minutes=30)
+        if entry_date.date() == tomorrow:
+            formatted_entry = {
+                "period_start":  entry_date.strftime("%H:%M"),
+                "pv_estimate": entry['pv_estimate'],
+                "pv_estimate10": entry['pv_estimate10'],
+                "pv_estimate90": entry['pv_estimate90'],
+            }
+            half_hourly_values.append(formatted_entry)
+    return {'date': f'{tomorrow}', 'data': half_hourly_values}
+
 if not check_already_exists(tomorrow_key):
     forecast = fetch_forecast()
-    summary = summarise(forecast)
-    add_to_history(summary)
+
+    summary = summarise_forecast(forecast)
+    add_to_forecast(summary)
+
+    hhf = half_hourly_forecast(forecast)
+    add_to_history(hhf)
 
