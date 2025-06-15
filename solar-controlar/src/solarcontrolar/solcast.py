@@ -25,7 +25,7 @@ class SolCast:
         if response.status_code == 200:
             return response.json()
         else:
-            raise response.raise_for_status()
+            raise BaseException(response.status_code, response.text)
 
     def forecast(self):
         return self.get(f"{self.base_url}{self.site_id}/forecasts?format=json")

@@ -26,7 +26,7 @@ class GivEnergy:
         if response.status_code == 200:
             return response.json()
         else:
-            raise response.raise_for_status()
+            raise BaseException(response.status_code, response.text)
 
     def post(self, url, payload=None):
         response = requests.post(url, headers=self.headers, json=payload)
@@ -34,7 +34,7 @@ class GivEnergy:
         if response.status_code == 200 or response.status_code == 201:
             return response.json()
         else:
-            raise response.raise_for_status()
+            raise BaseException(response.status_code, response.text)
 
     def events(self):
         return self.get(f"{self.base_url}/inverter/{self.inverter_id}/events")
