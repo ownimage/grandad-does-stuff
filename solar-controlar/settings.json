@@ -3,5 +3,6 @@
     "battery_min_kWh": 0.4,
     "solar_forecast_multiplier": 0.9,
     "tolerance_percent": 1,
+    "start_discharge_target": 30,
     "last_30mins_discharge_target": 16
 }
