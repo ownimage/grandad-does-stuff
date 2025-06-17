@@ -32,11 +32,6 @@ Once the discharge period is over in the evening we will:
 1) fetch a new solar forcast
 2) generate a config file
 
-# Create the docker image for development
-```sh
-docker build -t solar-controlar:latest .
-```
-
 # Running the Container
 
 ## First time configuration
