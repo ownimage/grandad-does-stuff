@@ -184,12 +184,37 @@ class TestConfigApply(unittest.TestCase):
             # THEN
             self.assertEqual(expected_msg, msg)
 
+    def test_calc_limited_discharge_target(self):
+        test_cases = [
+            (True, 0, 0, 15, 0, "Invalid hour=15 or minute=0, or not in discharge window."),
+            (True, 0, 0, 15, 59, "Invalid hour=15 or minute=59, or not in discharge window."),
+            (True, 0, 0, 19, 0, "Invalid hour=19 or minute=0, or not in discharge window."),
+            (True, 0, 0, 16, -1, "Invalid hour=16 or minute=-1, or not in discharge window."),
+            (True, 0, 0, 16, 60, "Invalid hour=16 or minute=60, or not in discharge window."),
+
+            (False, 97, 17, 16, 0, 97),
+            (False, 97, 17, 17, 15, 57),
+            (False, 97, 17, 18, 30, 17),
+        ]
+
+        for valid, start_discharge_target, last_30mins_discharge_target, hour, minute, expected in test_cases:
+            # GIVEN
+            subject = ConfigApply()
+            # WHEN
+            if valid:
+                with self.assertRaises(BaseException) as e:
+                    subject.calc_limited_discharge_target(start_discharge_target, last_30mins_discharge_target, hour, minute)
+                self.assertEqual(e.exception.args[0], expected)
+            else:
+                actual = subject.calc_limited_discharge_target(start_discharge_target, last_30mins_discharge_target, hour, minute)
+                self.assertEqual(actual, expected)
+
     def test_main(self):
         test_cases = [
             (0, 0, "2025-06-05 00:00:00 no action"),
             (3, 0, "2025-06-05 03:00:00 battery_level=50 target_percentage=10 CHANGE set_timed_charge(False)"),
             (7, 0, "2025-06-05 07:00:00 no action"),
-            (16, 15, "2025-06-05 16:15:00 battery_level=50 target_percentage=16 CHANGE set_timed_export(True)"),
+            (16, 15, "2025-06-05 16:15:00 battery_level=50 target_percentage=19 CHANGE set_timed_export(True)"),
             (18, 45, "2025-06-05 18:45:00 battery_level=50 target_percentage=0 CHANGE set_timed_export(True)"),
             (20, 0, "2025-06-05 20:00:00 no action"),
         ]
@@ -199,6 +224,7 @@ class TestConfigApply(unittest.TestCase):
             fixed_datetime = datetime.datetime(2025, 6, 5, hour, minute, 0)
             config = self._mock_config({"charge_to_percentage": 10})
             subject = ConfigApply(config=config, os=self.mock_os,  pytz=self.mock_pytz, datetime=self._mock_datetime(fixed_datetime), GivEnergy=self.mock_givenergy)
+            subject.get_settings = MagicMock(return_value={"tolerance_percent": 1, "start_discharge_target": 20, "last_30mins_discharge_target": 15})
             # WHEN
             msg = subject.main()
             # THEN

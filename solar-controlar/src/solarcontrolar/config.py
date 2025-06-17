@@ -16,9 +16,6 @@ class Config:
     def get_data(self):
         return copy.deepcopy(self.__data)
 
-    def with_data(self, data):
-        return Config(self.__filename, data)
-
     def save(self):
         with open(self.__filename, "w") as file:
             json.dump(self.__data, file, indent=4)

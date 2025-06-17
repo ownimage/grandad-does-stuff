@@ -12,6 +12,7 @@ from solarcontrolar.givenergy import GivEnergy
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 
+
 class ConfigApply:
     def __init__(self, config=Config(), os=os, json=json, GivEnergy=GivEnergy, pytz=pytz, datetime=datetime, logger=logger):
         self.__config = config
@@ -87,13 +88,24 @@ class ConfigApply:
         self.__logger.info(msg)
         return msg  # Allows assertion in unit tests
 
-# Main function for better testability
+    @staticmethod
+    def calc_limited_discharge_target(start_discharge_target, last_30mins_discharge_target, hour, minute):
+        # for between 4 and 6:30
+        if ((16 <= hour < 18) and (0 <= minute <= 59)) or (hour == 18 and 0 <= minute <= 30):
+            f = ((hour - 16) * 60 + minute) / 150
+            target = start_discharge_target + f * (last_30mins_discharge_target - start_discharge_target)
+            return int(target)
+        else:
+            raise BaseException(f"Invalid hour={hour} or minute={minute}, or not in discharge window.")
+
+    # Main function for better testability
     def main(self):
         config = self.get_config()
         givenergy = self.get_givenergy()
         settings = self.get_settings()
         tolerance = settings["tolerance_percent"]
-        init_discharge_target = settings["last_30mins_discharge_target"]
+        start_discharge_target = settings["start_discharge_target"]
+        last_30mins_discharge_target = settings["last_30mins_discharge_target"]
 
         now, formatted_date = self.get_current_time()
         hour = now.hour
@@ -102,15 +114,17 @@ class ConfigApply:
         if 2 <= hour < 5:
             return self.charge_to_percentage(givenergy, tolerance, formatted_date)
         elif 16 <= hour < 19:
-            if hour < 18 or minute < 30: # not last half-hour drain immediately to init_discharge_target
-                return self.limit_timed_export(givenergy, init_discharge_target, tolerance, formatted_date)
-            else: # last half-hour drain to floor
+            if hour < 18 or minute < 30:  # not last half-hour drain immediately to init_discharge_target
+                target = self.calc_limited_discharge_target(start_discharge_target, last_30mins_discharge_target, hour, minute)
+                return self.limit_timed_export(givenergy, target, tolerance, formatted_date)
+            else:  # last half-hour drain to floor
                 return self.full_discharge(givenergy, formatted_date)
 
         else:
             msg = f"{formatted_date} no action"
             self.__logger.info(msg)
             return msg
+
 
 if __name__ == "__main__":
     ConfigApply().main()
