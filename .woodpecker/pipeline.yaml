@@ -10,4 +10,5 @@ steps:
       - echo "Testing ........."
       - cd solar-controlar
       - pip install -r requirements.txt
-      - python -m unittest discover test
+      - coverage run -m unittest discover test
+      - coverage report -m
