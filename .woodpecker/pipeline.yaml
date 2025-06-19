@@ -12,3 +12,14 @@ steps:
       - pip install -r requirements.txt
       - coverage run -m unittest discover test
       - coverage report -m
+
+  - name: build-docker
+    image: docker:cli
+    when:
+      - path: [ 'solar-controlar/Dockerfile', '.woodpecker/**']
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    commands:
+      - cd solar-controlar
+      - docker build .
+

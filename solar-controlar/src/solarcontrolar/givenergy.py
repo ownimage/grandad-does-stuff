@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from collections import defaultdict
 
 class GivEnergy:
-    def __init__(self, api_key, inverter_id):
+    def __init__(self, api_key, inverter_id, requests=requests):
         self.api_key = api_key
         if not self.api_key:
             raise ValueError("Please supply api_key")
@@ -11,6 +11,8 @@ class GivEnergy:
         self.inverter_id = inverter_id
         if not self.inverter_id:
             raise ValueError("Please supply inverter_id")
+
+        self.requests = requests
 
         self.base_url = "https://api.givenergy.cloud/v1"
 
@@ -21,7 +23,7 @@ class GivEnergy:
 
     def get(self, url, payload=None):
         # Set up headers with authorization
-        response = requests.request("GET", url, headers=self.headers, json=payload)
+        response = self.requests.request("GET", url, headers=self.headers, json=payload)
 
         if response.status_code == 200:
             return response.json()
@@ -29,7 +31,7 @@ class GivEnergy:
             raise BaseException(response.status_code, response.text)
 
     def post(self, url, payload=None):
-        response = requests.post(url, headers=self.headers, json=payload)
+        response = self.requests.post(url, headers=self.headers, json=payload)
 
         if response.status_code == 200 or response.status_code == 201:
             return response.json()
@@ -65,11 +67,14 @@ class GivEnergy:
         if current_value == value:
             return False
         else:
-            print(f'{function_name} current value {current_value} being set to {value}')
+            print(f'{function_name} current_value {current_value} being set to {value}')
             self.setting_write(setting_id, value)
             updated_value = self.setting_read(setting_id)['data']['value']
+            if isinstance(value, bool):
+                updated_value = bool(updated_value)
             if updated_value != value:
                 raise RuntimeError(f'Givnergy::{function_name}({value}) failed, updated_value={updated_value} != value={value}')
+            print(f'{function_name} updated_value {updated_value}')
             return True
 
 
