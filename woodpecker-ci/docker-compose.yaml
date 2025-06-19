@@ -16,6 +16,7 @@ services:
     volumes:
       - .\woodpecker-server-data:/var/lib/woodpecker/
     environment:
+      - WOODPECKER_ADMIN=ownimage
       - WOODPECKER_OPEN=${WOODPECKER_OPEN}
       - WOODPECKER_HOST=${WOODPECKER_HOST}
       - WOODPECKER_GITHUB=true
