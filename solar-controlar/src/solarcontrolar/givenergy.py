@@ -1,6 +1,7 @@
 import requests
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from collections import defaultdict
+
 
 class GivEnergy:
     def __init__(self, api_key, inverter_id, requests=requests):
@@ -77,8 +78,6 @@ class GivEnergy:
             print(f'{function_name} updated_value {updated_value}')
             return True
 
-
-
     def get_timed_charge(self):
         return self.setting_read(66)
 
@@ -94,8 +93,30 @@ class GivEnergy:
     def get_day_usage(self, days_ago):
         today = datetime.today()
         start_time = (today - timedelta(days=days_ago)).strftime("%Y-%m-%d")
-        end_time = (today - timedelta(days=days_ago-1)).strftime("%Y-%m-%d")
+        end_time = (today - timedelta(days=days_ago - 1)).strftime("%Y-%m-%d")
         payload = {"start_time": start_time, "end_time": end_time, "grouping": 0}
+        return self.post(f"{self.base_url}/inverter/{self.inverter_id}/energy-flows", payload)
+
+    def get_generation_actuals(self, end_date, days):
+        start_date = end_date - timedelta(days=days)
+        payload = {
+            "start_time": start_date.strftime("%Y-%m-%d"),
+            "end_time": end_date.strftime("%Y-%m-%d"),
+            "grouping": 0,
+            "types": [0, 1, 2]
+        }
+
+        return self.post(f"{self.base_url}/inverter/{self.inverter_id}/energy-flows", payload)
+
+    def get_usage_actuals(self, end_date, days):
+        start_date = end_date - timedelta(days=days)
+        payload = {
+            "start_time": start_date.strftime("%Y-%m-%d"),
+            "end_time": end_date.strftime("%Y-%m-%d"),
+            "grouping": 0,
+            "types": [0, 3, 5]
+        }
+
         return self.post(f"{self.base_url}/inverter/{self.inverter_id}/energy-flows", payload)
 
     def last_4_weeks_usage(self):
@@ -116,5 +137,3 @@ class GivEnergy:
 
     def battery_level(self):
         return self.get(f"{self.base_url}/inverter/{self.inverter_id}/system-data/latest")['data']['battery']['percent']
-
-
