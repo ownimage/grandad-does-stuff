@@ -72,12 +72,13 @@ def half_hourly_forecast(data):
             half_hourly_values.append(formatted_entry)
     return {'date': f'{tomorrow}', 'data': half_hourly_values}
 
-if not check_already_exists(tomorrow_key):
-    forecast = fetch_forecast()
+if __name__ == '__main__':
+    if not check_already_exists(tomorrow_key):
+        forecast = fetch_forecast()
 
-    summary = summarise_forecast(forecast)
-    add_to_forecast(summary)
+        summary = summarise_forecast(forecast)
+        add_to_forecast(summary)
 
-    hhf = half_hourly_forecast(forecast)
-    add_to_history(hhf)
+        hhf = half_hourly_forecast(forecast)
+        add_to_history(hhf)
 
