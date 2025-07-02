@@ -6,7 +6,7 @@ import json
 import pytz
 from tenacity import retry, stop_after_attempt, wait_fixed
 
-from solarcontrolar.config import Config
+from common.json_store import JsonStore
 from solarcontrolar.givenergy import GivEnergy
 
 logger = logging.getLogger(__name__)
@@ -14,7 +14,7 @@ logging.basicConfig(level=logging.INFO, format="%(message)s")
 
 
 class ConfigApply:
-    def __init__(self, config=Config(), os=os, json=json, GivEnergy=GivEnergy, pytz=pytz, datetime=datetime, logger=logger):
+    def __init__(self, config=JsonStore("config.json"), os=os, json=json, GivEnergy=GivEnergy, pytz=pytz, datetime=datetime, logger=logger):
         self.__config = config
         self.__os = os
         self.__json = json
@@ -22,9 +22,6 @@ class ConfigApply:
         self.__pytz = pytz
         self.__datetime = datetime
         self.__logger = logger
-
-    def get_config(self):
-        return self.__config.get_data()
 
     def get_settings(self):
         with open("settings.json", "r") as file:
@@ -42,7 +39,7 @@ class ConfigApply:
 
     # @retry(stop=stop_after_attempt(3), wait=wait_fixed(10))
     def charge_to_percentage(self, givenergy, tolerance, formatted_date):
-        target_percentage = self.get_config()["charge_to_percentage"]
+        target_percentage = self.__config.read()["charge_to_percentage"]
         battery_level = givenergy.battery_level()
         enabled = battery_level <= target_percentage
 
@@ -100,7 +97,6 @@ class ConfigApply:
 
     # Main function for better testability
     def main(self):
-        config = self.get_config()
         givenergy = self.get_givenergy()
         settings = self.get_settings()
         tolerance = settings["tolerance_percent"]
