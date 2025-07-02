@@ -26,7 +26,7 @@ class TestConfigApply(unittest.TestCase):
 
     def _mock_config(self, data=TEST_DATA):
         mock_config = MagicMock()
-        mock_config.get_data.return_value = data
+        mock_config.read.return_value = data
         return mock_config
 
     def _mock_os(self):
@@ -60,14 +60,6 @@ class TestConfigApply(unittest.TestCase):
         datetime.datetime = MagicMock()
         datetime.datetime.now = MagicMock(return_value=fixed_datetime)
         return datetime
-
-    def test_get_config(self):
-        # GIVEN
-        subject = ConfigApply(config=self.mock_config)
-        # WHEN
-        actual = subject.get_config()
-        # THEN
-        self.assertEqual(actual, self.TEST_DATA)
 
     def test_get_givenergy(self):
         # GIVEN

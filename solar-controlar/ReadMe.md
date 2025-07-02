@@ -67,7 +67,7 @@ python -m unittest discover -s tests
 ## Getting a Forcast
 
 ```shell
-python solar_forecast_generate.py
+python solar_forecast_generator.py
 ```
 
 
