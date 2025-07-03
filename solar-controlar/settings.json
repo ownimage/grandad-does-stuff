@@ -1,4 +1,5 @@
 {
+    "timezone": "Europe/London",
     "battery_capacity_kWh": 9.6,
     "battery_min_kWh": 0.4,
     "solar_forecast_multiplier": 0.8495967889006028,
