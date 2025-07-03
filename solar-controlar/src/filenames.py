@@ -7,4 +7,3 @@ class Filenames(Enum):
     USAGE_BASELINE_FILE = "usage_baseline.json"
     CONFIG = "config.json"
     SETTINGS = "settings.json"
-    SOLAR_ACTUALS = "solar_actuals.json"

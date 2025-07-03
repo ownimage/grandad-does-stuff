@@ -45,9 +45,8 @@ class ConfigGenerator:
         charge_to_unlimited = charge_requirement * 100 / self.settings.battery_capacity_kwh()
         return int(max(self.battery_min_percentage, min(charge_to_unlimited, 100)))
 
-    def write_config(self):
-        config = self.config_store.read()
-        config["charge_to_percentage"] = self.calculate_charge_percentage()
+    def write_config(self, output_path="config.json"):
+        config = {"charge_to_percentage": self.calculate_charge_percentage()}
         self.config_store.write(config)
 
 
