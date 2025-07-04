@@ -16,7 +16,7 @@ class CalcErrro:
         self.forecast_data = forecast_store.read()
         self.actuals_data = actuals_store.read()
         self.settings_store = settings_store
-        self.start_date = (datetime.today() - timedelta(days=7)).date()
+        self.start_date = (datetime.today() - timedelta(days=6)).date()
         self.end_date = (datetime.today() - timedelta(days=1)).date()
 
     def calculate_forecast_total(self, data):

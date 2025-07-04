@@ -48,7 +48,7 @@ class SolarForecastGenerator:
     def run(self):
         forecast_history = self.forecast_history_store.read()
         if not self.check_already_exists(forecast_history):
-            new_forecast = self.dummy_forecast()
+            new_forecast = self.fetch_forecast()
             tomorrow_hh = self.half_hourly_forecast(new_forecast)
             self.forecast_history_store.write({**forecast_history, **tomorrow_hh})
 
