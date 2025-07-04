@@ -108,6 +108,17 @@ class GivEnergy:
 
         return self.post(f"{self.base_url}/inverter/{self.inverter_id}/energy-flows", payload)
 
+    def get_generation_actuals_hh(self, end_date, days):
+        hh = defaultdict(dict)
+        raw_data = self.get_generation_actuals(end_date, days)
+        for record  in raw_data["data"].values():
+            start_time = record["start_time"]
+            dt = datetime.strptime(start_time, "%Y-%m-%d %H:%M")
+            date_str = dt.date().isoformat()
+            time_str = dt.strftime("%H:%M")
+            hh[date_str][time_str] = record["data"]
+        return {k: v for k, v in hh.items() if len(v) == 48}
+
     def get_usage_actuals(self, end_date, days):
         start_date = end_date - timedelta(days=days)
         payload = {
