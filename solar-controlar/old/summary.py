@@ -2,7 +2,7 @@ import json
 from datetime import datetime, timedelta
 
 # Load the JSON data
-with open("solar_forecast.json", "r") as file:
+with open("solar_forecast_history.json", "r") as file:
     data = json.load(file)
 
 # Dictionary to store daily sums
