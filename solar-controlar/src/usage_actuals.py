@@ -10,10 +10,11 @@ from solarcontrolar.givenergy import GivEnergy
 
 logger = logging.getLogger(__name__)
 
+
 class UsageActuals:
     def __init__(self,
                  usage_store=JsonStore(Filenames.USAGE_ACTUALS.value),
-                 timezone = Settings().timezone(),
+                 timezone=Settings().timezone(),
                  days: int = 28
                  ):
         self.usage_store = usage_store
@@ -33,7 +34,7 @@ class UsageActuals:
             current_dt, current_val = entries[i]
             _, previous_val = entries[i - 1]
             delta = round(current_val - previous_val, 3)
-            delta = delta if delta > 0 else 0 # sometimes the data regresses and should not
+            delta = delta if delta > 0 else 0  # sometimes the data regresses and should not
 
             # Round to nearest half hour
             minute = current_dt.minute
@@ -58,9 +59,8 @@ class UsageActuals:
             .strftime("%Y-%m-%d %H:%M:%S %Z%z"): float(entry["today"]["consumption"])
             for entry in data["data"]
         }
-        summary[min(summary)] = 0.0 # this is to fix a data problem where sometimes the api returns bad data, the day should always start at zero
+        summary[min(summary)] = 0.0  # this is to fix a data problem where sometimes the api returns bad data, the day should always start at zero
         return dict(sorted(summary.items()))
-
 
     def run(self):
         usage_actuals = self.usage_store.read()
@@ -74,15 +74,7 @@ class UsageActuals:
 
         self.usage_store.write(dict(sorted(usage_actuals.items())))
 
-        # data = ua.fetch()
-        # day_data = ua.summarize(data)
-        #
-        # import pprint
-        # pprint.pprint(dict(day_data), sort_dicts=False)
-
 
 if __name__ == '__main__':
     ua = UsageActuals()
     ua.run()
-
-
