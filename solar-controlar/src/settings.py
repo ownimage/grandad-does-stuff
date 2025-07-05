@@ -13,6 +13,7 @@ class SettingsKeys(Enum):
     TOLERANCE_PERCENT = "tolerance_percent"
     START_DISCHARGE_TARGET = "start_discharge_target"
     LAST_30MINS_DISCHARGE_TARGET = "last_30mins_discharge_target"
+    HOLIDAY_CUTOFF_KWH = "holiday_cutoff_kwh"
 
 
 class Settings(JsonStore):
@@ -40,3 +41,6 @@ class Settings(JsonStore):
 
     def tolerance_percent(self):
         return self._settings[SettingsKeys.TOLERANCE_PERCENT.value]
+
+    def holiday_cutoff_kwh(self):
+        return self._settings[SettingsKeys.HOLIDAY_CUTOFF_KWH.value]
