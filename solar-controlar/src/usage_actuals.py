@@ -33,6 +33,7 @@ class UsageActuals:
             current_dt, current_val = entries[i]
             _, previous_val = entries[i - 1]
             delta = round(current_val - previous_val, 3)
+            delta = delta if delta > 0 else 0 # sometimes the data regresses and should not
 
             # Round to nearest half hour
             minute = current_dt.minute
@@ -54,9 +55,10 @@ class UsageActuals:
         summary = {
             datetime.fromisoformat(entry["time"])
             .astimezone(self.timezone)
-            .strftime("%Y-%m-%d %H:%M:%S %Z%z"): entry["today"]["consumption"]
+            .strftime("%Y-%m-%d %H:%M:%S %Z%z"): float(entry["today"]["consumption"])
             for entry in data["data"]
         }
+        summary[min(summary)] = 0.0 # this is to fix a data problem where sometimes the api returns bad data, the day should always start at zero
         return dict(sorted(summary.items()))
 
 
