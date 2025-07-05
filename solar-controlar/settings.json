@@ -5,5 +5,6 @@
     "solar_forecast_multiplier": 0.9933761883750035,
     "tolerance_percent": 1,
     "start_discharge_target": 30,
-    "last_30mins_discharge_target": 16
+    "last_30mins_discharge_target": 16,
+    "holiday_cutoff_kwh": 6
 }
