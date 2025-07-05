@@ -1,6 +1,6 @@
-import json
 from datetime import datetime, timedelta
 
+from common.dateHelper import DateHelper
 from filenames import Filenames
 from settings import Settings
 from common.json_store import JsonStore
@@ -11,14 +11,16 @@ class ConfigGenerator:
                  settings: Settings = Settings(),
                  solar_forecast_store: JsonStore = JsonStore(Filenames.SOLAR_FORECAST_FILE.value),
                  usage_forecast_store: JsonStore = JsonStore(Filenames.USAGE_FORECAST_FILE.value),
-                 usage_baseline_store: JsonStore = JsonStore(Filenames.USAGE_BASELINE_FILE.value),
-                 config_store: JsonStore = JsonStore(Filenames.CONFIG.value)
+                 usage_actuals_store: JsonStore = JsonStore(Filenames.USAGE_ACTUALS.value),
+                 config_store: JsonStore = JsonStore(Filenames.CONFIG.value),
+                 datehelper=DateHelper(),
                  ):
         self.settings = settings
         self.solar_forecast = solar_forecast_store.read()
         self.usage_forecast = usage_forecast_store.read()
-        self.usage_baseline = usage_baseline_store.read()
+        self.usage_actuals = usage_actuals_store.read()
         self.config_store = config_store
+        self.datehelper = datehelper
 
         self.battery_min_percentage = 100.0 * self.settings.battery_min_kwh() / self.settings.battery_capacity_kwh()
 
@@ -26,24 +28,30 @@ class ConfigGenerator:
         self.tomorrow_iso = self.tomorrow.isoformat()
         self.tomorrow_day = self.tomorrow.strftime('%A')
 
-    def get_usage_forecast(self):
-        try:
-            return self.usage_forecast[self.tomorrow_iso]
-        except KeyError:
-            return self.usage_baseline[self.tomorrow_day]
+    def get_min_max_estimate(self):
+        usage1 = self.usage_actuals[self.datehelper.offset_iso(-6)]
+        usage2 = self.usage_actuals[self.datehelper.offset_iso(-13)]
+        solar = self.solar_forecast[self.datehelper.tomorrow_iso()]
+        min_total = 0
+        max_total = 0
+        total = 0
+        for key, solar_value in sorted(solar.items()):
+            if "05:00" <= key <= "16:00":
+                usage = (usage1[key] + usage2[key]) / 2
+                total += solar_value["pv_estimate"] * self.settings.solar_forecast_multiplier() / 2 - usage
+                min_total = min(min_total, total)
+                max_total = max(max_total, total)
+        return min_total, max_total
 
     def calculate_charge_percentage(self):
-        usage = self.get_usage_forecast()
+        min_total, max_total = self.get_min_max_estimate()
 
-        solar_forecast_before_4 = {k: v for k, v in self.solar_forecast[self.tomorrow_iso].items() if k < "16:00"}
-        solar_total_before_4 = sum(d.get("pv_estimate", 0) for d in solar_forecast_before_4.values()) / 2.0
+        kwh_for_100_peak = self.settings.battery_capacity_kwh() - max_total
+        kwh_for_before_sun = self.settings.battery_min_kwh() - min_total
+        kwh_requirement = max(kwh_for_100_peak, kwh_for_before_sun)
 
-        charge_for_100_peak = self.settings.battery_capacity_kwh() - self.settings.solar_forecast_multiplier() * solar_total_before_4 + usage['day']
-        charge_for_before_sun = usage['early']
-        charge_requirement = max(charge_for_100_peak, charge_for_before_sun)
-
-        charge_to_unlimited = charge_requirement * 100 / self.settings.battery_capacity_kwh()
-        return int(max(self.battery_min_percentage, min(charge_to_unlimited, 100)))
+        percentage_unlimited = kwh_requirement * 100 / self.settings.battery_capacity_kwh()
+        return int(max(self.battery_min_percentage, min(percentage_unlimited, 100)))
 
     def write_config(self):
         config = self.config_store.read()

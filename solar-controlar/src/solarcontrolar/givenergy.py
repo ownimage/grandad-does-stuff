@@ -1,17 +1,14 @@
 import requests
+import os
 from datetime import date, datetime, timedelta
 from collections import defaultdict
 
 
 class GivEnergy:
-    def __init__(self, api_key, inverter_id, requests=requests):
-        self.api_key = api_key
-        if not self.api_key:
-            raise ValueError("Please supply api_key")
+    def __init__(self, api_key=None, inverter_id=None, requests=requests, os=os):
 
-        self.inverter_id = inverter_id
-        if not self.inverter_id:
-            raise ValueError("Please supply inverter_id")
+        self.api_key = api_key if api_key is not None else os.getenv('GIVENERGY_API_KEY')
+        self.inverter_id = inverter_id if inverter_id is not None else os.getenv('GIVENERGY_INVERTER_ID')
 
         self.requests = requests
 
@@ -97,6 +94,9 @@ class GivEnergy:
         payload = {"start_time": start_time, "end_time": end_time, "grouping": 0}
         return self.post(f"{self.base_url}/inverter/{self.inverter_id}/energy-flows", payload)
 
+    def get_meter_data(self, date_str):
+        return self.get(f"{self.base_url}/inverter/{self.inverter_id}/data-points/{date_str}?pageSize=1000")
+
     def get_generation_actuals(self, end_date, days):
         start_date = end_date - timedelta(days=days)
         payload = {
@@ -111,7 +111,7 @@ class GivEnergy:
     def get_generation_actuals_hh(self, end_date, days):
         hh = defaultdict(dict)
         raw_data = self.get_generation_actuals(end_date, days)
-        for record  in raw_data["data"].values():
+        for record in raw_data["data"].values():
             start_time = record["start_time"]
             dt = datetime.strptime(start_time, "%Y-%m-%d %H:%M")
             date_str = dt.date().isoformat()
