@@ -1,14 +1,14 @@
-import json
-from datetime import datetime, time
+import logging
+from datetime import date, datetime, timedelta
 from collections import defaultdict
 from dateutil import parser
-import pytz
 
 from common.json_store import JsonStore
 from filenames import Filenames
 from settings import Settings
 from solarcontrolar.givenergy import GivEnergy
 
+logger = logging.getLogger(__name__)
 
 class UsageActuals:
     def __init__(self,
@@ -48,26 +48,39 @@ class UsageActuals:
             summary[date_str][time_str] = summary[date_str].get(time_str, 0) + delta
         return summary
 
-    def fetch(self):
-        data = GivEnergy().get_meter_data(datetime.strptime("2025-07-03", "%Y-%m-%d").date(), 1)
-        # Extract relevant fields
+    def fetch(self, date_str):
+        logger.info('Fetching usage actuals for date: %s', date_str)
+        data = GivEnergy().get_meter_data(date_str)
         summary = {
             datetime.fromisoformat(entry["time"])
             .astimezone(self.timezone)
             .strftime("%Y-%m-%d %H:%M:%S %Z%z"): entry["today"]["consumption"]
             for entry in data["data"]
         }
+        return dict(sorted(summary.items()))
 
-        usage_store.write(dict(sorted(summary.items())))
+
+    def run(self):
+        usage_actuals = self.usage_store.read()
+        today = date.today()
+        date_strs = [(today - timedelta(days=i)).strftime("%Y-%m-%d") for i in range(1, self.days + 1)]
+        missing_days = [date_str for date_str in date_strs if date_str not in usage_actuals]
+        for date_str in missing_days:
+            data = self.fetch(date_str)
+            hh_summary = self.summarize(data)
+            usage_actuals.update(hh_summary)
+
+        self.usage_store.write(dict(sorted(usage_actuals.items())))
+
+        # data = ua.fetch()
+        # day_data = ua.summarize(data)
+        #
+        # import pprint
+        # pprint.pprint(dict(day_data), sort_dicts=False)
 
 
 if __name__ == '__main__':
     ua = UsageActuals()
+    ua.run()
 
-    usage_store = JsonStore(Filenames.USAGE_ACTUALS.value)
-    raw_data = ua.usage_store.read()
-    day_data = ua.summarize(raw_data)
-
-    import pprint
-    pprint.pprint(dict(day_data), sort_dicts=False)
 
