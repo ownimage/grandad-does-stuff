@@ -94,16 +94,8 @@ class GivEnergy:
         payload = {"start_time": start_time, "end_time": end_time, "grouping": 0}
         return self.post(f"{self.base_url}/inverter/{self.inverter_id}/energy-flows", payload)
 
-    def get_meter_data(self, end_date, days):
-        start_date = end_date - timedelta(days=days)
-        payload = {
-            "start_time": start_date.strftime("%Y-%m-%d"),
-            "end_time": end_date.strftime("%Y-%m-%d"),
-            "address": 1
-        }
-
-        # return self.get(f"{self.base_url}/inverter/{self.inverter_id}/meter/data", payload)
-        return self.get(f"{self.base_url}/inverter/{self.inverter_id}/data-points/2025-07-03?pageSize=1000")
+    def get_meter_data(self, date_str):
+        return self.get(f"{self.base_url}/inverter/{self.inverter_id}/data-points/{date_str}?pageSize=1000")
 
     def get_generation_actuals(self, end_date, days):
         start_date = end_date - timedelta(days=days)
