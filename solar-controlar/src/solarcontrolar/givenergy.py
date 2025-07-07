@@ -134,7 +134,7 @@ class GivEnergy:
         weekly_usage = defaultdict(float)  # Dictionary to store sums per day of the week
 
         # Iterate over the last 28 days
-        for days_ago in range(1, 8):
+        for days_ago in range(1, 28):
             daily_data = self.get_day_usage(days_ago)  # Get usage for the given day
             date_obj = datetime.today() - timedelta(days=days_ago)
             day_of_week = date_obj.strftime("%A")  # Convert to full weekday name
