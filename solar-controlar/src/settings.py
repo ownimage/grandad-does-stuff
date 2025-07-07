@@ -14,6 +14,9 @@ class SettingsKeys(Enum):
     START_DISCHARGE_TARGET = "start_discharge_target"
     LAST_30MINS_DISCHARGE_TARGET = "last_30mins_discharge_target"
     HOLIDAY_CUTOFF_KWH = "holiday_cutoff_kwh"
+    MIN_CHARGE_TO_BIAS_KWH = "min_charge_to_bias_kwh"
+    MAX_CHARGE_TO_BIAS_KWH = "max_charge_to_bias_kwh"
+    USAGE_MULTIPLIER = "usage_multiplier"
 
 
 class Settings(JsonStore):
@@ -44,3 +47,12 @@ class Settings(JsonStore):
 
     def holiday_cutoff_kwh(self):
         return self._settings[SettingsKeys.HOLIDAY_CUTOFF_KWH.value]
+
+    def min_charge_to_bias_kwh(self):
+        return self._settings[SettingsKeys.MIN_CHARGE_TO_BIAS_KWH.value]
+
+    def max_charge_to_bias_kwh(self):
+        return self._settings[SettingsKeys.MAX_CHARGE_TO_BIAS_KWH.value]
+
+    def usage_multiplier(self):
+        return self._settings[SettingsKeys.USAGE_MULTIPLIER.value]
