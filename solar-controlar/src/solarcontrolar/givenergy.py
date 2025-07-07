@@ -125,7 +125,7 @@ class GivEnergy:
             "start_time": start_date.strftime("%Y-%m-%d"),
             "end_time": end_date.strftime("%Y-%m-%d"),
             "grouping": 0,
-            "types": [0, 3, 5]
+            # "types": [0, 3, 5]
         }
 
         return self.post(f"{self.base_url}/inverter/{self.inverter_id}/energy-flows", payload)
