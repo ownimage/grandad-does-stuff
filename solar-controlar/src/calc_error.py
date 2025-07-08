@@ -6,7 +6,7 @@ from filenames import Filenames
 from settings import Settings
 
 
-class CalcErrro:
+class CalcError:
     def __init__(
             self,
             forecast_store=JsonStore(Filenames.SOLAR_FORECAST_FILE.value),
@@ -70,5 +70,5 @@ class CalcErrro:
 
 # Example usage
 if __name__ == "__main__":
-    calcError = CalcErrro()
+    calcError = CalcError()
     calcError.run()
