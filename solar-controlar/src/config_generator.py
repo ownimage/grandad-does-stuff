@@ -18,7 +18,6 @@ class ConfigGenerator:
                  usage_actuals_store: JsonStore = JsonStore(Filenames.USAGE_ACTUALS.value),
                  config_store: JsonStore = JsonStore(Filenames.CONFIG.value),
                  datehelper=DateHelper(),
-                 datehelper=DateHelper(datetime.strptime("2025-07-06", "%Y-%m-%d").date()),
                  logging=logging
                  ):
         self.settings = settings

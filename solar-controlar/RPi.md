@@ -29,19 +29,12 @@ Once you are logged into the RPi
 
 ```shell
 git clone https://github.com/ownimage/grandad-does-stuff
-cd grandad-does-stuff
-
-sudo mkdir /app
-sudo chown user /app
-cp -R solar-controlar/* /app
-
-cd /app
-python -m venv venv
-source /app/venv/bin/activate
-pip install -r requirements.txt 
-
+cd grandad-does-stuff/solar-controlar
+./install.sh
+ EDIT THE /app/envfile WITH YOUR ACTUAL VALUES
 ```
 
+Notes patching files in later
 # Copy files
 From **host machine** <base_dir>\grandad-does-stuff\solar-controlar
 ```shell
