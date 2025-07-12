@@ -4,6 +4,7 @@ SHELL ["/bin/bash", "-c"]
 
 RUN apt update \
     && apt --no-install-recommends install -y cron sudo \
+    && apt clean \
     && useradd -m -s /bin/bash user \
     && echo "user:password" | chpasswd \
     && adduser user sudo \
