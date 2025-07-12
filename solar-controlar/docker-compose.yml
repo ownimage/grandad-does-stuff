@@ -3,8 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      no_cache: true
     container_name: solarcontrolar
     volumes:
-      - .:/app
+      - .:/solarcontrolar
     command: ["cron", "-f"]
