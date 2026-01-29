@@ -1,0 +1,19 @@
+from typing import List
+from vector2d import Vector2D
+
+from ownimage.font_generator.stroke import Stroke
+
+
+class Mark:
+    def __init__(self, vec: Vector2D, strokes: List[Stroke]):
+        self.vec = vec
+        self.strokes = strokes
+
+    def svg(self, posn: Vector2D, scale: float):
+        start = posn.__add__(self.vec)
+        svg = ""
+        for stroke in self.strokes:
+            start, line = stroke.svg(start, scale)
+            svg = svg + line
+
+        return svg + "\n"
