@@ -7,12 +7,12 @@ from ownimage.font_generator.glyph import Glyph
 
 
 class Blackletter:
-    def __init__(self, pen_thickness, b, x):
+    def __init__(self, pen_thickness: float, b: float, x: float):
         self.pen_thickness = pen_thickness
         self.b = b
         self.x = x
 
-        self.m = pen_thickness * math.sqrt(2) / 2
+        self.m = pen_thickness / (2 * math.sqrt(2))
         self.xm = x - self.m
         self.x3m = x - 3 * self.m
         self.b3m = b + 3 * self.m
@@ -26,4 +26,4 @@ class Blackletter:
         self.g_a1 = Glyph(Vector2D(0, 0), [self.m_a1, self.m_a2])
 
     def svg(self, posn: Vector2D, scale: float):
-        return self.g_a1.svg(posn, scale)
+        return self.g_a1.svg(posn, scale, self.pen_thickness)

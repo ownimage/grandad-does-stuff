@@ -9,11 +9,11 @@ class Mark:
         self.vec = vec
         self.strokes = strokes
 
-    def svg(self, posn: Vector2D, scale: float):
+    def svg(self, posn: Vector2D, scale: float, pen_thickness: float):
         start = posn.__add__(self.vec)
         svg = ""
         for stroke in self.strokes:
-            start, line = stroke.svg(start, scale)
+            start, line = stroke.svg2(start, scale, pen_thickness)
             svg = svg + line
 
         return svg + "\n"
