@@ -51,7 +51,7 @@ if __name__ == "__main__":
      viewBox="0 0 500 500">
      <g transform="translate(0, 500) scale(1, -1)">
      
-""" +  blackletter.svg(Vector2D(1,0), 100) + """
+""" +  blackletter.svg(Vector2D(1,0), 10) + """
     </g>
 </svg>"""
     print(svg)
