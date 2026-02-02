@@ -61,7 +61,7 @@ class MainWindow(QWidget):
     
         <rect x="0" y="0" width="{width}" height="{height}" fill="white"/>
         <g transform="translate(0, {height}) scale(1, -1)">
-            {blackletter.svg(Vector2D(1,0), scale)}
+            {blackletter.svg(Vector2D(1,0), "ab", scale)}
         </g>
     </svg>
     """
