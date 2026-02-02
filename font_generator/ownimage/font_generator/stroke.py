@@ -45,10 +45,4 @@ class Stroke:
 
         paths = [f"S {p1.x:.5f},{p1.y:.5f} L {p2.x:.5f},{p2.y:.5f} L {p3.x:.5f},{p3.y:.5f} L {p4.x:.5f},{p4.y:.5f} L {p1.x:.5f},{p1.y:.5f}"]
         return start.__add__(self.vec), paths
-    def svg(self, start: Vector2D, scale: float):
-        x1 = start.x * scale
-        y1 = start.y * scale
-        x2 = (start.x + self.vec.x) * scale
-        y2 = (start.y + self.vec.y) * scale
-        svg = f"""<line x1="{x1}" y1="{y1}" x2="{x2}" y2="{y2}" stroke="black" stroke-width="2" />\n"""
-        return start.__add__(self.vec), svg
+
