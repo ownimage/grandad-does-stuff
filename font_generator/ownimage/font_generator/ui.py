@@ -1,6 +1,6 @@
 import sys
 from PySide6.QtWidgets import (
-    QApplication, QWidget, QVBoxLayout, QHBoxLayout,
+    QSizePolicy, QWidget, QVBoxLayout, QHBoxLayout,
     QCheckBox, QSlider, QLabel
 )
 from PySide6.QtSvgWidgets import QSvgWidget
@@ -22,8 +22,10 @@ class MainWindow(QWidget):
         self.slider.setRange(10, 70)
         self.slider.setValue(40)
 
+        self.svg_width = 2000
+        self.svg_height = 300
         self.svg_widget = QSvgWidget()
-        self.svg_widget.setFixedSize(150, 150)
+        self.svg_widget.setFixedSize(self.svg_width, self.svg_height)
 
         checkbox_row = QHBoxLayout()
         checkbox_row.addWidget(QLabel("Filled:"))
@@ -51,18 +53,15 @@ class MainWindow(QWidget):
         self.svg_widget.load(bytearray(svg_data, encoding="utf-8"))
 
     def make_svg(self, scale: float) -> str:
-        width = 2000
-        height = 150
-
         font_parameters = FontParameters(0.5, 0, 3, 7)
         blackletter = Blackletter(font_parameters)
 
         return f"""
-    <svg width="{width}" height="{height}" viewBox="0 0 {height} {height}" 
+    <svg width="{self.svg_width}" height="{self.svg_height}" viewBox="0 0 {self.svg_width} {self.svg_height}" 
         xmlns="http://www.w3.org/2000/svg">
     
-        <rect x="0" y="0" width="{width}" height="{height}" fill="white"/>
-        <g transform="translate(0, {height}) scale(1, -1)">
+        <rect x="0" y="0" width="{self.svg_width}" height="{self.svg_height}" fill="white"/>
+        <g transform="translate(0, {self.svg_height}) scale(1, -1)">
             {blackletter.svg(Vector2D(1,0), "abc", scale)}
         </g>
     </svg>
