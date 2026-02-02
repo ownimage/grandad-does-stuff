@@ -1,9 +1,9 @@
 import math
 from vector2d import Vector2D
 
-from ownimage.font_generator.stroke import Stroke, StrokeType
-from ownimage.font_generator.mark import Mark
-from ownimage.font_generator.glyph import Glyph
+from .stroke import Stroke, StrokeType
+from .mark import Mark
+from .glyph import Glyph
 
 
 class Blackletter:

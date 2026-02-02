@@ -1,7 +1,7 @@
 from typing import List
 from vector2d import Vector2D
 
-from ownimage.font_generator.mark import Mark
+from .mark import Mark
 
 
 class Glyph:

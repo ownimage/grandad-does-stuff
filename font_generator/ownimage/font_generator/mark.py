@@ -1,7 +1,7 @@
 from typing import List
 from vector2d import Vector2D
 
-from ownimage.font_generator.stroke import Stroke
+from .stroke import Stroke
 
 
 class Mark:
