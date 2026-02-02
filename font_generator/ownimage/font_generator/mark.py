@@ -1,7 +1,7 @@
 from typing import List
 from vector2d import Vector2D
 
-from ownimage.font_generator.stroke import Stroke
+from .stroke import Stroke
 
 
 class Mark:
@@ -9,11 +9,20 @@ class Mark:
         self.vec = vec
         self.strokes = strokes
 
-    def svg(self, posn: Vector2D, scale: float):
+    def svg(self, posn: Vector2D, scale: float, pen_thickness: float):
         start = posn.__add__(self.vec)
         svg = ""
         for stroke in self.strokes:
-            start, line = stroke.svg(start, scale)
+            start, line = stroke.svg(start, scale, pen_thickness)
             svg = svg + line
 
         return svg + "\n"
+
+    def birdfont_path(self, scale: float, pen_thickness: float):
+        start = self.vec
+        paths = []
+        for stroke in self.strokes:
+            start, stroke_paths = stroke.birdfont_path(start, scale, pen_thickness)
+            paths += stroke_paths
+
+        return paths
