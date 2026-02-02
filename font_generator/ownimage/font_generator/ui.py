@@ -8,6 +8,7 @@ from PySide6.QtCore import Qt
 from vector2d import Vector2D
 
 from .blackletter import Blackletter
+from .font_parameters import FontParameters
 
 
 class MainWindow(QWidget):
@@ -53,7 +54,8 @@ class MainWindow(QWidget):
         width = 2000
         height = 150
 
-        blackletter = Blackletter(.5, 0, 3, 7)
+        font_parameters = FontParameters(0.5, 0, 3, 7)
+        blackletter = Blackletter(font_parameters)
 
         return f"""
     <svg width="{width}" height="{height}" viewBox="0 0 {height} {height}" 
