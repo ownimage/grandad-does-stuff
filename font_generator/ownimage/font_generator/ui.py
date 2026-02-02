@@ -50,7 +50,7 @@ class MainWindow(QWidget):
         self.svg_widget.load(bytearray(svg_data, encoding="utf-8"))
 
     def make_svg(self, scale: float) -> str:
-        width = 500
+        width = 2000
         height = 150
 
         blackletter = Blackletter(.5, 0, 3, 7)
@@ -61,7 +61,7 @@ class MainWindow(QWidget):
     
         <rect x="0" y="0" width="{width}" height="{height}" fill="white"/>
         <g transform="translate(0, {height}) scale(1, -1)">
-            {blackletter.svg(Vector2D(1,0), "ab", scale)}
+            {blackletter.svg(Vector2D(1,0), "abc", scale)}
         </g>
     </svg>
     """

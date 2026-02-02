@@ -2,14 +2,17 @@ import math
 from enum import Enum
 from vector2d import Vector2D
 
+from .strokeable import Strokeable
+
 
 class StrokeType(Enum):
     Block = 1
     Line = 2
 
 
-class Stroke:
+class Stroke(Strokeable):
     def __init__(self, vec: Vector2D, stroke_type: StrokeType):
+        super().__init__()
         self.vec = vec
         self.stroke_type = stroke_type
 
@@ -45,4 +48,3 @@ class Stroke:
 
         paths = [f"S {p1.x:.5f},{p1.y:.5f} L {p2.x:.5f},{p2.y:.5f} L {p3.x:.5f},{p3.y:.5f} L {p4.x:.5f},{p4.y:.5f} L {p1.x:.5f},{p1.y:.5f}"]
         return start.__add__(self.vec), paths
-
