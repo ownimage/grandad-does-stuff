@@ -1,11 +1,11 @@
 from typing import List
 from vector2d import Vector2D
 
-from .stroke import Stroke
+from .stroke import Strokeable
 
 
 class Mark:
-    def __init__(self, vec: Vector2D, strokes: List[Stroke]):
+    def __init__(self, vec: Vector2D, strokes: List[Strokeable]):
         self.vec = vec
         self.strokes = strokes
 
@@ -14,7 +14,7 @@ class Mark:
         svg = ""
         for stroke in self.strokes:
             start, line = stroke.svg(start, scale, pen_thickness)
-            svg = svg + line
+            svg += line
 
         return svg + "\n"
 
