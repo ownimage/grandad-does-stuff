@@ -18,5 +18,10 @@ class CompoundStroke(Strokeable):
         return start, svg
 
     def birdfont_path(self, start: Vector2D, scale: float, pen_thickness: float):
-        raise RuntimeError("Not implemented yet")
+        paths = []
+
+        for stroke in self.strokes:
+            start, new_paths = stroke.birdfont_path(start, scale, pen_thickness)
+            paths += new_paths
+        return start, paths
 
