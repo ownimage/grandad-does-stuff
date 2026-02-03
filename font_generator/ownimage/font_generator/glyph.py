@@ -1,6 +1,7 @@
 from typing import List
 from vector2d import Vector2D
 
+from .font_parameters import FontParameters
 from .mark import Mark
 
 
@@ -9,10 +10,10 @@ class Glyph:
         self.vec = vec
         self.marks = marks
 
-    def svg(self, posn: Vector2D, scale: float, pen_thickness: float):
+    def svg(self, posn: Vector2D, fp: FontParameters, scale: float):
         svg = ""
         for mark in self.marks:
-            svg += mark.svg(posn.__add__(self.vec), scale, pen_thickness)
+            svg += mark.svg(posn.__add__(self.vec), fp, scale)
         return svg
 
     def birdfont_path(self, scale: float, pen_thickness: float):

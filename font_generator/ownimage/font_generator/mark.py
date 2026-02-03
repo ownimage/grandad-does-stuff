@@ -1,6 +1,7 @@
 from typing import List
 from vector2d import Vector2D
 
+from .font_parameters import FontParameters
 from .stroke import Strokeable
 
 
@@ -9,11 +10,11 @@ class Mark:
         self.vec = vec
         self.strokes = strokes
 
-    def svg(self, posn: Vector2D, scale: float, pen_thickness: float):
+    def svg(self, posn: Vector2D, fp: FontParameters, scale: float):
         start = posn.__add__(self.vec)
         svg = ""
         for stroke in self.strokes:
-            start, line = stroke.svg(start, scale, pen_thickness)
+            start, line = stroke.svg(start, fp, scale)
             svg += line
 
         return svg + "\n"

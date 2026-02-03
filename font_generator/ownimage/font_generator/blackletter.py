@@ -60,7 +60,7 @@ class Blackletter:
         svg = ""
         start = posn
         for c in chars:
-            svg += self.glyph_map[c].svg(start, scale, self.fp.pen_thickness)
+            svg += self.glyph_map[c].svg(start, self.fp, scale)
             start += Vector2D(self.glyph_widths[c], 0)
         return svg
 

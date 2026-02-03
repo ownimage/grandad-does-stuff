@@ -2,6 +2,7 @@ import math
 from enum import Enum
 from vector2d import Vector2D
 
+from .font_parameters import FontParameters
 from .strokeable import Strokeable
 
 
@@ -16,8 +17,8 @@ class Stroke(Strokeable):
         self.vec = vec
         self.stroke_type = stroke_type
 
-    def svg(self, start: Vector2D, scale: float, pen_thickness: float):
-        d = scale * pen_thickness / (2 * math.sqrt(2))
+    def svg(self, start: Vector2D, fp: FontParameters, scale: float):
+        d = scale * fp.pen_thickness / (2 * math.sqrt(2))
         s = Vector2D(-d, -d)
         s2 = s.__mul__(2)
         v = self.vec.__mul__(scale)
@@ -27,11 +28,9 @@ class Stroke(Strokeable):
         p3 = p2.__sub__(s2)
         p4 = p3.__sub__(v)
 
+        fill_attr = 'fill="black"' if fp.filled else 'fill="none"'
         svg = f"""
-        <line x1="{p1.x}" y1="{p1.y}" x2="{p2.x}" y2="{p2.y}" stroke="black" stroke-width="2" />
-        <line x1="{p2.x}" y1="{p2.y}" x2="{p3.x}" y2="{p3.y}" stroke="black" stroke-width="2" />
-        <line x1="{p3.x}" y1="{p3.y}" x2="{p4.x}" y2="{p4.y}" stroke="black" stroke-width="2" />
-        <line x1="{p4.x}" y1="{p4.y}" x2="{p1.x}" y2="{p1.y}" stroke="black" stroke-width="2" />
+        <path d ="M{p1.x} {p1.y} L{p2.x} {p2.y} L{p3.x} {p3.y} L{p4.x} {p4.y} Z" {fill_attr} stroke="black" stroke-width="2" />
                 """
         return start.__add__(self.vec), svg
 
