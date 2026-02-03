@@ -1,5 +1,6 @@
 from vector2d import Vector2D
 
+from .font_parameters import FontParameters
 from .strokeable import Strokeable
 
 class CompoundStroke(Strokeable):
@@ -8,11 +9,11 @@ class CompoundStroke(Strokeable):
         self.strokes = strokes
 
 
-    def svg(self, posn: Vector2D, scale: float, pen_thickness: float):
+    def svg(self, posn: Vector2D, fp: FontParameters, scale: float):
         svg = ""
         start = posn
         for stroke in self.strokes:
-            start, s = stroke.svg(start, scale, pen_thickness)
+            start, s = stroke.svg(start, fp, scale)
             svg += s
         return start, svg
 

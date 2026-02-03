@@ -15,12 +15,12 @@ class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
 
-        self.setWindowTitle("Dynamic SVG Example")
+        self.setWindowTitle("Font Generator")
 
-        self.checkbox = QCheckBox()
-        self.slider = QSlider(Qt.Horizontal)
-        self.slider.setRange(10, 70)
-        self.slider.setValue(40)
+        self.filled = QCheckBox()
+        self.scale = QSlider(Qt.Horizontal)
+        self.scale.setRange(10, 70)
+        self.scale.setValue(40)
 
         self.svg_width = 2000
         self.svg_height = 300
@@ -29,17 +29,17 @@ class MainWindow(QWidget):
 
         checkbox_row = QHBoxLayout()
         checkbox_row.addWidget(QLabel("Filled:"))
-        checkbox_row.addWidget(self.checkbox)
+        checkbox_row.addWidget(self.filled)
         checkbox_row.addStretch()
 
         slider_row = QHBoxLayout()
-        slider_row.addWidget(QLabel("Radius:"))
-        slider_row.addWidget(self.slider)
+        slider_row.addWidget(QLabel("Scale:"))
+        slider_row.addWidget(self.scale)
 
         self.update_svg()
 
-        self.checkbox.stateChanged.connect(self.update_svg)
-        self.slider.valueChanged.connect(self.update_svg)
+        self.filled.stateChanged.connect(self.update_svg)
+        self.scale.valueChanged.connect(self.update_svg)
 
         layout = QVBoxLayout()
         layout.addWidget(self.svg_widget)
@@ -48,12 +48,12 @@ class MainWindow(QWidget):
         self.setLayout(layout)
 
     def update_svg(self):
-        radius = float(self.slider.value())
+        radius = float(self.scale.value())
         svg_data = self.make_svg(radius)
         self.svg_widget.load(bytearray(svg_data, encoding="utf-8"))
 
     def make_svg(self, scale: float) -> str:
-        font_parameters = FontParameters(0.5, 0, 3, 7)
+        font_parameters = FontParameters(0.5, self.filled.isChecked(), 0, 3, 7)
         blackletter = Blackletter(font_parameters)
 
         return f"""
