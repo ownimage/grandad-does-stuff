@@ -1,19 +1,24 @@
 import sys
+
+from PySide6.QtGui import QAction
 from PySide6.QtWidgets import (
-    QSizePolicy, QWidget, QVBoxLayout, QHBoxLayout,
-    QCheckBox, QSlider, QLabel
+    QVBoxLayout, QHBoxLayout,
+    QCheckBox, QSlider, QLabel, QMainWindow, QWidget, QFileDialog
 )
 from PySide6.QtSvgWidgets import QSvgWidget
 from PySide6.QtCore import Qt
 from vector2d import Vector2D
 
+from .birdfont_reader import BirdfontReader
 from .blackletter import Blackletter
 from .font_parameters import FontParameters
 
 
-class MainWindow(QWidget):
+class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+
+        self.create_menu()
 
         self.setWindowTitle("Font Generator")
 
@@ -45,16 +50,23 @@ class MainWindow(QWidget):
         layout.addWidget(self.svg_widget)
         layout.addLayout(checkbox_row)
         layout.addLayout(slider_row)
-        self.setLayout(layout)
+
+        central = QWidget()
+        central.setLayout(layout)
+        self.setCentralWidget(central)
+
+        self.blackletter = Blackletter(self.get_fontParameters())
 
     def update_svg(self):
         radius = float(self.scale.value())
         svg_data = self.make_svg(radius)
         self.svg_widget.load(bytearray(svg_data, encoding="utf-8"))
 
+    def get_fontParameters(self):
+        return FontParameters(0.5, self.filled.isChecked(), 0, 3, 7)
+
     def make_svg(self, scale: float) -> str:
-        font_parameters = FontParameters(0.5, self.filled.isChecked(), 0, 3, 7)
-        blackletter = Blackletter(font_parameters)
+        self.blackletter = Blackletter(self.get_fontParameters())
 
         return f"""
     <svg width="{self.svg_width}" height="{self.svg_height}" viewBox="0 0 {self.svg_width} {self.svg_height}" 
@@ -62,9 +74,48 @@ class MainWindow(QWidget):
     
         <rect x="0" y="0" width="{self.svg_width}" height="{self.svg_height}" fill="white"/>
         <g transform="translate(0, {self.svg_height}) scale(1, -1)">
-            {blackletter.svg(Vector2D(1,0), "abc", scale)}
+            {self.blackletter.svg(Vector2D(1, 0), "abc", scale)}
         </g>
     </svg>
     """
 
+    def create_menu(self):
+        menu_bar = self.menuBar()
+        file_menu = menu_bar.addMenu("File")
+
+        open_action = QAction("Open", self)
+        save_action = QAction("Save", self)
+
+        update_birdfont_action = QAction("Update Birdfont", self)
+        update_birdfont_action.triggered.connect(self.update_birdfont)
+
+        exit_action = QAction("Exit", self)
+        exit_action.triggered.connect(self.close)
+
+        # Add actions to the File menu
+        file_menu.addAction(open_action)
+        file_menu.addAction(save_action)
+        file_menu.addSeparator()
+        file_menu.addAction(update_birdfont_action)
+
+        file_menu.addSeparator()
+        file_menu.addAction(exit_action)
+
+
+    def update_birdfont(self):
+        filename, _ = QFileDialog.getOpenFileName(
+            self,
+            "Open File",
+            "",
+            "Birdfont files (*.birdfont)"
+        )
+
+        if filename:
+            br = BirdfontReader("cour.birdfont")
+            br.load()
+
+            br.replace_paths_by_unicode("a", self.blackletter.birdfont_path('a', 10))
+            br.replace_paths_by_unicode("b", self.blackletter.birdfont_path('b', 10))
+            br.replace_paths_by_unicode("c", self.blackletter.birdfont_path('c', 10))
+            br.save()
 
