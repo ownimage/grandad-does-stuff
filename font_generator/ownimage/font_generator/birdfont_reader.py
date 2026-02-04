@@ -45,7 +45,7 @@ class BirdfontReader:
 
     # ---------------- Path modification ----------------
 
-    def replace_paths_by_unicode(self, char: str, new_paths: list[str]):
+    def replace_paths_by_unicode(self, char: str, path_attrs: list[dict]):
         glyph = self.get_glyph_by_unicode(char)
         if glyph is None:
             raise ValueError(f"No glyph found for Unicode {char!r}")
@@ -63,8 +63,8 @@ class BirdfontReader:
             layer.remove(p)
 
         # Add new paths
-        for data in new_paths:
-            ET.SubElement(layer, "path", {"data": data})
+        for attrib in path_attrs:
+            ET.SubElement(layer, "path", attrib)
 
     def add_path_by_unicode(self, char: str, path_data: str):
         glyph = self.get_glyph_by_unicode(char)
@@ -89,10 +89,23 @@ class BirdfontReader:
                 layer.remove(p)
 
     # ---------------- Saving ----------------
+    def indent(self, elem, level=0):
+        i = "\n" + level * "  "
+        if len(elem):
+            if not elem.text or not elem.text.strip():
+                elem.text = i + "  "
+            for child in elem:
+                self.indent(child, level + 1)
+            if not elem.tail or not elem.tail.strip():
+                elem.tail = i
+        else:
+            if not elem.tail or not elem.tail.strip():
+                elem.tail = i
 
     def save(self, out_filename: str | None = None):
         if out_filename is None:
             out_filename = self.filename
+        self.indent(self.tree.getroot())
         self.tree.write(out_filename, encoding="utf-8", xml_declaration=True)
 
 

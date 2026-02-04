@@ -60,8 +60,10 @@ class Blackletter:
         svg = ""
         start = posn
         for c in chars:
+            svg += f"<!-- char {c} -->\n"
             svg += self.glyph_map[c].svg(start, self.fp, scale)
             start += Vector2D(self.glyph_widths[c], 0)
+        print(f"svg={svg}")
         return svg
 
     def birdfont_path(self, key, scale: float):

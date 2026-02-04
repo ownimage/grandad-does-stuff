@@ -114,8 +114,8 @@ class MainWindow(QMainWindow):
             br = BirdfontReader("cour.birdfont")
             br.load()
 
-            br.replace_paths_by_unicode("a", self.blackletter.birdfont_path('a', 10))
-            br.replace_paths_by_unicode("b", self.blackletter.birdfont_path('b', 10))
-            br.replace_paths_by_unicode("c", self.blackletter.birdfont_path('c', 10))
+            br.replace_paths_by_unicode("a", self.blackletter.birdfont_path('a', 20))
+            br.replace_paths_by_unicode("b", self.blackletter.birdfont_path('b', 20))
+            br.replace_paths_by_unicode("c", self.blackletter.birdfont_path('c', 20))
             br.save()
 

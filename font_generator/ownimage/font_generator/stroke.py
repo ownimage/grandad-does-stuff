@@ -45,5 +45,14 @@ class Stroke(Strokeable):
         p3 = p2.__sub__(s2)
         p4 = p3.__sub__(v)
 
-        paths = [f"S {p1.x:.5f},{p1.y:.5f} L {p2.x:.5f},{p2.y:.5f} L {p3.x:.5f},{p3.y:.5f} L {p4.x:.5f},{p4.y:.5f} L {p1.x:.5f},{p1.y:.5f}"]
+        paths = [
+            {
+                "data": f"S {p1.x:.5f},{p1.y:.5f} L {p2.x:.5f},{p2.y:.5f} L {p3.x:.5f},{p3.y:.5f} L {p4.x:.5f},{p4.y:.5f} L {p1.x:.5f},{p1.y:.5f}",
+                "stroke": ".1"
+            },
+            # {
+            #     "data": f"S {p1.x:.5f},{p1.y:.5f} L {p2.x:.5f},{p2.y:.5f} L {p3.x:.5f},{p3.y:.5f} L {p4.x:.5f},{p4.y:.5f} L {p1.x:.5f},{p1.y:.5f}",
+            #     "fill": "black",
+            # }
+        ]
         return start.__add__(self.vec), paths
