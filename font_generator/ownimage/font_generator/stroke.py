@@ -55,20 +55,17 @@ class Stroke(Strokeable):
         ip3 = insideLine2.intersection(insideLine3)
         ip4 = insideLine3.intersection(insideLine4)
 
-        fill_attr = 'fill="black"' if fp.filled else 'fill="none"'
+        svg = f"""<path d ="M{p1.x} {p1.y} L{p2.x} {p2.y} L{p3.x} {p3.y} L{p4.x} {p4.y} Z" fill="black" stroke="black" stroke-width=".5" />\n"""
 
         if ip1.is_empty or ip2.is_empty or ip3.is_empty or ip4.is_empty:
             p1offset = VM.subtract_points(p1, offset4)
             p3offset = VM.subtract_points(p3, offset4)
-            svg = f"""
-            <path d ="M{p1.x} {p1.y} L{p1offset.x} {p1offset.y} L{p3offset.x} {p3offset.y} L{p3.x} {p3.y} Z" {fill_attr} stroke="black" stroke-width=".5" />
-                    """
+            if not fp.filled:
+                svg += f"""<path d ="M{p1.x} {p1.y} L{p1offset.x} {p1offset.y} L{p3offset.x} {p3offset.y} L{p3.x} {p3.y} Z" fill="black" stroke="white" stroke-width=".5" />\n"""
             return VM.add_points(start, self.vec), svg
 
-        svg = f"""
-        <path d ="M{p1.x} {p1.y} L{p2.x} {p2.y} L{p3.x} {p3.y} L{p4.x} {p4.y} Z" {fill_attr} stroke="black" stroke-width=".5" />
-        <path d ="M{ip1.x} {ip1.y} L{ip2.x} {ip2.y} L{ip3.x} {ip3.y} L{ip4.x} {ip4.y} Z" {fill_attr} stroke="black" stroke-width=".5" />
-                """
+        if not fp.filled:
+            svg += f"""<path d ="M{ip1.x} {ip1.y} L{ip2.x} {ip2.y} L{ip3.x} {ip3.y} L{ip4.x} {ip4.y} Z" fill="white" stroke="black" stroke-width=".5" />\n"""
         return VM.add_points(start, self.vec), svg
 
     def birdfont_path(self, start: Point, scale: float, pen_thickness: float):
