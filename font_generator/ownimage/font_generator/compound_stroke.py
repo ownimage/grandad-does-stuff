@@ -1,4 +1,4 @@
-from vector2d import Vector2D
+from shapely.geometry import Point
 
 from .font_parameters import FontParameters
 from .strokeable import Strokeable
@@ -9,7 +9,7 @@ class CompoundStroke(Strokeable):
         self.strokes = strokes
 
 
-    def svg(self, posn: Vector2D, fp: FontParameters, scale: float):
+    def svg(self, posn: Point, fp: FontParameters, scale: float):
         svg = ""
         start = posn
         for stroke in self.strokes:
@@ -17,7 +17,7 @@ class CompoundStroke(Strokeable):
             svg += s
         return start, svg
 
-    def birdfont_path(self, start: Vector2D, fp: FontParameters, scale: float):
+    def birdfont_path(self, start: Point, fp: FontParameters, scale: float):
         paths = []
 
         for stroke in self.strokes:
