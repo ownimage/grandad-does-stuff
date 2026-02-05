@@ -8,3 +8,4 @@ class FontParameters:
     baseline: float
     x_height: float
     ascender: float
+    descender: float

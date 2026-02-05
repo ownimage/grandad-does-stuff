@@ -19,11 +19,11 @@ class Mark:
 
         return svg + "\n"
 
-    def birdfont_path(self, scale: float, pen_thickness: float):
+    def birdfont_path(self, fp: FontParameters,  scale: float):
         start = self.vec
         paths = []
         for stroke in self.strokes:
-            start, stroke_paths = stroke.birdfont_path(start, scale, pen_thickness)
+            start, stroke_paths = stroke.birdfont_path(start, fp, scale)
             paths += stroke_paths
 
         return paths

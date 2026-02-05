@@ -16,8 +16,8 @@ class Glyph:
             svg += mark.svg(Point(posn.x + self.vec.x, posn.y + self.vec.y), fp, scale)
         return svg
 
-    def birdfont_path(self, scale: float, pen_thickness: float):
+    def birdfont_path(self, fp: FontParameters, scale: float):
         paths = []
         for mark in self.marks:
-            paths += mark.birdfont_path(scale, pen_thickness)
+            paths += mark.birdfont_path(fp, scale)
         return paths
