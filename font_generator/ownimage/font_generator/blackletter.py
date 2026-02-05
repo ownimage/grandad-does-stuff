@@ -16,22 +16,33 @@ class Blackletter:
         # calculated values
         self.m = fp.pen_thickness / (2 * math.sqrt(2))
 
+        self.am_m = fp.ascender - self.m
+        self.am_3m = fp.ascender - 3 * self.m
+        self.am_7m = fp.ascender - 7 * self.m
+
         self.xp_m = fp.x_height +  self.m
         self.xm_m = fp.x_height - self.m
         self.xm_3m = fp.x_height - 3 * self.m
         self.xm_7m = fp.x_height - 7 * self.m
 
+        self.bp_m = fp.baseline + self.m
+        self.bp_2m = fp.baseline + 2 * self.m
         self.bp_3m = fp.baseline + 3 * self.m
+
+        self.dp_3m = fp.descender + 3 * self.m
 
         # strokes
         self.s_a1 = Stroke(Point(0, self.bp_3m - self.xm_3m), StrokeType.Block)
         self.s_a2 = Stroke(Point(2 * self.m, -2 * self.m), StrokeType.Block)
 
-        self.s_b1 = Stroke(Point(0, self.bp_3m - fp.ascender), StrokeType.Block)
+        self.s_b1 = Stroke(Point(0, self.bp_3m - self.am_m ), StrokeType.Block)
 
         self.s_c1 = Stroke(Point(2 * self.m, 2 * self.m), StrokeType.Block)
 
         self.s_d1 = Stroke(Point(4 * self.m, -4 * self.m), StrokeType.Block)
+
+        self.s_f1 = Stroke(Point(0, 3 * self.m - fp.descender - fp.ascender), StrokeType.Block)
+        self.s_f2 = Stroke(Point(6 * self.m, 0), StrokeType.Block)
 
         # compound strokes
         self.cs_a1 = CompoundStroke([self.s_a1, self.s_a2])
@@ -46,7 +57,7 @@ class Blackletter:
         self.m_a1 = Mark(Point(0, self.xm_3m), [self.cs_a1])
         self.m_a2 = Mark(Point(2 * self.m, self.xm_m), [self.cs_a2])
 
-        self.m_b1 = Mark(Point(0, self.fp.ascender), [self.cs_b1])
+        self.m_b1 = Mark(Point(0, self.am_m), [self.cs_b1])
         self.m_b2 = Mark(Point(2 * self.m, self.xm_m), [self.cs_b2])
 
         self.m_c1 = Mark(Point(0, self.xm_3m), [self.cs_c1])
@@ -56,15 +67,22 @@ class Blackletter:
 
         self.m_e1 = Mark(Point(0, self.xm_7m), [self.s_c1])
 
+        self.m_f1 = Mark(Point(0, self.am_3m), [self.s_f1])
+        self.m_f2 = Mark(Point(-4 * self.m, -self.fp.descender), [self.s_a2])
+        self.m_f3 = Mark(Point(2 * self.m, self.am_m), [self.s_a2])
+        self.m_f4 = Mark(Point(-3 * self.m, self.am_7m), [self.s_f2])
+
+
         # glyphs
         self.g_a1 = Glyph(Point(0, 0), [self.m_a1, self.m_a2])
         self.g_b1 = Glyph(Point(0, 0), [self.m_b1, self.m_b2])
         self.g_c1 = Glyph(Point(0, 0), [self.m_c1, self.m_c2])
         self.g_d1 = Glyph(Point(0, 0), [self.m_a1, self.m_d1])
         self.g_e1 = Glyph(Point(0, 0), [self.m_c1, self.m_c2, self.m_e1])
+        self.g_f1 = Glyph(Point(0, 0), [self.m_f1, self.m_f2, self.m_f3, self.m_f4])
 
         # glyph map
-        self.glyph_map = {'a': self.g_a1, 'b': self.g_b1, 'c': self.g_c1, 'd': self.g_d1, 'e': self.g_e1}
+        self.glyph_map = {'a': self.g_a1, 'b': self.g_b1, 'c': self.g_c1, 'd': self.g_d1, 'e': self.g_e1, 'f': self.g_f1}
 
         self.glyph_widths = {'default': 8 * self.m}
 
@@ -86,3 +104,6 @@ class Blackletter:
     def birdfont_path(self, key, scale: float):
         g = self.glyph_map[key]
         return g.birdfont_path(scale, self.fp.pen_thickness)
+
+    def glyph_keys(self):
+        return self.glyph_map.keys()
