@@ -10,81 +10,79 @@ from .glyph import Glyph
 
 class Blackletter:
     def __init__(self, fp: FontParameters):
-
         self.fp = fp
 
         # calculated values
-        self.m = fp.pen_thickness / (2 * math.sqrt(2))
+        m = fp.pen_thickness / (2 * math.sqrt(2))
 
-        self.am_m = fp.ascender - self.m
-        self.am_3m = fp.ascender - 3 * self.m
-        self.am_7m = fp.ascender - 7 * self.m
+        am_m = fp.ascender - m
+        am_3m = fp.ascender - 3 * m
+        am_7m = fp.ascender - 7 * m
 
-        self.xp_m = fp.x_height +  self.m
-        self.xm_m = fp.x_height - self.m
-        self.xm_3m = fp.x_height - 3 * self.m
-        self.xm_7m = fp.x_height - 7 * self.m
+        xp_m = fp.x_height + m
+        xm_m = fp.x_height - m
+        xm_3m = fp.x_height - 3 * m
+        xm_7m = fp.x_height - 7 * m
 
-        self.bp_m = fp.baseline + self.m
-        self.bp_2m = fp.baseline + 2 * self.m
-        self.bp_3m = fp.baseline + 3 * self.m
+        bp_m = fp.baseline + m
+        bp_2m = fp.baseline + 2 * m
+        bp_3m = fp.baseline + 3 * m
 
-        self.dp_3m = fp.descender + 3 * self.m
+        dp_3m = fp.descender + 3 * m
 
         # strokes
-        self.s_a1 = Stroke(Point(0, self.bp_3m - self.xm_3m), StrokeType.Block)
-        self.s_a2 = Stroke(Point(2 * self.m, -2 * self.m), StrokeType.Block)
+        s_a1 = Stroke(Point(0, bp_3m - xm_3m), StrokeType.Block)
+        s_a2 = Stroke(Point(2 * m, -2 * m), StrokeType.Block)
 
-        self.s_b1 = Stroke(Point(0, self.bp_3m - self.am_m ), StrokeType.Block)
+        s_b1 = Stroke(Point(0, bp_3m - am_m), StrokeType.Block)
 
-        self.s_c1 = Stroke(Point(2 * self.m, 2 * self.m), StrokeType.Block)
+        s_c1 = Stroke(Point(2 * m, 2 * m), StrokeType.Block)
 
-        self.s_d1 = Stroke(Point(4 * self.m, -4 * self.m), StrokeType.Block)
+        s_d1 = Stroke(Point(4 * m, -4 * m), StrokeType.Block)
 
-        self.s_f1 = Stroke(Point(0, 3 * self.m - fp.descender - fp.ascender), StrokeType.Block)
-        self.s_f2 = Stroke(Point(6 * self.m, 0), StrokeType.Block)
+        s_f1 = Stroke(Point(0, 3 * m - fp.descender - fp.ascender), StrokeType.Block)
+        s_f2 = Stroke(Point(6 * m, 0), StrokeType.Block)
 
         # compound strokes
-        self.cs_a1 = CompoundStroke([self.s_a1, self.s_a2])
-        self.cs_a2 = CompoundStroke([self.s_a2, self.s_a1, self.s_a2])
+        cs_a1 = CompoundStroke([s_a1, s_a2])
+        cs_a2 = CompoundStroke([s_a2, s_a1, s_a2])
 
-        self.cs_b1 = CompoundStroke([self.s_b1, self.s_a2])
-        self.cs_b2 = CompoundStroke([self.s_a2, self.s_a1])
+        cs_b1 = CompoundStroke([s_b1, s_a2])
+        cs_b2 = CompoundStroke([s_a2, s_a1])
 
-        self.cs_c1 = CompoundStroke([self.s_a1, self.s_a2, self.s_c1])
+        cs_c1 = CompoundStroke([s_a1, s_a2, s_c1])
 
         # marks
-        self.m_a1 = Mark(Point(0, self.xm_3m), [self.cs_a1])
-        self.m_a2 = Mark(Point(2 * self.m, self.xm_m), [self.cs_a2])
+        m_a1 = Mark(Point(0, xm_3m), [cs_a1])
+        m_a2 = Mark(Point(2 * m, xm_m), [cs_a2])
 
-        self.m_b1 = Mark(Point(0, self.am_m), [self.cs_b1])
-        self.m_b2 = Mark(Point(2 * self.m, self.xm_m), [self.cs_b2])
+        m_b1 = Mark(Point(0, am_m), [cs_b1])
+        m_b2 = Mark(Point(2 * m, xm_m), [cs_b2])
 
-        self.m_c1 = Mark(Point(0, self.xm_3m), [self.cs_c1])
-        self.m_c2 = Mark(Point(2 * self.m, self.xm_m), [self.s_a2])
+        m_c1 = Mark(Point(0, xm_3m), [cs_c1])
+        m_c2 = Mark(Point(2 * m, xm_m), [s_a2])
 
-        self.m_d1 = Mark(Point(0, self.xp_m, 0), [self.s_d1, self.s_a1])
+        m_d1 = Mark(Point(0, xp_m, 0), [s_d1, s_a1])
 
-        self.m_e1 = Mark(Point(0, self.xm_7m), [self.s_c1])
+        m_e1 = Mark(Point(0, xm_7m), [s_c1])
 
-        self.m_f1 = Mark(Point(0, self.am_3m), [self.s_f1])
-        self.m_f2 = Mark(Point(-4 * self.m, -self.fp.descender), [self.s_a2])
-        self.m_f3 = Mark(Point(2 * self.m, self.am_m), [self.s_a2])
-        self.m_f4 = Mark(Point(-3 * self.m, self.am_7m), [self.s_f2])
-
+        m_f1 = Mark(Point(0, am_3m), [s_f1])
+        m_f2 = Mark(Point(-4 * m, -fp.descender), [s_a2])
+        m_f3 = Mark(Point(2 * m, am_m), [s_a2])
+        m_f4 = Mark(Point(-3 * m, am_7m), [s_f2])
 
         # glyphs
-        self.g_a1 = Glyph(Point(0, 0), [self.m_a1, self.m_a2])
-        self.g_b1 = Glyph(Point(0, 0), [self.m_b1, self.m_b2])
-        self.g_c1 = Glyph(Point(0, 0), [self.m_c1, self.m_c2])
-        self.g_d1 = Glyph(Point(0, 0), [self.m_a1, self.m_d1])
-        self.g_e1 = Glyph(Point(0, 0), [self.m_c1, self.m_c2, self.m_e1])
-        self.g_f1 = Glyph(Point(0, 0), [self.m_f1, self.m_f2, self.m_f3, self.m_f4])
+        g_a1 = Glyph(Point(0, 0), [m_a1, m_a2])
+        g_b1 = Glyph(Point(0, 0), [m_b1, m_b2])
+        g_c1 = Glyph(Point(0, 0), [m_c1, m_c2])
+        g_d1 = Glyph(Point(0, 0), [m_a1, m_d1])
+        g_e1 = Glyph(Point(0, 0), [m_c1, m_c2, m_e1])
+        g_f1 = Glyph(Point(0, 0), [m_f1, m_f2, m_f3, m_f4])
 
         # glyph map
-        self.glyph_map = {'a': self.g_a1, 'b': self.g_b1, 'c': self.g_c1, 'd': self.g_d1, 'e': self.g_e1, 'f': self.g_f1}
+        self.glyph_map = {'a': g_a1, 'b': g_b1, 'c': g_c1, 'd': g_d1, 'e': g_e1, 'f': g_f1}
 
-        self.glyph_widths = {'default': 8 * self.m}
+        self.glyph_widths = {'default': 8 * m}
 
     def svg(self, posn: Point, chars: str, scale: float):
         svg = ""
