@@ -62,7 +62,7 @@ class MainWindow(QMainWindow):
         layout.addLayout(ascender_row)
 
         self.descender = QSlider(Qt.Horizontal)
-        self.descender.setRange(100, 1000)
+        self.descender.setRange(0, 1000)
         self.descender.setValue(700)
         self.descender.valueChanged.connect(self.update_svg)
 
