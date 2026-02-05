@@ -24,7 +24,7 @@ class MainWindow(QMainWindow):
 
         self.filled = QCheckBox()
         self.scale = QSlider(Qt.Horizontal)
-        self.scale.setRange(10, 70)
+        self.scale.setRange(10, 400)
         self.scale.setValue(40)
 
         self.svg_width = 2000
