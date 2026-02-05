@@ -7,7 +7,7 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtSvgWidgets import QSvgWidget
 from PySide6.QtCore import Qt
-from vector2d import Vector2D
+from shapely.geometry import Point
 
 from .birdfont_reader import BirdfontReader
 from .blackletter import Blackletter
@@ -74,7 +74,7 @@ class MainWindow(QMainWindow):
     
         <rect x="0" y="0" width="{self.svg_width}" height="{self.svg_height}" fill="white"/>
         <g transform="translate(0, {self.svg_height}) scale(1, -1)">
-            {self.blackletter.svg(Vector2D(1, 0), "abc", scale)}
+            {self.blackletter.svg_known(Point(1, 0), scale)}
         </g>
     </svg>
     """
