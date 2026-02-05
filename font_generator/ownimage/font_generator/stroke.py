@@ -68,8 +68,8 @@ class Stroke(Strokeable):
             svg += f"""<path d ="M{ip1.x} {ip1.y} L{ip2.x} {ip2.y} L{ip3.x} {ip3.y} L{ip4.x} {ip4.y} Z" fill="white" stroke="black" stroke-width=".5" />\n"""
         return VM.add_points(start, self.vec), svg
 
-    def birdfont_path(self, start: Point, scale: float, pen_thickness: float):
-        d = scale * pen_thickness / (2 * math.sqrt(2))
+    def birdfont_path(self, start: Point, fp: FontParameters, scale: float):
+        d = scale * fp.pen_thickness / (2 * math.sqrt(2))
         s = Point(-d, -d)
         s2 = VM.scale_point(s, 2)
         v = VM.scale_point(self.vec, scale)

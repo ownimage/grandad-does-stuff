@@ -101,7 +101,7 @@ class Blackletter:
 
     def birdfont_path(self, key, scale: float):
         g = self.glyph_map[key]
-        return g.birdfont_path(scale, self.fp.pen_thickness)
+        return g.birdfont_path(self.fp, scale)
 
     def glyph_keys(self):
         return self.glyph_map.keys()

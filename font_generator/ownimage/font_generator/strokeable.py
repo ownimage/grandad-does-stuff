@@ -10,6 +10,6 @@ class Strokeable:
     def svg(self, start: Vector2D, fp: FontParameters, scale: float):
         raise RuntimeError("Not implemented yet")
 
-    def birdfont_path(self, start: Vector2D, scale: float, pen_thickness: float):
+    def birdfont_path(self, start: Vector2D, fp: FontParameters, scale: float):
         raise RuntimeError("Not implemented yet")
 

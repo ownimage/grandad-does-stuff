@@ -17,11 +17,11 @@ class CompoundStroke(Strokeable):
             svg += s
         return start, svg
 
-    def birdfont_path(self, start: Vector2D, scale: float, pen_thickness: float):
+    def birdfont_path(self, start: Vector2D, fp: FontParameters, scale: float):
         paths = []
 
         for stroke in self.strokes:
-            start, new_paths = stroke.birdfont_path(start, scale, pen_thickness)
+            start, new_paths = stroke.birdfont_path(start, fp, scale)
             paths += new_paths
         return start, paths
 
