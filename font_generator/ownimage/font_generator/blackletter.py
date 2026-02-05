@@ -19,6 +19,7 @@ class Blackletter:
         self.xp_m = fp.x_height +  self.m
         self.xm_m = fp.x_height - self.m
         self.xm_3m = fp.x_height - 3 * self.m
+        self.xm_7m = fp.x_height - 7 * self.m
 
         self.bp_3m = fp.baseline + 3 * self.m
 
@@ -53,14 +54,17 @@ class Blackletter:
 
         self.m_d1 = Mark(Point(0, self.xp_m, 0), [self.s_d1, self.s_a1])
 
+        self.m_e1 = Mark(Point(0, self.xm_7m), [self.s_c1])
+
         # glyphs
         self.g_a1 = Glyph(Point(0, 0), [self.m_a1, self.m_a2])
         self.g_b1 = Glyph(Point(0, 0), [self.m_b1, self.m_b2])
         self.g_c1 = Glyph(Point(0, 0), [self.m_c1, self.m_c2])
         self.g_d1 = Glyph(Point(0, 0), [self.m_a1, self.m_d1])
+        self.g_e1 = Glyph(Point(0, 0), [self.m_c1, self.m_c2, self.m_e1])
 
         # glyph map
-        self.glyph_map = {'a': self.g_a1, 'b': self.g_b1, 'c': self.g_c1, 'd': self.g_d1}
+        self.glyph_map = {'a': self.g_a1, 'b': self.g_b1, 'c': self.g_c1, 'd': self.g_d1, 'e': self.g_e1}
 
         self.glyph_widths = {'default': 8 * self.m}
 
