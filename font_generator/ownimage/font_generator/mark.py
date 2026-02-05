@@ -1,17 +1,17 @@
 from typing import List
-from vector2d import Vector2D
+from shapely.geometry import Point
 
 from .font_parameters import FontParameters
 from .stroke import Strokeable
 
 
 class Mark:
-    def __init__(self, vec: Vector2D, strokes: List[Strokeable]):
+    def __init__(self, vec: Point, strokes: List[Strokeable]):
         self.vec = vec
         self.strokes = strokes
 
-    def svg(self, posn: Vector2D, fp: FontParameters, scale: float):
-        start = posn.__add__(self.vec)
+    def svg(self, posn: Point, fp: FontParameters, scale: float):
+        start = Point(posn.x + self.vec.x, posn.y + self.vec.y)
         svg = ""
         for stroke in self.strokes:
             start, line = stroke.svg(start, fp, scale)

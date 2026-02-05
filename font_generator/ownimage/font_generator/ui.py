@@ -7,7 +7,7 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtSvgWidgets import QSvgWidget
 from PySide6.QtCore import Qt
-from vector2d import Vector2D
+from shapely.geometry import Point
 
 from .birdfont_reader import BirdfontReader
 from .blackletter import Blackletter
@@ -23,8 +23,17 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("Font Generator")
 
         self.filled = QCheckBox()
+
+        self.x_height = QSlider(Qt.Horizontal)
+        self.x_height.setRange(100, 1000)
+        self.x_height.setValue(300)
+
+        self.ascender = QSlider(Qt.Horizontal)
+        self.ascender.setRange(100, 1000)
+        self.ascender.setValue(700)
+
         self.scale = QSlider(Qt.Horizontal)
-        self.scale.setRange(10, 70)
+        self.scale.setRange(10, 400)
         self.scale.setValue(40)
 
         self.svg_width = 2000
@@ -32,10 +41,18 @@ class MainWindow(QMainWindow):
         self.svg_widget = QSvgWidget()
         self.svg_widget.setFixedSize(self.svg_width, self.svg_height)
 
-        checkbox_row = QHBoxLayout()
-        checkbox_row.addWidget(QLabel("Filled:"))
-        checkbox_row.addWidget(self.filled)
-        checkbox_row.addStretch()
+        filled_row = QHBoxLayout()
+        filled_row.addWidget(QLabel("Filled:"))
+        filled_row.addWidget(self.filled)
+        filled_row.addStretch()
+
+        x_height_row = QHBoxLayout()
+        x_height_row.addWidget(QLabel("X Height:"))
+        x_height_row.addWidget(self.x_height)
+
+        ascender_row = QHBoxLayout()
+        ascender_row.addWidget(QLabel("Ascender:"))
+        ascender_row.addWidget(self.ascender)
 
         slider_row = QHBoxLayout()
         slider_row.addWidget(QLabel("Scale:"))
@@ -44,11 +61,15 @@ class MainWindow(QMainWindow):
         self.update_svg()
 
         self.filled.stateChanged.connect(self.update_svg)
+        self.x_height.valueChanged.connect(self.update_svg)
+        self.ascender.valueChanged.connect(self.update_svg)
         self.scale.valueChanged.connect(self.update_svg)
 
         layout = QVBoxLayout()
         layout.addWidget(self.svg_widget)
-        layout.addLayout(checkbox_row)
+        layout.addLayout(filled_row)
+        layout.addLayout(x_height_row)
+        layout.addLayout(ascender_row)
         layout.addLayout(slider_row)
 
         central = QWidget()
@@ -63,7 +84,7 @@ class MainWindow(QMainWindow):
         self.svg_widget.load(bytearray(svg_data, encoding="utf-8"))
 
     def get_fontParameters(self):
-        return FontParameters(0.5, self.filled.isChecked(), 0, 3, 7)
+        return FontParameters(0.5, self.filled.isChecked(), 0, self.x_height.value()/100, self.ascender.value()/100)
 
     def make_svg(self, scale: float) -> str:
         self.blackletter = Blackletter(self.get_fontParameters())
@@ -74,7 +95,7 @@ class MainWindow(QMainWindow):
     
         <rect x="0" y="0" width="{self.svg_width}" height="{self.svg_height}" fill="white"/>
         <g transform="translate(0, {self.svg_height}) scale(1, -1)">
-            {self.blackletter.svg(Vector2D(1, 0), "abc", scale)}
+            {self.blackletter.svg_known(Point(1, 0), scale)}
         </g>
     </svg>
     """
