@@ -99,17 +99,16 @@ class Blackletter:
 
         m_f1 = Mark(Point(0, am_3m), [CompoundStroke([s_f1]).add_after(f_f_footer)])
         m_f2 = Mark(Point(2 * m, am_m), [f_dot])
-        m_f3 = Mark(Point(-3 * m, am_7m), [s_f2])
+        m_f3 = Mark(Point(-3 * m, fp.tbar), [s_f2])
 
         m_g1 = Mark(Point(2 * m, xm_m), [cs_g1.add_after(f_f_footer)])
 
         m_h1 = Mark(Point(0, fp.ascender - m), [CompoundStroke([s_h1]).add_after(f_h_footer)])
 
         m_i1 = Mark(Point(0, fp.x_height - m), [CompoundStroke([s_i1]).add_after(f_h_footer)])
-        m_i2 = Mark(Point(-m, fp.x_height + 3 * m), [f_dot])
+        m_i_dot = Mark(Point(-m, fp.tbar), [f_dot])
 
-        m_j1 = Mark(Point(0, fp.x_height - m), [s_j1])
-        m_j2 = Mark(Point(-4 * m, dp_3m), [f_dot])
+        m_j1 = Mark(Point(0, xm_m), [CompoundStroke([s_j1]).add_after(f_f_footer)])
 
         m_k1 = Mark(Point(0, fp.x_height - 7 * m), [cs_k1])
 
@@ -123,8 +122,8 @@ class Blackletter:
             'f': Glyph(Point(0, 0), [m_f1, m_f2, m_f3]),
             'g': Glyph(Point(0, 0), [m_a1, m_g1]),
             'h': Glyph(Point(0, 0), [m_h1, m_a2]),
-            'i': Glyph(Point(0, 0), [m_i1, m_i2]),
-            'j': Glyph(Point(0, 0), [m_j1, m_j2, m_i2]),
+            'i': Glyph(Point(0, 0), [m_i1, m_i_dot]),
+            'j': Glyph(Point(0, 0), [m_j1, m_i_dot]),
             'k': Glyph(Point(0, 0), [m_h1, m_c2, m_e1, m_k1]),
             'l': Glyph(Point(0, 0), [m_h1])
         }
