@@ -1,5 +1,3 @@
-import sys
-
 from PySide6.QtGui import QAction
 from PySide6.QtWidgets import (
     QVBoxLayout, QHBoxLayout,
@@ -40,66 +38,32 @@ class MainWindow(QMainWindow):
 
         layout.addLayout(filled_row)
 
-        self.x_height = QSlider(Qt.Horizontal)
-        self.x_height.setRange(100, 1000)
-        self.x_height.setValue(300)
-        self.x_height.valueChanged.connect(self.update_svg)
+        self.ascender = self.createSlider(layout, 100, 1000, 700, "Ascender")
+        self.tbar = self.createSlider(layout, 100, 1000, 500, "T Bar")
+        self.x_height = self.createSlider(layout, 100, 1000, 300, "X Height")
+        self.descender = self.createSlider(layout, 100, 1000, 700, "Descender")
 
-        x_height_row = QHBoxLayout()
-        x_height_row.addWidget(QLabel("X Height:"))
-        x_height_row.addWidget(self.x_height)
-
-        layout.addLayout(x_height_row)
-
-        self.ascender = QSlider(Qt.Horizontal)
-        self.ascender.setRange(100, 1000)
-        self.ascender.setValue(700)
-        self.ascender.valueChanged.connect(self.update_svg)
-
-        ascender_row = QHBoxLayout()
-        ascender_row.addWidget(QLabel("Ascender:"))
-        ascender_row.addWidget(self.ascender)
-
-        layout.addLayout(ascender_row)
-
-        self.tbar = QSlider(Qt.Horizontal)
-        self.tbar.setRange(100, 1000)
-        self.tbar.setValue(500)
-        self.tbar.valueChanged.connect(self.update_svg)
-
-        tbar_row = QHBoxLayout()
-        tbar_row.addWidget(QLabel("T Bar:"))
-        tbar_row.addWidget(self.tbar)
-
-        layout.addLayout(tbar_row)
-
-        self.descender = QSlider(Qt.Horizontal)
-        self.descender.setRange(0, 1000)
-        self.descender.setValue(700)
-        self.descender.valueChanged.connect(self.update_svg)
-
-        descender_row = QHBoxLayout()
-        descender_row.addWidget(QLabel("Descender:"))
-        descender_row.addWidget(self.descender)
-
-        layout.addLayout(descender_row)
-
-        self.scale = QSlider(Qt.Horizontal)
-        self.scale.setRange(10, 400)
-        self.scale.setValue(40)
-        self.scale.valueChanged.connect(self.update_svg)
-
-        scale_row = QHBoxLayout()
-        scale_row.addWidget(QLabel("Scale:"))
-        scale_row.addWidget(self.scale)
-
-        layout.addLayout(scale_row)
+        self.scale = self.createSlider(layout, 10, 400, 40, "Scale")
 
         central = QWidget()
         central.setLayout(layout)
         self.setCentralWidget(central)
 
         self.update_svg()
+
+    def createSlider(self, layout, min, max, value, name):
+        slider = QSlider(Qt.Horizontal)
+        slider.setRange(min, max)
+        slider.setValue(value)
+        slider.valueChanged.connect(self.update_svg)
+
+        scale_row = QHBoxLayout()
+        scale_row.addWidget(QLabel(f"{name}:"))
+        scale_row.addWidget(slider)
+
+        layout.addLayout(scale_row)
+
+        return slider
 
     def update_svg(self):
         radius = float(self.scale.value())

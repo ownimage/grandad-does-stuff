@@ -9,9 +9,9 @@ from .vector_math import VectorMath as VM
 
 
 class CompoundStroke(Strokeable):
-    def __init__(self, strokes: list[Stroke]):
+    def __init__(self, strokes: Stroke | list[Stroke]):
         super().__init__()
-        self.strokes: list[Stroke] = strokes
+        self.strokes: list[Stroke] = [strokes] if isinstance(strokes, Stroke) else strokes
 
     def add_after(self, cs: CompoundStroke) -> CompoundStroke:
         cs_first = cs.strokes[0]
