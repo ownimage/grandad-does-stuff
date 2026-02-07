@@ -1,5 +1,3 @@
-import sys
-
 from PySide6.QtGui import QAction
 from PySide6.QtWidgets import (
     QVBoxLayout, QHBoxLayout,
@@ -30,6 +28,7 @@ class MainWindow(QMainWindow):
         layout.addWidget(self.svg_widget)
 
         self.filled = QCheckBox()
+        self.filled.setChecked(True)
         self.filled.stateChanged.connect(self.update_svg)
 
         filled_row = QHBoxLayout()
@@ -39,49 +38,12 @@ class MainWindow(QMainWindow):
 
         layout.addLayout(filled_row)
 
-        self.x_height = QSlider(Qt.Horizontal)
-        self.x_height.setRange(100, 1000)
-        self.x_height.setValue(300)
-        self.x_height.valueChanged.connect(self.update_svg)
+        self.ascender = self.createSlider(layout, 100, 1000, 700, "Ascender")
+        self.tbar = self.createSlider(layout, 100, 1000, 500, "T Bar")
+        self.x_height = self.createSlider(layout, 100, 1000, 300, "X Height")
+        self.descender = self.createSlider(layout, 100, 1000, 700, "Descender")
 
-        x_height_row = QHBoxLayout()
-        x_height_row.addWidget(QLabel("X Height:"))
-        x_height_row.addWidget(self.x_height)
-
-        layout.addLayout(x_height_row)
-
-        self.ascender = QSlider(Qt.Horizontal)
-        self.ascender.setRange(100, 1000)
-        self.ascender.setValue(700)
-        self.ascender.valueChanged.connect(self.update_svg)
-
-        ascender_row = QHBoxLayout()
-        ascender_row.addWidget(QLabel("Ascender:"))
-        ascender_row.addWidget(self.ascender)
-
-        layout.addLayout(ascender_row)
-
-        self.descender = QSlider(Qt.Horizontal)
-        self.descender.setRange(0, 1000)
-        self.descender.setValue(700)
-        self.descender.valueChanged.connect(self.update_svg)
-
-        descender_row = QHBoxLayout()
-        descender_row.addWidget(QLabel("descender:"))
-        descender_row.addWidget(self.descender)
-
-        layout.addLayout(descender_row)
-
-        self.scale = QSlider(Qt.Horizontal)
-        self.scale.setRange(10, 400)
-        self.scale.setValue(40)
-        self.scale.valueChanged.connect(self.update_svg)
-
-        scale_row = QHBoxLayout()
-        scale_row.addWidget(QLabel("Scale:"))
-        scale_row.addWidget(self.scale)
-
-        layout.addLayout(scale_row)
+        self.scale = self.createSlider(layout, 10, 400, 40, "Scale")
 
         central = QWidget()
         central.setLayout(layout)
@@ -89,6 +51,19 @@ class MainWindow(QMainWindow):
 
         self.update_svg()
 
+    def createSlider(self, layout, min, max, value, name):
+        slider = QSlider(Qt.Horizontal)
+        slider.setRange(min, max)
+        slider.setValue(value)
+        slider.valueChanged.connect(self.update_svg)
+
+        scale_row = QHBoxLayout()
+        scale_row.addWidget(QLabel(f"{name}:"))
+        scale_row.addWidget(slider)
+
+        layout.addLayout(scale_row)
+
+        return slider
 
     def update_svg(self):
         radius = float(self.scale.value())
@@ -96,7 +71,8 @@ class MainWindow(QMainWindow):
         self.svg_widget.load(bytearray(svg_data, encoding="utf-8"))
 
     def get_fontParameters(self):
-        return FontParameters(0.5, self.filled.isChecked(), 0, self.x_height.value()/100, self.ascender.value()/100, self.descender.value()/100)
+        return FontParameters(0.5, self.filled.isChecked(), self.ascender.value() / 100, self.tbar.value() / 100, self.x_height.value() / 100, 0,
+                              -self.descender.value() / 100)
 
     def make_svg(self, scale: float) -> str:
         self.blackletter = Blackletter(self.get_fontParameters())
@@ -107,8 +83,8 @@ class MainWindow(QMainWindow):
     <svg width="{self.svg_width}" height="{self.svg_height}" viewBox="0 0 {self.svg_width} {self.svg_height}" 
         xmlns="http://www.w3.org/2000/svg">
     
-        <rect x="0" y="{-offset}" width="{self.svg_width}" height="{self.svg_height+offset}" fill="white"/>
-        <g transform="translate(0, {self.svg_height-offset}) scale(1, -1)">
+        <rect x="0" y="{-offset}" width="{self.svg_width}" height="{self.svg_height + offset}" fill="white"/>
+        <g transform="translate(0, {self.svg_height - offset}) scale(1, -1)">
             {self.blackletter.svg_known(Point(1, 0), scale)}
         </g>
     </svg>
@@ -136,7 +112,6 @@ class MainWindow(QMainWindow):
         file_menu.addSeparator()
         file_menu.addAction(exit_action)
 
-
     def update_birdfont(self):
         filename, _ = QFileDialog.getOpenFileName(
             self,
@@ -152,4 +127,3 @@ class MainWindow(QMainWindow):
             for k in self.blackletter.glyph_keys():
                 br.replace_paths_by_unicode(k, self.blackletter.birdfont_path(k, 20))
             br.save()
-

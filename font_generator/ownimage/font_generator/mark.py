@@ -6,9 +6,9 @@ from .stroke import Strokeable
 
 
 class Mark:
-    def __init__(self, vec: Point, strokes: List[Strokeable]):
+    def __init__(self, vec: Point, strokes: List[Strokeable] | Strokeable):
         self.vec = vec
-        self.strokes = strokes
+        self.strokes: List[Strokeable] = [strokes] if isinstance(strokes, Strokeable) else strokes
 
     def svg(self, posn: Point, fp: FontParameters, scale: float):
         start = Point(posn.x + self.vec.x, posn.y + self.vec.y)

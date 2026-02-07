@@ -6,9 +6,10 @@ from .mark import Mark
 
 
 class Glyph:
-    def __init__(self, vec: Point, marks: List[Mark]):
+    def __init__(self, vec: Point, marks: List[Mark], width):
         self.vec = vec
         self.marks = marks
+        self.width = width
 
     def svg(self, posn: Point, fp: FontParameters, scale: float):
         svg = ""
