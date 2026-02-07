@@ -5,7 +5,8 @@ from dataclasses import dataclass
 class FontParameters:
     pen_thickness: float
     filled: bool
-    baseline: float
-    x_height: float
     ascender: float
+    tbar: float
+    x_height: float
+    baseline: float
     descender: float

@@ -30,6 +30,7 @@ class MainWindow(QMainWindow):
         layout.addWidget(self.svg_widget)
 
         self.filled = QCheckBox()
+        self.filled.setChecked(True)
         self.filled.stateChanged.connect(self.update_svg)
 
         filled_row = QHBoxLayout()
@@ -61,13 +62,24 @@ class MainWindow(QMainWindow):
 
         layout.addLayout(ascender_row)
 
+        self.tbar = QSlider(Qt.Horizontal)
+        self.tbar.setRange(100, 1000)
+        self.tbar.setValue(500)
+        self.tbar.valueChanged.connect(self.update_svg)
+
+        tbar_row = QHBoxLayout()
+        tbar_row.addWidget(QLabel("T Bar:"))
+        tbar_row.addWidget(self.tbar)
+
+        layout.addLayout(tbar_row)
+
         self.descender = QSlider(Qt.Horizontal)
         self.descender.setRange(0, 1000)
         self.descender.setValue(700)
         self.descender.valueChanged.connect(self.update_svg)
 
         descender_row = QHBoxLayout()
-        descender_row.addWidget(QLabel("descender:"))
+        descender_row.addWidget(QLabel("Descender:"))
         descender_row.addWidget(self.descender)
 
         layout.addLayout(descender_row)
@@ -89,14 +101,14 @@ class MainWindow(QMainWindow):
 
         self.update_svg()
 
-
     def update_svg(self):
         radius = float(self.scale.value())
         svg_data = self.make_svg(radius)
         self.svg_widget.load(bytearray(svg_data, encoding="utf-8"))
 
     def get_fontParameters(self):
-        return FontParameters(0.5, self.filled.isChecked(), 0, self.x_height.value()/100, self.ascender.value()/100, self.descender.value()/100)
+        return FontParameters(0.5, self.filled.isChecked(), self.ascender.value() / 100, self.tbar.value() / 100, self.x_height.value() / 100, 0,
+                              -self.descender.value() / 100)
 
     def make_svg(self, scale: float) -> str:
         self.blackletter = Blackletter(self.get_fontParameters())
@@ -107,8 +119,8 @@ class MainWindow(QMainWindow):
     <svg width="{self.svg_width}" height="{self.svg_height}" viewBox="0 0 {self.svg_width} {self.svg_height}" 
         xmlns="http://www.w3.org/2000/svg">
     
-        <rect x="0" y="{-offset}" width="{self.svg_width}" height="{self.svg_height+offset}" fill="white"/>
-        <g transform="translate(0, {self.svg_height-offset}) scale(1, -1)">
+        <rect x="0" y="{-offset}" width="{self.svg_width}" height="{self.svg_height + offset}" fill="white"/>
+        <g transform="translate(0, {self.svg_height - offset}) scale(1, -1)">
             {self.blackletter.svg_known(Point(1, 0), scale)}
         </g>
     </svg>
@@ -136,7 +148,6 @@ class MainWindow(QMainWindow):
         file_menu.addSeparator()
         file_menu.addAction(exit_action)
 
-
     def update_birdfont(self):
         filename, _ = QFileDialog.getOpenFileName(
             self,
@@ -152,4 +163,3 @@ class MainWindow(QMainWindow):
             for k in self.blackletter.glyph_keys():
                 br.replace_paths_by_unicode(k, self.blackletter.birdfont_path(k, 20))
             br.save()
-

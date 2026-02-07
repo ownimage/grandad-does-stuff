@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import math
 from enum import Enum
 from shapely.geometry import Point, LineString
@@ -8,18 +10,35 @@ from .strokeable import Strokeable
 from .vector_math import VectorMath as VM
 
 
-class StrokeType(Enum):
-    Block = 1
-    Line = 2
-
-
 class Stroke(Strokeable):
-    def __init__(self, vec: Point, stroke_type: StrokeType):
+    class StrokeType(Enum):
+        Block = 1
+        Line = 2
+        Move = 3
+        Extend = 4
+
+    def __init__(self, vec: Point, stroke_type: StrokeType = StrokeType.Block):
         super().__init__()
         self.vec = vec
         self.stroke_type = stroke_type
 
+    @staticmethod
+    def from_xy(x: float, y: float, stroke_type: StrokeType = StrokeType.Block) -> Stroke:
+        return Stroke(Point(x, y), stroke_type)
+
+    @staticmethod
+    def between(start: Point, end: Point, stroke_type: StrokeType = StrokeType.Block) -> Stroke:
+        return Stroke(VM.subtract_points(start, end), stroke_type)
+
+    def extend(self, e: Stroke) -> Stroke:
+        if e.stroke_type != Stroke.StrokeType.Extend:
+            raise RuntimeError("Stroke of wrong type.")
+        return Stroke(VM.add_points(self.vec, e.vec), self.stroke_type)
+
     def svg(self, start: Point, fp: FontParameters, scale: float):
+        if self.stroke_type == Stroke.StrokeType.Move:
+            return VM.add_points(start, self.vec), ""
+
         d = scale * fp.pen_thickness / (2 * math.sqrt(2))
         s = Point(-d, -d)
         s2 = VM.scale_point(s, 2)
@@ -68,6 +87,9 @@ class Stroke(Strokeable):
         return VM.add_points(start, self.vec), svg
 
     def birdfont_path(self, start: Point, fp: FontParameters, scale: float):
+        if self.stroke_type == Stroke.StrokeType.Move:
+            return VM.add_points(start, self.vec), []
+
         d = scale * fp.pen_thickness / (2 * math.sqrt(2))
         s = Point(-d, -d)
         s2 = VM.scale_point(s, 2)
