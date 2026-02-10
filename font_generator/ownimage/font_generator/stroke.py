@@ -47,14 +47,14 @@ class Stroke(Strokeable):
         p3 = VM.subtract_points(p2, s2)
         p4 = VM.subtract_points(p3, v)
 
-        if prev is None:
+        if prev is None or prev.stroke_type != StrokeType.Block:
             geom_set.get_current_outline().extend([p3, p4, p1, p2])
         else:
             curr = geom_set.get_current_outline()
             new = [p3] + curr + [p2]
             geom_set.replace_current_outline(new)
 
-        if next is None:
+        if next is None or next.stroke_type != StrokeType.Block:
             geom_set.add_new_outline()
 
         return VM.add_points(start, self.vec)

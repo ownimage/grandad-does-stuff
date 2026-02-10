@@ -16,11 +16,11 @@ class Mark:
         self.strokes: List[Strokeable] = [strokes] if isinstance(strokes, Strokeable) else strokes
 
     def svg(self, posn: Point, fp: FontParameters, scale: float):
-        start = Point(posn.x + self.vec.x, posn.y + self.vec.y)
-        svg = ""
-        for stroke in self.strokes:
-            start, line = stroke.svg(start, fp, scale)
-            svg += line
+        # start = Point(posn.x + self.vec.x, posn.y + self.vec.y)
+        # svg = ""
+        # for stroke in self.strokes:
+        #     start, line = stroke.svg(start, fp, scale)
+        #     svg += line
 
         start = Point(posn.x + self.vec.x, posn.y + self.vec.y)
         geom_set = GeometrySet()
