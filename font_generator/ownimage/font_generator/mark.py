@@ -1,8 +1,12 @@
+from __future__ import annotations
+
 from typing import List
 from shapely.geometry import Point
 
 from .font_parameters import FontParameters
 from .stroke import Strokeable
+
+from .vector_math import VectorMath as VM
 
 
 class Mark:
@@ -19,7 +23,7 @@ class Mark:
 
         return svg + "\n"
 
-    def birdfont_path(self, fp: FontParameters,  scale: float):
+    def birdfont_path(self, fp: FontParameters, scale: float):
         start = self.vec
         paths = []
         for stroke in self.strokes:
@@ -27,3 +31,6 @@ class Mark:
             paths += stroke_paths
 
         return paths
+
+    def plus(self, off: Point) -> Mark:
+        return Mark(VM.add_points(self.vec, off), self.strokes)

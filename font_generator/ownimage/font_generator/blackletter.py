@@ -17,15 +17,22 @@ class Blackletter:
         m2 = 2 * m
         m3 = 3 * m
         m4 = 4 * m
+        m5 = 5 * m
+        m6 = 6 * m
+        m7 = 7 * m
+        m8 = 8 * m
+        m9 = 9 * m
 
         am_m = fp.ascender - m
-        am_3m = fp.ascender -m3
-        am_7m = fp.ascender - 7 * m
+        am_3m = fp.ascender - m3
+        am_7m = fp.ascender - m7
 
         xp_m = fp.x_height + m
         xm_m = fp.x_height - m
+        xm_2m = fp.x_height - m2
         xm_3m = fp.x_height - m3
-        xm_7m = fp.x_height - 7 * m
+        xm_4m = fp.x_height - m4
+        xm_7m = fp.x_height - m7
 
         bp_m = fp.baseline + m
         bp_2m = fp.baseline + m2
@@ -41,7 +48,7 @@ class Blackletter:
             f_dot
         ])
 
-        f_h_footer = CompoundStroke([
+        f_i_footer = CompoundStroke([
             Stroke(Point(0, m), Stroke.StrokeType.Extend),
             Stroke(Point(-m, m), Stroke.StrokeType.Move),
             f_dot
@@ -57,18 +64,22 @@ class Blackletter:
         s_d1 = Stroke(Point(m4, -m4))
 
         s_f1 = Stroke(Point(0, dp_3m - am_3m))
-        s_f2 = Stroke(Point(6 * m, 0))
+        s_f2 = Stroke(Point(m6, 0))
 
         s_g1 = Stroke(Point(0, dp_3m - xm_3m))
 
-        s_h1 = Stroke(Point(0, 0 - (fp.ascender - 2 * m)))
+        s_h1 = Stroke(Point(0, 0 - (fp.ascender - m2)))
 
         s_i1 = Stroke(Point(0, m - xm_m))
 
         s_j1 = Stroke(Point(0, dp_3m - xm_m))
 
-        s_k1 = Stroke(Point(4 * m, 0))
+        s_k1 = Stroke(Point(m4, 0))
         s_k2 = Stroke(Point(0, 10 * m - fp.x_height))
+
+        s_l1 = Stroke(Point(0, m2 - (fp.ascender - m2)))
+
+        s_m2 = Stroke(Point(0, -xm_4m))
 
         # compound strokes
         cs_a1 = CompoundStroke([s_a1, f_dot])
@@ -83,50 +94,61 @@ class Blackletter:
 
         cs_k1 = CompoundStroke([s_k1, s_k2, f_dot])
 
+        cs_a2 = CompoundStroke([f_dot, s_a1, f_dot])
+
+        cs_m2 = CompoundStroke([f_dot, s_m2]).add_after(f_i_footer)
+
         # marks
         m_a1 = Mark(Point(0, xm_3m), cs_a1)
-        m_a2 = Mark(Point(2 * m, xm_m), cs_a2)
+        m_a2 = Mark(Point(m2, xm_m), cs_a2)
 
         m_b1 = Mark(Point(0, am_m), cs_b1)
-        m_b2 = Mark(Point(2 * m, xm_m), cs_b2)
+        m_b2 = Mark(Point(m2, xm_m), cs_b2)
 
         m_c1 = Mark(Point(0, xm_3m), cs_c1)
-        m_c2 = Mark(Point(2 * m, xm_m), f_dot)
+        m_c2 = Mark(Point(m2, xm_m), f_dot)
 
         m_d1 = Mark(Point(0, xp_m, 0), [s_d1, s_a1])
 
         m_e1 = Mark(Point(0, xm_7m), s_c1)
 
         m_f1 = Mark(Point(0, am_3m), CompoundStroke(s_f1).add_after(f_f_footer))
-        m_f2 = Mark(Point(2 * m, am_m), f_dot)
-        m_f3 = Mark(Point(-3 * m, fp.tbar), s_f2)
+        m_f2 = Mark(Point(m2, am_m), f_dot)
+        m_f3 = Mark(Point(-m3, fp.tbar), s_f2)
 
-        m_g1 = Mark(Point(2 * m, xm_m), cs_g1.add_after(f_f_footer))
+        m_g1 = Mark(Point(m2, xm_m), cs_g1.add_after(f_f_footer))
 
-        m_h1 = Mark(Point(0, fp.ascender - m), CompoundStroke(s_h1).add_after(f_h_footer))
+        m_h1 = Mark(Point(0, fp.ascender - m), CompoundStroke(s_h1).add_after(f_i_footer))
 
-        m_i1 = Mark(Point(0, fp.x_height - m), CompoundStroke(s_i1).add_after(f_h_footer))
+        m_i1 = Mark(Point(0, fp.x_height - m), CompoundStroke(s_i1).add_after(f_i_footer))
         m_i_dot = Mark(Point(-m, fp.tbar), f_dot)
 
         m_j1 = Mark(Point(0, xm_m), CompoundStroke(s_j1).add_after(f_f_footer))
 
         m_k1 = Mark(Point(0, fp.x_height - 7 * m), cs_k1)
 
+        m_l1 = Mark(Point(0, fp.ascender - m), CompoundStroke([s_l1, f_dot]))
+
+        m_m2 = Mark(Point(m2, fp.x_height - m), cs_m2)
+        m_m3 = m_a2.plus(Point(m4, 0))
+
         # glyphs
         default_width = 8 * m
         self.glyph_map = {
             'a': Glyph(Point(0, 0), [m_a1, m_a2], default_width),
             'b': Glyph(Point(0, 0), [m_b1, m_b2], default_width),
-            'c': Glyph(Point(0, 0), [m_c1, m_c2], 6 * m),
+            'c': Glyph(Point(0, 0), [m_c1, m_c2], m6),
             'd': Glyph(Point(0, 0), [m_a1, m_d1], default_width),
             'e': Glyph(Point(0, 0), [m_c1, m_c2, m_e1], default_width),
-            'f': Glyph(Point(0, 0), [m_f1, m_f2, m_f3], 4 * m),
+            'f': Glyph(Point(0, 0), [m_f1, m_f2, m_f3], m4),
             'g': Glyph(Point(0, 0), [m_a1, m_g1], default_width),
-            'h': Glyph(Point(0, 0), [m_h1, m_a2], 9 * m),
-            'i': Glyph(Point(0, 0), [m_i1, m_i_dot], 4 * m),
-            'j': Glyph(Point(0, 0), [m_j1, m_i_dot], 4 * m),
-            'k': Glyph(Point(0, 0), [m_h1, m_c2, m_e1, m_k1], 9 * m),
-            'l': Glyph(Point(0, 0), [m_h1], default_width)
+            'h': Glyph(Point(0, 0), [m_h1, m_a2], m9),
+            'i': Glyph(Point(0, 0), [m_i1, m_i_dot], m4),
+            'j': Glyph(Point(0, 0), [m_j1, m_i_dot], m4),
+            'k': Glyph(Point(0, 0), [m_h1, m_c2, m_e1, m_k1], m9),
+            'l': Glyph(Point(0, 0), [m_l1], m5),
+            'm': Glyph(Point(0, 0), [m_i1, m_m2, m_m3], 13 * m),
+            'n': Glyph(Point(0, 0), [m_i1, m_a2], default_width),
         }
 
     def svg(self, posn: Point, chars: str, scale: float):
