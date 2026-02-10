@@ -1,27 +1,24 @@
 from __future__ import annotations
 
 import math
-from enum import Enum
+
 from shapely.geometry import Point, LineString
 from shapely.affinity import rotate
 
 from .font_parameters import FontParameters
 from .geom import Geom
+from .geometry_set import GeometrySet
+from .stroke_type import StrokeType
 from .strokeable import Strokeable
 from .vector_math import VectorMath as VM
 
 
 class Stroke(Strokeable):
-    class StrokeType(Enum):
-        Block = 1
-        Line = 2
-        Move = 3
-        Extend = 4
+
 
     def __init__(self, vec: Point, stroke_type: StrokeType = StrokeType.Block):
-        super().__init__()
+        super().__init__(stroke_type)
         self.vec = vec
-        self.stroke_type = stroke_type
 
     @staticmethod
     def from_xy(x: float, y: float, stroke_type: StrokeType = StrokeType.Block) -> Stroke:
@@ -36,9 +33,35 @@ class Stroke(Strokeable):
             raise RuntimeError("Stroke of wrong type.")
         return Stroke(VM.add_points(self.vec, e.vec), self.stroke_type)
 
+    def get_geom(self, start: Point, fp: FontParameters, scale: float, prev: Strokeable, next: Strokeable, geom_set: GeometrySet):
+        if self.stroke_type == StrokeType.Move:
+            return VM.add_points(start, self.vec)
+
+        d = scale * fp.pen_thickness / (2 * math.sqrt(2))
+        s = Point(-d, -d)
+        s2 = VM.scale_point(s, 2)
+        v = VM.scale_point(self.vec, scale)
+
+        p1 = VM.add_points(VM.scale_point(start, scale), s)
+        p2 = VM.add_points(p1, v)
+        p3 = VM.subtract_points(p2, s2)
+        p4 = VM.subtract_points(p3, v)
+
+        if prev is None:
+            geom_set.get_current_outline().extend([p3, p4, p1, p2])
+        else:
+            curr = geom_set.get_current_outline()
+            new = [p3] + curr + [p2]
+            geom_set.replace_current_outline(new)
+
+        if next is None:
+            geom_set.add_new_outline()
+
+        return VM.add_points(start, self.vec)
+
     def geom(self, start: Point, fp: FontParameters, scale: float) -> tuple[Point, list[Geom]]:
 
-        if self.stroke_type == Stroke.StrokeType.Move:
+        if self.stroke_type == StrokeType.Move:
             return VM.add_points(start, self.vec), []
 
         d = scale * fp.pen_thickness / (2 * math.sqrt(2))
@@ -80,7 +103,7 @@ class Stroke(Strokeable):
         if ip1.is_empty or ip2.is_empty or ip3.is_empty or ip4.is_empty:
             p1offset = VM.subtract_points(p1, offset4)
             p3offset = VM.subtract_points(p3, offset4)
-            if not fp.filled:
+            if fp.filled:
                 geom += [Geom([p1, p1offset, p3offset, p3])]
             return VM.add_points(start, self.vec), geom
 

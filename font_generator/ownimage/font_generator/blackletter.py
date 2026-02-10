@@ -6,6 +6,7 @@ from .font_parameters import FontParameters
 from .stroke import Stroke
 from .mark import Mark
 from .glyph import Glyph
+from .stroke_type import StrokeType
 
 
 class Blackletter:
@@ -44,13 +45,13 @@ class Blackletter:
         f_dot = Stroke(Point(m2, -m2))
 
         f_f_footer = CompoundStroke([
-            Stroke(Point(-m4, 0), Stroke.StrokeType.Move),
+            Stroke(Point(-m4, 0), StrokeType.Move),
             f_dot
         ])
 
         f_i_footer = CompoundStroke([
-            Stroke(Point(0, m), Stroke.StrokeType.Extend),
-            Stroke(Point(-m, m), Stroke.StrokeType.Move),
+            Stroke(Point(0, m), StrokeType.Extend),
+            Stroke(Point(-m, m), StrokeType.Move),
             f_dot
         ])
 
