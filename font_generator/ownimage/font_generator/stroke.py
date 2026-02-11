@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import math
 
-from shapely.geometry import Point, LineString
+from shapely.geometry import LineString
 from shapely.affinity import rotate
 
 from .font_parameters import FontParameters
@@ -10,21 +10,22 @@ from .geom import Geom
 from .geometry_set import GeometrySet
 from .stroke_type import StrokeType
 from .strokeable import Strokeable
+from .vector import Vector
 from .vector_math import VectorMath as VM
 
 
 class Stroke(Strokeable):
 
-    def __init__(self, vec: Point, stroke_type: StrokeType = StrokeType.Block):
+    def __init__(self, vec: Vector, stroke_type: StrokeType = StrokeType.Block):
         super().__init__(stroke_type)
         self.vec = vec
 
     @staticmethod
     def from_xy(x: float, y: float, stroke_type: StrokeType = StrokeType.Block) -> Stroke:
-        return Stroke(Point(x, y), stroke_type)
+        return Stroke(Vector(x, y), stroke_type)
 
     @staticmethod
-    def between(start: Point, end: Point, stroke_type: StrokeType = StrokeType.Block) -> Stroke:
+    def between(start: Vector, end: Vector, stroke_type: StrokeType = StrokeType.Block) -> Stroke:
         return Stroke(VM.subtract_points(start, end), stroke_type)
 
     def extend(self, e: Stroke) -> Stroke:
@@ -32,14 +33,14 @@ class Stroke(Strokeable):
             raise RuntimeError("Stroke of wrong type.")
         return Stroke(VM.add_points(self.vec, e.vec), self.stroke_type)
 
-    def get_geom(self, start: Point, fp: FontParameters, scale: float, prev: Strokeable, next: Strokeable, geom_set: GeometrySet):
+    def get_geom(self, start: Vector, fp: FontParameters, scale: float, prev: Strokeable, next: Strokeable, geom_set: GeometrySet):
         if self.stroke_type == StrokeType.Move:
             return VM.add_points(start, self.vec)
 
         offset = fp.line_thickness * fp.pen_thickness * scale / 2
         sqrt2 = math.sqrt(2)
         d = scale * fp.pen_thickness / (2 * sqrt2)
-        s = Point(-d, -d)
+        s = Vector(-d, -d)
         s2 = VM.scale_point(s, 2)
         v = VM.scale_point(self.vec, scale)
 
@@ -81,13 +82,13 @@ class Stroke(Strokeable):
 
 
 
-    def geom(self, start: Point, fp: FontParameters, scale: float) -> tuple[Point, list[Geom]]:
+    def geom(self, start: Vector, fp: FontParameters, scale: float) -> tuple[Vector, list[Geom]]:
 
         if self.stroke_type == StrokeType.Move:
             return VM.add_points(start, self.vec), []
 
         d = scale * fp.pen_thickness / (2 * math.sqrt(2))
-        s = Point(-d, -d)
+        s = Vector(-d, -d)
         s2 = VM.scale_point(s, 2)
         v = VM.scale_point(self.vec, scale)
 
@@ -133,7 +134,7 @@ class Stroke(Strokeable):
             geom += [Geom([ip1, ip2, ip3, ip4], Geom.GeomType.White)]
         return VM.add_points(start, self.vec), geom
 
-    def svg(self, start: Point, fp: FontParameters, scale: float):
+    def svg(self, start: Vector, fp: FontParameters, scale: float):
         end, geoms = self.geom(start, fp, scale)
         svg = list(map(self.geom_to_svg, geoms))
         return end, "\n".join(svg)
@@ -147,7 +148,7 @@ class Stroke(Strokeable):
         svg += f"""Z" fill="{colour}" stroke="black" stroke-width=".5" />\n"""
         return svg
 
-    def birdfont_path(self, start: Point, fp: FontParameters, scale: float):
+    def birdfont_path(self, start: Vector, fp: FontParameters, scale: float):
         end, geoms = self.geom(start, fp, scale)
         paths = list(map(self.geom_to_path, geoms))
         return end, paths

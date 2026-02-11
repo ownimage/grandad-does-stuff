@@ -1,22 +1,21 @@
 from __future__ import annotations
 
 from typing import List
-from shapely.geometry import Point
 
 from .font_parameters import FontParameters
 from .geometry_set import GeometrySet
 from .stroke import Strokeable
-
+from .vector import Vector
 from .vector_math import VectorMath as VM
 
 
 class Mark:
-    def __init__(self, vec: Point, strokes: List[Strokeable] | Strokeable):
+    def __init__(self, vec: Vector, strokes: List[Strokeable] | Strokeable):
         self.vec = vec
         self.strokes: List[Strokeable] = [strokes] if isinstance(strokes, Strokeable) else strokes
 
-    def svg(self, posn: Point, fp: FontParameters, scale: float):
-        start = Point(posn.x + self.vec.x, posn.y + self.vec.y)
+    def svg(self, posn: Vector, fp: FontParameters, scale: float):
+        start = Vector(posn.x + self.vec.x, posn.y + self.vec.y)
         geom_set = GeometrySet()
         for i in range(len(self.strokes)):
             prev_item = self.strokes[i - 1] if i > 0 else None
@@ -36,5 +35,5 @@ class Mark:
 
         return paths
 
-    def plus(self, off: Point) -> Mark:
+    def plus(self, off: Vector) -> Mark:
         return Mark(VM.add_points(self.vec, off), self.strokes)

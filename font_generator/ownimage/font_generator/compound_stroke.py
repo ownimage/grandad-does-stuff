@@ -1,12 +1,11 @@
 from __future__ import annotations
 
-from shapely.geometry import Point
-
 from .font_parameters import FontParameters
 from .geometry_set import GeometrySet
 from .stroke import Stroke
 from .stroke_type import StrokeType
 from .strokeable import Strokeable
+from .vector import Vector
 from .vector_math import VectorMath as VM
 
 
@@ -15,7 +14,7 @@ class CompoundStroke(Strokeable):
         super().__init__()
         self.strokes: list[Stroke] = [strokes] if isinstance(strokes, Stroke) else strokes
 
-    def get_geom(self, start: Point, fp: FontParameters, scale: float, prev: Strokeable, next: Strokeable, geom_set: GeometrySet):
+    def get_geom(self, start: Vector, fp: FontParameters, scale: float, prev: Strokeable, next: Strokeable, geom_set: GeometrySet):
         for i in range(len(self.strokes)):
             prev_item = self.strokes[i - 1] if i > 0 else prev
             curr_item = self.strokes[i]
@@ -36,7 +35,7 @@ class CompoundStroke(Strokeable):
             new_list += cs.strokes
         return CompoundStroke(new_list)
 
-    def svg(self, posn: Point, fp: FontParameters, scale: float):
+    def svg(self, posn: Vector, fp: FontParameters, scale: float):
         svg = ""
         start = posn
         for stroke in self.strokes:
@@ -44,7 +43,7 @@ class CompoundStroke(Strokeable):
             svg += s
         return start, svg
 
-    def birdfont_path(self, start: Point, fp: FontParameters, scale: float):
+    def birdfont_path(self, start: Vector, fp: FontParameters, scale: float):
         paths = []
 
         for stroke in self.strokes:

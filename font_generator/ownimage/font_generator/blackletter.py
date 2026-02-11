@@ -1,5 +1,4 @@
 import math
-from shapely.geometry import Point
 
 from .compound_stroke import CompoundStroke
 from .font_parameters import FontParameters
@@ -7,6 +6,7 @@ from .stroke import Stroke
 from .mark import Mark
 from .glyph import Glyph
 from .stroke_type import StrokeType
+from .vector import Vector
 
 
 class Blackletter:
@@ -42,45 +42,45 @@ class Blackletter:
         dp_3m = fp.descender + m3
 
         # flourishes
-        f_dot = Stroke(Point(m2, -m2))
+        f_dot = Stroke(Vector(m2, -m2))
 
         f_f_footer = CompoundStroke([
-            Stroke(Point(-m4, 0), StrokeType.Move),
+            Stroke(Vector(-m4, 0), StrokeType.Move),
             f_dot
         ])
 
         f_i_footer = CompoundStroke([
-            Stroke(Point(0, m), StrokeType.Extend),
-            Stroke(Point(-m, m), StrokeType.Move),
+            Stroke(Vector(0, m), StrokeType.Extend),
+            Stroke(Vector(-m, m), StrokeType.Move),
             f_dot
         ])
 
         # strokes
-        s_a1 = Stroke(Point(0, bp_3m - xm_3m))
+        s_a1 = Stroke(Vector(0, bp_3m - xm_3m))
 
-        s_b1 = Stroke(Point(0, bp_3m - am_m))
+        s_b1 = Stroke(Vector(0, bp_3m - am_m))
 
-        s_c1 = Stroke(Point(m2, m2), StrokeType.Line)
+        s_c1 = Stroke(Vector(m2, m2), StrokeType.Line)
 
-        s_d1 = Stroke(Point(m4, -m4))
+        s_d1 = Stroke(Vector(m4, -m4))
 
-        s_f1 = Stroke(Point(0, dp_3m - am_3m))
-        s_f2 = Stroke(Point(m6, 0))
+        s_f1 = Stroke(Vector(0, dp_3m - am_3m))
+        s_f2 = Stroke(Vector(m6, 0))
 
-        s_g1 = Stroke(Point(0, dp_3m - xm_3m))
+        s_g1 = Stroke(Vector(0, dp_3m - xm_3m))
 
-        s_h1 = Stroke(Point(0, 0 - (fp.ascender - m2)))
+        s_h1 = Stroke(Vector(0, 0 - (fp.ascender - m2)))
 
-        s_i1 = Stroke(Point(0, m - xm_m))
+        s_i1 = Stroke(Vector(0, m - xm_m))
 
-        s_j1 = Stroke(Point(0, dp_3m - xm_m))
+        s_j1 = Stroke(Vector(0, dp_3m - xm_m))
 
-        s_k1 = Stroke(Point(m4, 0))
-        s_k2 = Stroke(Point(0, 10 * m - fp.x_height))
+        s_k1 = Stroke(Vector(m4, 0))
+        s_k2 = Stroke(Vector(0, 10 * m - fp.x_height))
 
-        s_l1 = Stroke(Point(0, m2 - (fp.ascender - m2)))
+        s_l1 = Stroke(Vector(0, m2 - (fp.ascender - m2)))
 
-        s_m2 = Stroke(Point(0, -xm_4m))
+        s_m2 = Stroke(Vector(0, -xm_4m))
 
         # compound strokes
         cs_a1 = CompoundStroke([s_a1, f_dot])
@@ -100,59 +100,59 @@ class Blackletter:
         cs_m2 = CompoundStroke([f_dot, s_m2]).add_after(f_i_footer)
 
         # marks
-        m_a1 = Mark(Point(0, xm_3m), cs_a1)
-        m_a2 = Mark(Point(m2, xm_m), cs_a2)
+        m_a1 = Mark(Vector(0, xm_3m), cs_a1)
+        m_a2 = Mark(Vector(m2, xm_m), cs_a2)
 
-        m_b1 = Mark(Point(0, am_m), cs_b1)
-        m_b2 = Mark(Point(m2, xm_m), cs_b2)
+        m_b1 = Mark(Vector(0, am_m), cs_b1)
+        m_b2 = Mark(Vector(m2, xm_m), cs_b2)
 
-        m_c1 = Mark(Point(0, xm_3m), cs_c1)
-        m_c2 = Mark(Point(m2, xm_m), f_dot)
+        m_c1 = Mark(Vector(0, xm_3m), cs_c1)
+        m_c2 = Mark(Vector(m2, xm_m), f_dot)
 
-        m_d1 = Mark(Point(0, xp_m, 0), [s_d1, s_a1])
+        m_d1 = Mark(Vector(0, xp_m), [s_d1, s_a1])
 
-        m_e1 = Mark(Point(0, xm_7m), s_c1)
+        m_e1 = Mark(Vector(0, xm_7m), s_c1)
 
-        m_f1 = Mark(Point(0, am_3m), CompoundStroke(s_f1).add_after(f_f_footer))
-        m_f2 = Mark(Point(m2, am_m), f_dot)
-        m_f3 = Mark(Point(-m3, fp.tbar), s_f2)
+        m_f1 = Mark(Vector(0, am_3m), CompoundStroke(s_f1).add_after(f_f_footer))
+        m_f2 = Mark(Vector(m2, am_m), f_dot)
+        m_f3 = Mark(Vector(-m3, fp.tbar), s_f2)
 
-        m_g1 = Mark(Point(m2, xm_m), cs_g1.add_after(f_f_footer))
+        m_g1 = Mark(Vector(m2, xm_m), cs_g1.add_after(f_f_footer))
 
-        m_h1 = Mark(Point(0, fp.ascender - m), CompoundStroke(s_h1).add_after(f_i_footer))
+        m_h1 = Mark(Vector(0, fp.ascender - m), CompoundStroke(s_h1).add_after(f_i_footer))
 
-        m_i1 = Mark(Point(0, fp.x_height - m), CompoundStroke(s_i1).add_after(f_i_footer))
-        m_i_dot = Mark(Point(-m, fp.tbar), f_dot)
+        m_i1 = Mark(Vector(0, fp.x_height - m), CompoundStroke(s_i1).add_after(f_i_footer))
+        m_i_dot = Mark(Vector(-m, fp.tbar), f_dot)
 
-        m_j1 = Mark(Point(0, xm_m), CompoundStroke(s_j1).add_after(f_f_footer))
+        m_j1 = Mark(Vector(0, xm_m), CompoundStroke(s_j1).add_after(f_f_footer))
 
-        m_k1 = Mark(Point(0, fp.x_height - 7 * m), cs_k1)
+        m_k1 = Mark(Vector(0, fp.x_height - 7 * m), cs_k1)
 
-        m_l1 = Mark(Point(0, fp.ascender - m), CompoundStroke([s_l1, f_dot]))
+        m_l1 = Mark(Vector(0, fp.ascender - m), CompoundStroke([s_l1, f_dot]))
 
-        m_m2 = Mark(Point(m2, fp.x_height - m), cs_m2)
-        m_m3 = m_a2.plus(Point(m4, 0))
+        m_m2 = Mark(Vector(m2, fp.x_height - m), cs_m2)
+        m_m3 = m_a2.plus(Vector(m4, 0))
 
         # glyphs
         default_width = 8 * m
         self.glyph_map = {
-            'a': Glyph(Point(0, 0), [m_a1, m_a2], default_width),
-            'b': Glyph(Point(0, 0), [m_b1, m_b2], default_width),
-            'c': Glyph(Point(0, 0), [m_c1, m_c2], m6),
-            'd': Glyph(Point(0, 0), [m_a1, m_d1], default_width),
-            'e': Glyph(Point(0, 0), [m_c1, m_c2, m_e1], default_width),
-            'f': Glyph(Point(0, 0), [m_f1, m_f2, m_f3], m4),
-            'g': Glyph(Point(0, 0), [m_a1, m_g1], default_width),
-            'h': Glyph(Point(0, 0), [m_h1, m_a2], m9),
-            'i': Glyph(Point(0, 0), [m_i1, m_i_dot], m4),
-            'j': Glyph(Point(0, 0), [m_j1, m_i_dot], m4),
-            'k': Glyph(Point(0, 0), [m_h1, m_c2, m_e1, m_k1], m9),
-            'l': Glyph(Point(0, 0), [m_l1], m5),
-            'm': Glyph(Point(0, 0), [m_i1, m_m2, m_m3], 13 * m),
-            'n': Glyph(Point(0, 0), [m_i1, m_a2], default_width),
+            'a': Glyph(Vector(0, 0), [m_a1, m_a2], default_width),
+            'b': Glyph(Vector(0, 0), [m_b1, m_b2], default_width),
+            'c': Glyph(Vector(0, 0), [m_c1, m_c2], m6),
+            'd': Glyph(Vector(0, 0), [m_a1, m_d1], default_width),
+            'e': Glyph(Vector(0, 0), [m_c1, m_c2, m_e1], default_width),
+            'f': Glyph(Vector(0, 0), [m_f1, m_f2, m_f3], m4),
+            'g': Glyph(Vector(0, 0), [m_a1, m_g1], default_width),
+            'h': Glyph(Vector(0, 0), [m_h1, m_a2], m9),
+            'i': Glyph(Vector(0, 0), [m_i1, m_i_dot], m4),
+            'j': Glyph(Vector(0, 0), [m_j1, m_i_dot], m4),
+            'k': Glyph(Vector(0, 0), [m_h1, m_c2, m_e1, m_k1], m9),
+            'l': Glyph(Vector(0, 0), [m_l1], m5),
+            'm': Glyph(Vector(0, 0), [m_i1, m_m2, m_m3], 13 * m),
+            'n': Glyph(Vector(0, 0), [m_i1, m_a2], default_width),
         }
 
-    def svg(self, posn: Point, chars: str, scale: float):
+    def svg(self, posn: Vector, chars: str, scale: float):
         svg = ""
         start = posn
         for c in chars:
@@ -160,11 +160,11 @@ class Blackletter:
             svg += f"<!-- char {c} -->\n"
             svg += g.svg(start, self.fp, scale)
             w = g.width
-            start = Point(start.x + w, start.y)
+            start = Vector(start.x + w, start.y)
         print(f"svg={svg}")
         return svg
 
-    def svg_known(self, posn: Point, scale: float):
+    def svg_known(self, posn: Vector, scale: float):
         chars = ''.join(self.glyph_map.keys())
         return self.svg(posn, chars, scale)
 
