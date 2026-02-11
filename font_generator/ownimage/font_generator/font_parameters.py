@@ -10,3 +10,4 @@ class FontParameters:
     x_height: float
     baseline: float
     descender: float
+    line_thickness: float
