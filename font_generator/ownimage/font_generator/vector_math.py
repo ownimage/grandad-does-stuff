@@ -6,29 +6,6 @@ class VectorMath:
     """Utility methods for simple vector-style operations on Shapely Points."""
 
     @staticmethod
-    def add_points(a: Vector, b: Vector) -> Vector:
-        """Return a new Vector equal to a + b."""
-        return Vector(a.x + b.x, a.y + b.y)
-
-    @staticmethod
-    def subtract_points(a: Vector, b: Vector) -> Vector:
-        """Return a new Vector equal to a - b."""
-        return Vector(a.x - b.x, a.y - b.y)
-
-    @staticmethod
-    def scale_point(p: Vector, factor: float) -> Vector:
-        """Return a new Vector equal to p * factor."""
-        return Vector(p.x * factor, p.y * factor)
-
-    @staticmethod
-    def normalize(p: Vector) -> Vector:
-        """Return a unit-length version of the Vector treated as a vector."""
-        length = (p.x ** 2 + p.y ** 2) ** 0.5
-        if length == 0:
-            return Vector(0, 0)
-        return Vector(p.x / length, p.y / length)
-
-    @staticmethod
     def line_intersection(p1: Vector, p2: Vector, p3: Vector, p4: Vector) -> Vector:
         """Return instsection of line between p1, p2 and p3, p4"""
         x1, y1 = p1.x, p1.y

@@ -36,4 +36,4 @@ class Mark:
         return paths
 
     def plus(self, off: Vector) -> Mark:
-        return Mark(VM.add_points(self.vec, off), self.strokes)
+        return Mark(self.vec + off, self.strokes)
