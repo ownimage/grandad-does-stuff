@@ -17,9 +17,9 @@ class CompoundStroke(Strokeable):
 
     def get_geom(self, start: Point, fp: FontParameters, scale: float, prev: Strokeable, next: Strokeable, geom_set: GeometrySet):
         for i in range(len(self.strokes)):
-            prev_item = self.strokes[i - 1] if i > 0 else None
+            prev_item = self.strokes[i - 1] if i > 0 else prev
             curr_item = self.strokes[i]
-            next_item = self.strokes[i + 1] if i < len(self.strokes) - 1 else None
+            next_item = self.strokes[i + 1] if i < len(self.strokes) - 1 else next
 
             start = curr_item.get_geom(start, fp, scale, prev_item, next_item, geom_set)
         return start

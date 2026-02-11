@@ -60,7 +60,7 @@ class Blackletter:
 
         s_b1 = Stroke(Point(0, bp_3m - am_m))
 
-        s_c1 = Stroke(Point(m2, m2))
+        s_c1 = Stroke(Point(m2, m2), StrokeType.Line)
 
         s_d1 = Stroke(Point(m4, -m4))
 

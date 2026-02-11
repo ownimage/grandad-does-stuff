@@ -31,7 +31,7 @@ class Mark:
 
             start = curr_item.get_geom(start, fp, scale, prev_item, next_item, geom_set)
 
-        return geom_set.svg() + "\n"
+        return geom_set.svg(fp.filled) + "\n"
 
     def birdfont_path(self, fp: FontParameters, scale: float):
         start = self.vec

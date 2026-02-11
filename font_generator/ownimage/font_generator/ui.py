@@ -43,6 +43,9 @@ class MainWindow(QMainWindow):
         self.x_height = self.createSlider(layout, 100, 1000, 300, "X Height")
         self.descender = self.createSlider(layout, 100, 1000, 700, "Descender")
 
+        self.pen_width = self.createSlider(layout, 0, 100, 50, "Pen Width")
+        self.line_thickness = self.createSlider(layout, 0, 100, 40, "Line Thickness")
+
         self.scale = self.createSlider(layout, 10, 400, 40, "Scale")
 
         central = QWidget()
@@ -71,8 +74,8 @@ class MainWindow(QMainWindow):
         self.svg_widget.load(bytearray(svg_data, encoding="utf-8"))
 
     def get_fontParameters(self):
-        return FontParameters(0.5, self.filled.isChecked(), self.ascender.value() / 100, self.tbar.value() / 100, self.x_height.value() / 100, 0,
-                              -self.descender.value() / 100)
+        return FontParameters(self.pen_width.value() / 100, self.filled.isChecked(), self.ascender.value() / 100, self.tbar.value() / 100, self.x_height.value() / 100, 0,
+                              -self.descender.value() / 100, self.line_thickness.value() / 100)
 
     def make_svg(self, scale: float) -> str:
         self.blackletter = Blackletter(self.get_fontParameters())
