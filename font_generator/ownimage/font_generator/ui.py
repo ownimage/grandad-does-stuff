@@ -1,15 +1,15 @@
+from PySide6.QtCore import Qt
 from PySide6.QtGui import QAction
+from PySide6.QtSvgWidgets import QSvgWidget
 from PySide6.QtWidgets import (
     QVBoxLayout, QHBoxLayout,
     QCheckBox, QSlider, QLabel, QMainWindow, QWidget, QFileDialog
 )
-from PySide6.QtSvgWidgets import QSvgWidget
-from PySide6.QtCore import Qt
-from shapely.geometry import Point
 
 from .birdfont_reader import BirdfontReader
 from .blackletter import Blackletter
 from .font_parameters import FontParameters
+from .vector import Vector
 
 
 class MainWindow(QMainWindow):
@@ -74,7 +74,8 @@ class MainWindow(QMainWindow):
         self.svg_widget.load(bytearray(svg_data, encoding="utf-8"))
 
     def get_fontParameters(self):
-        return FontParameters(self.pen_width.value() / 100, self.filled.isChecked(), self.ascender.value() / 100, self.tbar.value() / 100, self.x_height.value() / 100, 0,
+        return FontParameters(self.pen_width.value() / 100, self.filled.isChecked(), self.ascender.value() / 100, self.tbar.value() / 100,
+                              self.x_height.value() / 100, 0,
                               -self.descender.value() / 100, self.line_thickness.value() / 100)
 
     def make_svg(self, scale: float) -> str:
@@ -88,7 +89,7 @@ class MainWindow(QMainWindow):
     
         <rect x="0" y="{-offset}" width="{self.svg_width}" height="{self.svg_height + offset}" fill="white"/>
         <g transform="translate(0, {self.svg_height - offset}) scale(1, -1)">
-            {self.blackletter.svg_known(Point(1, 0), scale)}
+            {self.blackletter.svg_known(Vector(1, 0), scale)}
         </g>
     </svg>
     """
