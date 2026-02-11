@@ -39,33 +39,20 @@ class Stroke(Strokeable):
         offset = fp.line_thickness * fp.pen_thickness * scale / 2
         sqrt2 = math.sqrt(2)
         d = scale * fp.pen_thickness / (2 * sqrt2)
-        # so = VM.scale_point(Point(-sqrt2, -sqrt2), 0.5 * offset)
         s = Point(-d, -d)
         s2 = VM.scale_point(s, 2)
         v = VM.scale_point(self.vec, scale)
-        # vo = VM.scale_point(VM.normalize(self.vec), offset)
 
         p1 = VM.add_points(VM.scale_point(start, scale), s)
         p2 = VM.add_points(p1, v)
         p3 = VM.subtract_points(p2, s2)
         p4 = VM.subtract_points(p3, v)
 
-        sideways_offset = rotate(VM.scale_point(VM.normalize(self.vec), offset), -90, origin=(0, 0))
-        end_offset = rotate(VM.scale_point(VM.normalize(VM.subtract_points(p1, p4)), offset), 90, origin=(0, 0))
+        ip1 = VM.offset_intersection(p1, self.vec, s, offset)
+        ip2 = VM.offset_intersection(p2, VM.scale_point(s, -1), self.vec, offset)
+        ip3 = VM.offset_intersection(p3, VM.scale_point(self.vec, -1), VM.scale_point(s, -1), offset)
+        ip4 = VM.offset_intersection(p4, VM.scale_point(self.vec, -1), s, offset)
 
-        p1_sideways_offset = VM.subtract_points(p1, sideways_offset)
-        p1_end_offset = VM.add_points(p1, end_offset)
-        p2_sideways_offset = VM.subtract_points(p2, sideways_offset)
-        p2_end_offset = VM.subtract_points(p2, end_offset)
-        p3_sideways_offset = VM.add_points(p3, sideways_offset)
-        p3_end_offset = VM.subtract_points(p3, end_offset)
-        p4_sideways_offset = VM.add_points(p4, sideways_offset)
-        p4_end_offset = VM.add_points(p4, end_offset)
-
-        ip1 = VM.line_intersection(p1_sideways_offset, p2_sideways_offset, p1_end_offset, p4_end_offset)
-        ip2 = VM.line_intersection(p2_sideways_offset, p1_sideways_offset, p2_end_offset, p3_end_offset)
-        ip3 = VM.line_intersection(p3_sideways_offset, p4_sideways_offset, p3_end_offset, p2_end_offset)
-        ip4 = VM.line_intersection(p4_sideways_offset, p3_sideways_offset, p4_end_offset, p1_end_offset)
 
         if next is not None and next.stroke_type == StrokeType.Block:
             p = VM.offset_intersection(p2, self.vec, next.vec, offset)
@@ -86,49 +73,13 @@ class Stroke(Strokeable):
             new_hole = [ip3] + hole + [ip2]
             geom_set.replace_current_hole(new_hole)
 
-            # if not (ip1.is_empty or ip2.is_empty or ip3.is_empty or ip4.is_empty):
-            #     hole = geom_set.get_current_hole()
-            #     new_hole = [ip1, ip3] + hole + [ip2, ip4]
-            #     geom_set.replace_current_hole(new_hole)
-
         if next is None or next.stroke_type != StrokeType.Block:
-            # outline = geom_set.get_current_outline()
-            # hole = self.generate_hole(outline, offset)
-            # geom_set.replace_current_hole(hole)
-
             geom_set.add_new_outline()
             geom_set.add_new_hole()
 
         return VM.add_points(start, self.vec)
 
 
-    # def generate_hole(self, outline: list[Point], offset: float) -> list[Point]:
-    #     hole = []
-    #     n = len(outline)
-    #
-    #     for i in range(n):
-    #         p1 = outline[i]
-    #         p2 = outline[(i + 1) % n]
-    #         p3 = outline[(i + 2) % n]
-    #         o = self.get_offset_point(p1, p2, p3, offset)
-    #         if o != None:
-    #             hole.append(o)
-    #     return hole
-    #
-    # def get_offset_point(self, p1: Point, p2: Point, p3: Point, offset: float) -> Point:
-    #
-    #     # inside line 1
-    #     vector12n = rotate(VM.scale_point(VM.normalize(VM.subtract_points(p2, p1)), offset), 90, origin=(0, 0))
-    #     vector23n = rotate(VM.scale_point(VM.normalize(VM.subtract_points(p3, p2)), offset), 90, origin=(0, 0))
-    #
-    #     p1offset1 = VM.add_points(p1, vector12n)
-    #     p2offset1 = VM.add_points(p2, vector12n)
-    #     p2offset2 = VM.subtract_points(p2, vector23n)
-    #     p3offset2 = VM.subtract_points(p3, vector23n)
-    #
-    #     i = VM.line_intersection(p1offset1, p2offset1, p2offset2, p3offset2)
-    #
-    #     return i
 
     def geom(self, start: Point, fp: FontParameters, scale: float) -> tuple[Point, list[Geom]]:
 
