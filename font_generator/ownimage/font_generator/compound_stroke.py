@@ -11,8 +11,8 @@ from .vector_math import VectorMath as VM
 
 class CompoundStroke(Strokeable):
     def __init__(self, strokes: Stroke | list[Stroke]):
-        super().__init__()
         self.strokes: list[Stroke] = [strokes] if isinstance(strokes, Stroke) else strokes
+        super().__init__(self.strokes[0].stroke_type)
 
     def get_geom(self, start: Vector, fp: FontParameters, scale: float, prev: Strokeable, next: Strokeable, geom_set: GeometrySet):
         for i in range(len(self.strokes)):

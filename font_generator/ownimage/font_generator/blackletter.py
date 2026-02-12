@@ -2,9 +2,10 @@ import math
 
 from .compound_stroke import CompoundStroke
 from .font_parameters import FontParameters
-from .stroke import Stroke
-from .mark import Mark
 from .glyph import Glyph
+from .mark import Mark
+from .stroke import Stroke
+from .stroke_line import StrokeLine
 from .stroke_type import StrokeType
 from .vector import Vector
 
@@ -60,7 +61,7 @@ class Blackletter:
 
         s_b1 = Stroke(Vector(0, bp_3m - am_m))
 
-        s_c1 = Stroke(Vector(m2, m2), StrokeType.Line)
+        s_c1 = CompoundStroke([Stroke(Vector(m, m), StrokeType.Move), StrokeLine(Vector(m2, m2))])
 
         s_d1 = Stroke(Vector(m4, -m4))
 
@@ -81,6 +82,10 @@ class Blackletter:
         s_l1 = Stroke(Vector(0, m2 - (fp.ascender - m2)))
 
         s_m2 = Stroke(Vector(0, -xm_4m))
+
+        s_s1 = Stroke.down(m6)
+        s_s2 = StrokeLine.right(m4)
+        s_s3 = Stroke.down(fp.x_height - 10 * m)
 
         # compound strokes
         cs_a1 = CompoundStroke([s_a1, f_dot])
@@ -133,12 +138,17 @@ class Blackletter:
         m_m2 = Mark(Vector(m2, fp.x_height - m), cs_m2)
         m_m3 = m_a2.plus(Vector(m4, 0))
 
+        m_p1 = Mark(Vector(0, xm_m), s_j1)
+        m_p3 = Mark(Vector(-m2, m5), Stroke.from_xy(m4, -m4))
+
+        m_s1 = Mark(Vector(0, fp.x_height - m), CompoundStroke([s_s1, s_s2, s_s3]).add_after(f_f_footer))
+
         # glyphs
         default_width = 8 * m
         self.glyph_map = {
             'a': Glyph(Vector(0, 0), [m_a1, m_a2], default_width),
             'b': Glyph(Vector(0, 0), [m_b1, m_b2], default_width),
-            'c': Glyph(Vector(0, 0), [m_c1, m_c2], m6),
+            'c': Glyph(Vector(0, 0), [m_c1, m_c2], default_width),
             'd': Glyph(Vector(0, 0), [m_a1, m_d1], default_width),
             'e': Glyph(Vector(0, 0), [m_c1, m_c2, m_e1], default_width),
             'f': Glyph(Vector(0, 0), [m_f1, m_f2, m_f3], m4),
@@ -150,6 +160,11 @@ class Blackletter:
             'l': Glyph(Vector(0, 0), [m_l1], m5),
             'm': Glyph(Vector(0, 0), [m_i1, m_m2, m_m3], 13 * m),
             'n': Glyph(Vector(0, 0), [m_i1, m_a2], default_width),
+            'o': Glyph(Vector(0, 0), [m_a1, m_b2], default_width),
+            'p': Glyph(Vector(0, 0), [m_p1, m_b2, m_p3], default_width),
+            'r': Glyph(Vector(0, 0), [m_i1, m_c2], default_width),
+            's': Glyph(Vector(0, 0), [m_s1, m_c2], m4),
+
         }
 
     def svg(self, posn: Vector, chars: str, scale: float):
