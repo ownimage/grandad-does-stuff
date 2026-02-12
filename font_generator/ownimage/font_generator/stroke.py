@@ -24,6 +24,11 @@ class Stroke(Strokeable):
     def between(start: Vector, end: Vector, stroke_type: StrokeType = StrokeType.Block) -> Stroke:
         return Stroke(start - end, stroke_type)
 
+    @staticmethod
+    def down(length: float, stroke_type: StrokeType = StrokeType.Block) -> Stroke:
+        return Stroke(Vector(0, -length), stroke_type)
+
+
     def extend(self, e: Stroke) -> Stroke:
         if e.stroke_type != Stroke.StrokeType.Extend:
             raise RuntimeError("Stroke of wrong type.")

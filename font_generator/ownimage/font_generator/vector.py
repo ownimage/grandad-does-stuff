@@ -27,8 +27,9 @@ class Vector:
         l = self.length()
         return Vector(self.x / l, self.y / l) if l else Vector(0, 0)
 
-    def rotated(self, angle):
-        c = math.cos(angle)
-        s = math.sin(angle)
+    def rotated(self, degrees):
+        r = math.radians(degrees)
+        c = math.cos(r)
+        s = math.sin(r)
         return Vector(self.x * c - self.y * s,
                     self.x * s + self.y * c)
