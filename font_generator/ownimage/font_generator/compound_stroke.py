@@ -14,6 +14,12 @@ class CompoundStroke(Strokeable):
         self.strokes: list[Stroke] = [strokes] if isinstance(strokes, Stroke) else strokes
         super().__init__(self.strokes[0].stroke_type)
 
+    def __add__(self, other):
+        if isinstance(other, Stroke):
+            return CompoundStroke(self.strokes + [other])
+
+        raise NotImplemented
+
     def get_geom(self, start: Vector, fp: FontParameters, scale: float, prev: Strokeable, next: Strokeable, geom_set: GeometrySet):
         for i in range(len(self.strokes)):
             prev_item = self.strokes[i - 1] if i > 0 else prev

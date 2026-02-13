@@ -26,6 +26,7 @@ class Blackletter:
         m9 = 9 * m
 
         am_m = fp.ascender - m
+        am_2m = fp.ascender - m2
         am_3m = fp.ascender - m3
         am_7m = fp.ascender - m7
 
@@ -58,37 +59,37 @@ class Blackletter:
         ])
 
         # strokes
-        s_a1 = Stroke(Vector(0, bp_3m - xm_3m))
+        s_a1 = Stroke.down(xm_3m - bp_3m)
 
-        s_b1 = Stroke(Vector(0, bp_3m - am_m))
+        s_b1 = Stroke.down(am_m - bp_3m)
 
-        s_c1 = CompoundStroke([Stroke(Vector(m, m), StrokeType.Move), StrokeLine(Vector(m2, m2))])
+        s_c1 = Stroke(Vector(m, m), StrokeType.Move) + StrokeLine(Vector(m2, m2))
 
         s_d1 = Stroke(Vector(m4, -m4))
 
-        s_f1 = Stroke(Vector(0, dp_3m - am_3m))
-        s_f2 = Stroke(Vector(m6, 0))
+        s_f1 = Stroke.down(am_3m - dp_3m)
+        s_f2 = Stroke.right(m6)
 
-        s_g1 = Stroke(Vector(0, dp_3m - xm_3m))
+        s_g1 = Stroke.down(xm_3m - dp_3m)
 
-        s_h1 = Stroke(Vector(0, 0 - (fp.ascender - m2)))
+        s_h1 = Stroke.down(am_2m)
 
-        s_i1 = Stroke(Vector(0, m - xm_m))
+        s_i1 = Stroke.down(xm_m - m)
 
-        s_j1 = Stroke(Vector(0, dp_3m - xm_m))
+        s_j1 = Stroke.down(xm_m - dp_3m)
 
-        s_k1 = Stroke(Vector(m4, 0))
-        s_k2 = Stroke(Vector(0, 10 * m - fp.x_height))
+        s_k1 = Stroke.right(m4)
+        s_k2 = Stroke.down(fp.x_height - 10 * m)
 
-        s_l1 = Stroke(Vector(0, m2 - (fp.ascender - m2)))
+        s_l1 = Stroke.down(am_2m - m2)
 
-        s_m2 = Stroke(Vector(0, -xm_4m))
+        s_m2 = Stroke.down(xm_4m)
 
         s_s1 = Stroke.down(m6)
         s_s2 = StrokeLine.right(m4)
         s_s3 = Stroke.down(fp.x_height - 10 * m)
 
-        s_u1 = Stroke(Vector(0, m3 - xm_m))
+        s_u1 = Stroke.down(xm_m - m3)
 
         s_x2 = Stroke.down(xm_m - bp_3m)
 
@@ -97,23 +98,23 @@ class Blackletter:
         s_z3 = Stroke.down(xm_5m - dp_3m)
 
         # compound strokes
-        cs_a1 = CompoundStroke([s_a1, f_dot])
-        cs_a2 = CompoundStroke([f_dot, s_a1, f_dot])
+        cs_a1 = s_a1 + f_dot
+        cs_a2 = f_dot + s_a1 + f_dot
 
-        cs_b1 = CompoundStroke([s_b1, f_dot])
-        cs_b2 = CompoundStroke([f_dot, s_a1])
+        cs_b1 = s_b1 + f_dot
+        cs_b2 = f_dot + s_a1
 
-        cs_c1 = CompoundStroke([s_a1, f_dot, s_c1])
+        cs_c1 = s_a1, f_dot, s_c1
 
-        cs_g1 = CompoundStroke([f_dot, s_g1])
+        cs_g1 = f_dot + s_g1
 
-        cs_k1 = CompoundStroke([s_k1, s_k2, f_dot])
+        cs_k1 = s_k1 + s_k2 + f_dot
 
-        cs_a2 = CompoundStroke([f_dot, s_a1, f_dot])
+        cs_a2 = f_dot + s_a1 + f_dot
 
-        cs_m2 = CompoundStroke([f_dot, s_m2]).add_after(f_i_footer)
+        cs_m2 = (f_dot + s_m2).add_after(f_i_footer)
 
-        cs_x1 = CompoundStroke([s_k1, s_x2, f_dot])
+        cs_x1 = s_k1 + s_x2 + f_dot
 
         # marks
         m_a1 = Mark(Vector(0, xm_3m), cs_a1)
@@ -125,7 +126,7 @@ class Blackletter:
         m_c1 = Mark(Vector(0, xm_3m), cs_c1)
         m_c2 = Mark(Vector(m2, xm_m), f_dot)
 
-        m_d1 = Mark(Vector(0, xp_m), [s_d1, s_a1])
+        m_d1 = Mark(Vector(0, xp_m), s_d1 + s_a1)
 
         m_e1 = Mark(Vector(0, xm_7m), s_c1)
 
@@ -144,7 +145,7 @@ class Blackletter:
 
         m_k1 = Mark(Vector(0, xm_7m), cs_k1)
 
-        m_l1 = Mark(Vector(0, fp.ascender - m), CompoundStroke([s_l1, f_dot]))
+        m_l1 = Mark(Vector(0, fp.ascender - m), s_l1 + f_dot)
 
         m_m2 = Mark(Vector(m2, fp.x_height - m), cs_m2)
         m_m3 = m_a2.plus(Vector(m4, 0))
@@ -152,14 +153,14 @@ class Blackletter:
         m_p1 = Mark(Vector(0, xm_m), s_j1)
         m_p3 = Mark(Vector(-m2, m5), Stroke.from_xy(m4, -m4))
 
-        m_s1 = Mark(Vector(0, xm_m), CompoundStroke([s_s1, s_s2, s_s3]).add_after(f_f_footer))
+        m_s1 = Mark(Vector(0, xm_m), (s_s1 + s_s2 + s_s3).add_after(f_f_footer))
 
-        m_u1 = Mark(Vector(0, xm_m), CompoundStroke([s_u1, f_dot]))
-        m_u2 = Mark(Vector(m4, xm_m), CompoundStroke([s_u1, f_dot]))
+        m_u1 = Mark(Vector(0, xm_m), s_u1 + f_dot)
+        m_u2 = Mark(Vector(m4, xm_m), s_u1 + f_dot)
 
         m_v2 = Mark(Vector(m4, xm_m), s_u1)
 
-        m_w2 = Mark(Vector(m4, xm_m), CompoundStroke([s_u1, f_dot]))
+        m_w2 = Mark(Vector(m4, xm_m), s_u1 + f_dot)
         m_w3 = Mark(Vector(m8, xm_m), s_u1)  # need add
         m_w4 = Mark(Vector(m2, xm_7m), s_k1)
 
@@ -169,7 +170,7 @@ class Blackletter:
 
         m_z1 = Mark(Vector(0, xm_m), s_z1)
         m_z2 = Mark(Vector(m4, xm_m), s_z2)
-        m_z3 = Mark(Vector(0, xm_5m), CompoundStroke([s_z1, s_z3]).add_after(f_f_footer))
+        m_z3 = Mark(Vector(0, xm_5m), (s_z1 + s_z3).add_after(f_f_footer))
 
         # glyphs
         default_width = 8 * m

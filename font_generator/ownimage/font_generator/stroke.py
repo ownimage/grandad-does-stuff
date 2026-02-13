@@ -16,6 +16,20 @@ class Stroke(Strokeable):
         super().__init__(stroke_type)
         self.vec = vec
 
+    def __add__(self, other):
+        from .compound_stroke import CompoundStroke
+        from .stroke_line import StrokeLine
+
+        if isinstance(other, (Stroke, StrokeLine)):
+            return CompoundStroke([self, other])
+
+        if isinstance(other, CompoundStroke):
+            return CompoundStroke(other.strokes + [self])
+
+
+        raise NotImplemented
+
+
     @staticmethod
     def from_xy(x: float, y: float, stroke_type: StrokeType = StrokeType.Block) -> Stroke:
         return Stroke(Vector(x, y), stroke_type)
