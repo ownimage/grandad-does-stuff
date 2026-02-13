@@ -26,8 +26,8 @@ class StrokeLine(Strokeable):
         return StrokeLine(start - end)
 
     @staticmethod
-    def right(lenght: float) -> StrokeLine:
-        return StrokeLine(Vector(lenght, 0))
+    def right(length: float) -> StrokeLine:
+        return StrokeLine(Vector(length, 0))
 
     def extend(self, e: StrokeLine) -> StrokeLine:
         if e.stroke_type != StrokeType.Extend:

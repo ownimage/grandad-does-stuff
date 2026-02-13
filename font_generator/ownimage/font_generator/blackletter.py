@@ -34,6 +34,7 @@ class Blackletter:
         xm_2m = fp.x_height - m2
         xm_3m = fp.x_height - m3
         xm_4m = fp.x_height - m4
+        xm_5m = fp.x_height - m5
         xm_7m = fp.x_height - m7
 
         bp_m = fp.baseline + m
@@ -89,6 +90,12 @@ class Blackletter:
 
         s_u1 = Stroke(Vector(0, m3 - xm_m))
 
+        s_x2 = Stroke.down(xm_m - bp_3m)
+
+        s_z1 = Stroke.right(m4)
+        s_z2 = StrokeLine(Vector(-m4, -m4))
+        s_z3 = Stroke.down(xm_5m - dp_3m)
+
         # compound strokes
         cs_a1 = CompoundStroke([s_a1, f_dot])
         cs_a2 = CompoundStroke([f_dot, s_a1, f_dot])
@@ -105,6 +112,8 @@ class Blackletter:
         cs_a2 = CompoundStroke([f_dot, s_a1, f_dot])
 
         cs_m2 = CompoundStroke([f_dot, s_m2]).add_after(f_i_footer)
+
+        cs_x1 = CompoundStroke([s_k1, s_x2, f_dot])
 
         # marks
         m_a1 = Mark(Vector(0, xm_3m), cs_a1)
@@ -133,7 +142,7 @@ class Blackletter:
 
         m_j1 = Mark(Vector(0, xm_m), CompoundStroke(s_j1).add_after(f_f_footer))
 
-        m_k1 = Mark(Vector(0, fp.x_height - 7 * m), cs_k1)
+        m_k1 = Mark(Vector(0, xm_7m), cs_k1)
 
         m_l1 = Mark(Vector(0, fp.ascender - m), CompoundStroke([s_l1, f_dot]))
 
@@ -151,33 +160,46 @@ class Blackletter:
         m_v2 = Mark(Vector(m4, xm_m), s_u1)
 
         m_w2 = Mark(Vector(m4, xm_m), CompoundStroke([s_u1, f_dot]))
-        m_w3 = Mark(Vector(m8, xm_m), s_u1) # need add
+        m_w3 = Mark(Vector(m8, xm_m), s_u1)  # need add
+        m_w4 = Mark(Vector(m2, xm_7m), s_k1)
+
+        m_x1 = Mark(Vector(0, xm_m), cs_x1)
+        m_x2 = Mark(Vector(0, m3), f_dot)
+        m_x3 = Mark(Vector(m6, xm_m), f_dot)
+
+        m_z1 = Mark(Vector(0, xm_m), s_z1)
+        m_z2 = Mark(Vector(m4, xm_m), s_z2)
+        m_z3 = Mark(Vector(0, xm_5m), CompoundStroke([s_z1, s_z3]).add_after(f_f_footer))
 
         # glyphs
         default_width = 8 * m
+        next = Vector(m4, 0)
         self.glyph_map = {
-            'a': Glyph(Vector(0, 0), [m_a1, m_a2], default_width),
-            'b': Glyph(Vector(0, 0), [m_b1, m_b2], default_width),
-            'c': Glyph(Vector(0, 0), [m_c1, m_c2], default_width),
-            'd': Glyph(Vector(0, 0), [m_a1, m_d1], default_width),
-            'e': Glyph(Vector(0, 0), [m_c1, m_c2, m_e1], default_width),
-            'f': Glyph(Vector(0, 0), [m_f1, m_f2, m_f3], m4),
-            'g': Glyph(Vector(0, 0), [m_a1, m_g1], default_width),
-            'h': Glyph(Vector(0, 0), [m_h1, m_a2], m9),
-            'i': Glyph(Vector(0, 0), [m_i1, m_i_dot], m4),
-            'j': Glyph(Vector(0, 0), [m_j1, m_i_dot], m4),
-            'k': Glyph(Vector(0, 0), [m_h1, m_c2, m_e1, m_k1], m9),
-            'l': Glyph(Vector(0, 0), [m_l1], m5),
-            'm': Glyph(Vector(0, 0), [m_i1, m_m2, m_m3], 13 * m),
-            'n': Glyph(Vector(0, 0), [m_i1, m_a2], default_width),
-            'o': Glyph(Vector(0, 0), [m_a1, m_b2], default_width),
-            'p': Glyph(Vector(0, 0), [m_p1, m_b2, m_p3], default_width),
-            'r': Glyph(Vector(0, 0), [m_i1, m_c2], m7),
-            's': Glyph(Vector(0, 0), [m_s1, m_c2], m7),
-            't': Glyph(Vector(0, 0), [m_l1, m_f3], m5),
-            'u': Glyph(Vector(0, 0), [m_u1, m_u2], m9),
-            'v': Glyph(Vector(0, 0), [m_u1, m_v2], default_width),
-            'w': Glyph(Vector(0, 0), [m_u1, m_w2, m_w3], 12 * m),
+            'a': Glyph([m_a1, m_a2], default_width),
+            'b': Glyph([m_b1, m_b2], default_width),
+            'c': Glyph([m_c1, m_c2], default_width),
+            'd': Glyph([m_a1, m_d1], default_width),
+            'e': Glyph([m_c1, m_c2, m_e1], default_width),
+            'f': Glyph([m_f1, m_f2, m_f3], m4),
+            'g': Glyph([m_a1, m_g1], default_width),
+            'h': Glyph([m_h1, m_a2], m9),
+            'i': Glyph([m_i1, m_i_dot], m4),
+            'j': Glyph([m_j1, m_i_dot], m4),
+            'k': Glyph([m_h1, m_c2, m_e1, m_k1], m9),
+            'l': Glyph([m_l1], m5),
+            'm': Glyph([m_i1, m_m2, m_m3], 13 * m),
+            'n': Glyph([m_i1, m_a2], default_width),
+            'o': Glyph([m_a1, m_b2], default_width),
+            'p': Glyph([m_p1, m_b2, m_p3], default_width),
+            'r': Glyph([m_i1, m_c2], m7),
+            's': Glyph([m_s1, m_c2], m7),
+            't': Glyph([m_l1, m_f3], m5),
+            'u': Glyph([m_u1, m_u2], m9),
+            'v': Glyph([m_u1, m_v2], default_width),
+            'w': Glyph([m_u1, m_w2, m_w3, m_w4], 11 * m),
+            'x': Glyph([m_x1, m_x2, m_x3, m_w4], 11 * m),
+            'y': Glyph([m_u1, m_j1 + next], default_width),
+            'z': Glyph([m_z1, m_z2, m_z3], default_width),
         }
 
     def svg(self, posn: Vector, chars: str, scale: float):

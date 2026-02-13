@@ -5,7 +5,7 @@ from .mark import Mark
 from .vector import Vector
 
 class Glyph:
-    def __init__(self, vec: Vector, marks: List[Mark], width):
+    def __init__(self, marks: List[Mark], width, vec: Vector = Vector(0,0)):
         self.vec = vec
         self.marks = marks
         self.width = width

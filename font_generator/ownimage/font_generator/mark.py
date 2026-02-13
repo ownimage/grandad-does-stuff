@@ -6,13 +6,15 @@ from .font_parameters import FontParameters
 from .geometry_set import GeometrySet
 from .stroke import Strokeable
 from .vector import Vector
-from .vector_math import VectorMath as VM
 
 
 class Mark:
     def __init__(self, vec: Vector, strokes: List[Strokeable] | Strokeable):
         self.vec = vec
         self.strokes: List[Strokeable] = [strokes] if isinstance(strokes, Strokeable) else strokes
+
+    def __add__(self, v):
+        return Mark(self.vec + v, self.strokes)
 
     def svg(self, posn: Vector, fp: FontParameters, scale: float):
         start = Vector(posn.x + self.vec.x, posn.y + self.vec.y)

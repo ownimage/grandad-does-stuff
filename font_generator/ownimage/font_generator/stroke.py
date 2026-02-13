@@ -28,6 +28,9 @@ class Stroke(Strokeable):
     def down(length: float, stroke_type: StrokeType = StrokeType.Block) -> Stroke:
         return Stroke(Vector(0, -length), stroke_type)
 
+    @staticmethod
+    def right(length: float, stroke_type: StrokeType = StrokeType.Block) -> Stroke:
+        return Stroke(Vector(length, 0), stroke_type)
 
     def extend(self, e: Stroke) -> Stroke:
         if e.stroke_type != Stroke.StrokeType.Extend:
