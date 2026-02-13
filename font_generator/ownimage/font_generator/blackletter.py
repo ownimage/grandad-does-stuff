@@ -87,6 +87,8 @@ class Blackletter:
         s_s2 = StrokeLine.right(m4)
         s_s3 = Stroke.down(fp.x_height - 10 * m)
 
+        s_u1 = Stroke(Vector(0, m3 - xm_m))
+
         # compound strokes
         cs_a1 = CompoundStroke([s_a1, f_dot])
         cs_a2 = CompoundStroke([f_dot, s_a1, f_dot])
@@ -141,7 +143,15 @@ class Blackletter:
         m_p1 = Mark(Vector(0, xm_m), s_j1)
         m_p3 = Mark(Vector(-m2, m5), Stroke.from_xy(m4, -m4))
 
-        m_s1 = Mark(Vector(0, fp.x_height - m), CompoundStroke([s_s1, s_s2, s_s3]).add_after(f_f_footer))
+        m_s1 = Mark(Vector(0, xm_m), CompoundStroke([s_s1, s_s2, s_s3]).add_after(f_f_footer))
+
+        m_u1 = Mark(Vector(0, xm_m), CompoundStroke([s_u1, f_dot]))
+        m_u2 = Mark(Vector(m4, xm_m), CompoundStroke([s_u1, f_dot]))
+
+        m_v2 = Mark(Vector(m4, xm_m), s_u1)
+
+        m_w2 = Mark(Vector(m4, xm_m), CompoundStroke([s_u1, f_dot]))
+        m_w3 = Mark(Vector(m8, xm_m), s_u1) # need add
 
         # glyphs
         default_width = 8 * m
@@ -162,9 +172,12 @@ class Blackletter:
             'n': Glyph(Vector(0, 0), [m_i1, m_a2], default_width),
             'o': Glyph(Vector(0, 0), [m_a1, m_b2], default_width),
             'p': Glyph(Vector(0, 0), [m_p1, m_b2, m_p3], default_width),
-            'r': Glyph(Vector(0, 0), [m_i1, m_c2], default_width),
-            's': Glyph(Vector(0, 0), [m_s1, m_c2], m4),
-
+            'r': Glyph(Vector(0, 0), [m_i1, m_c2], m7),
+            's': Glyph(Vector(0, 0), [m_s1, m_c2], m7),
+            't': Glyph(Vector(0, 0), [m_l1, m_f3], m5),
+            'u': Glyph(Vector(0, 0), [m_u1, m_u2], m9),
+            'v': Glyph(Vector(0, 0), [m_u1, m_v2], default_width),
+            'w': Glyph(Vector(0, 0), [m_u1, m_w2, m_w3], 12 * m),
         }
 
     def svg(self, posn: Vector, chars: str, scale: float):
