@@ -9,12 +9,20 @@ from .vector import Vector
 
 
 class Mark:
-    def __init__(self, vec: Vector, strokes: List[Strokeable] | Strokeable):
-        self.vec = vec
+    def __init__(self, strokes: List[Strokeable] | Strokeable, vec: Vector = None, x : float = None, y: float = None):
+        if vec is not None:
+            if x is not None or y is not None:
+                raise ValueError("Cannot specify vec and x or y")
+            self.vec = vec
+        elif x is not None or y is not None:
+            self.vec = Vector(x or 0, y or 0)
+        else:
+            self.vec = Vector(0, 0)
+
         self.strokes: List[Strokeable] = [strokes] if isinstance(strokes, Strokeable) else strokes
 
     def __add__(self, v):
-        return Mark(self.vec + v, self.strokes)
+        return Mark(self.strokes, self.vec + v)
 
     def svg(self, posn: Vector, fp: FontParameters, scale: float):
         start = Vector(posn.x + self.vec.x, posn.y + self.vec.y)
@@ -38,4 +46,4 @@ class Mark:
         return paths
 
     def plus(self, off: Vector) -> Mark:
-        return Mark(self.vec + off, self.strokes)
+        return Mark(self.strokes, self.vec + off)

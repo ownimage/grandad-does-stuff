@@ -117,60 +117,60 @@ class Blackletter:
         cs_x1 = s_k1 + s_x2 + f_dot
 
         # marks
-        m_a1 = Mark(Vector(0, xm_3m), cs_a1)
-        m_a2 = Mark(Vector(m2, xm_m), cs_a2)
+        m_a1 = Mark(cs_a1, y=xm_3m)
+        m_a2 = Mark(cs_a2, x=m2, y=xm_m)
 
-        m_b1 = Mark(Vector(0, am_m), cs_b1)
-        m_b2 = Mark(Vector(m2, xm_m), cs_b2)
+        m_b1 = Mark(cs_b1, y=am_m)
+        m_b2 = Mark(cs_b2, x=m2, y=xm_m)
 
-        m_c1 = Mark(Vector(0, xm_3m), cs_c1)
-        m_c2 = Mark(Vector(m2, xm_m), f_dot)
+        m_c1 = Mark(cs_c1, y=xm_3m)
+        m_c2 = Mark(f_dot, x=m2, y=xm_m)
 
-        m_d1 = Mark(Vector(0, xp_m), s_d1 + s_a1)
+        m_d1 = Mark(s_d1 + s_a1, y=xp_m)
 
-        m_e1 = Mark(Vector(0, xm_7m), s_c1)
+        m_e1 = Mark(s_c1, y=xm_7m)
 
-        m_f1 = Mark(Vector(0, am_3m), CompoundStroke(s_f1).add_after(f_f_footer))
-        m_f2 = Mark(Vector(m2, am_m), f_dot)
-        m_f3 = Mark(Vector(-m3, fp.tbar), s_f2)
+        m_f1 = Mark(CompoundStroke(s_f1).add_after(f_f_footer), y=am_3m)
+        m_f2 = Mark(f_dot, x=m2, y=am_m)
+        m_f3 = Mark(s_f2, x=-m3, y=fp.tbar)
 
-        m_g1 = Mark(Vector(m2, xm_m), cs_g1.add_after(f_f_footer))
+        m_g1 = Mark(cs_g1.add_after(f_f_footer), x=m2, y=xm_m)
 
-        m_h1 = Mark(Vector(0, fp.ascender - m), CompoundStroke(s_h1).add_after(f_i_footer))
+        m_h1 = Mark(CompoundStroke(s_h1).add_after(f_i_footer), y=fp.ascender - m)
 
-        m_i1 = Mark(Vector(0, fp.x_height - m), CompoundStroke(s_i1).add_after(f_i_footer))
-        m_i_dot = Mark(Vector(-m, fp.tbar), f_dot)
+        m_i1 = Mark(CompoundStroke(s_i1).add_after(f_i_footer), y=fp.x_height - m)
+        m_i_dot = Mark(f_dot, x=-m, y=fp.tbar)
 
-        m_j1 = Mark(Vector(0, xm_m), CompoundStroke(s_j1).add_after(f_f_footer))
+        m_j1 = Mark(CompoundStroke(s_j1).add_after(f_f_footer), y=xm_m)
 
-        m_k1 = Mark(Vector(0, xm_7m), cs_k1)
+        m_k1 = Mark(cs_k1, y=xm_7m)
 
-        m_l1 = Mark(Vector(0, fp.ascender - m), s_l1 + f_dot)
+        m_l1 = Mark(s_l1 + f_dot, y=fp.ascender - m)
 
-        m_m2 = Mark(Vector(m2, fp.x_height - m), cs_m2)
-        m_m3 = m_a2.plus(Vector(m4, 0))
+        m_m2 = Mark(cs_m2, x=m2, y=fp.x_height - m)
+        m_m3 = m_a2.plus(Vector(m4, 0))  # this one stays as-is because it's a vector addition
 
-        m_p1 = Mark(Vector(0, xm_m), s_j1)
-        m_p3 = Mark(Vector(-m2, m5), Stroke.from_xy(m4, -m4))
+        m_p1 = Mark(s_j1, y=xm_m)
+        m_p3 = Mark(Stroke.from_xy(m4, -m4), x=-m2, y=m5)
 
-        m_s1 = Mark(Vector(0, xm_m), (s_s1 + s_s2 + s_s3).add_after(f_f_footer))
+        m_s1 = Mark((s_s1 + s_s2 + s_s3).add_after(f_f_footer), y=xm_m)
 
-        m_u1 = Mark(Vector(0, xm_m), s_u1 + f_dot)
-        m_u2 = Mark(Vector(m4, xm_m), s_u1 + f_dot)
+        m_u1 = Mark(s_u1 + f_dot, y=xm_m)
+        m_u2 = Mark(s_u1 + f_dot, x=m4, y=xm_m)
 
-        m_v2 = Mark(Vector(m4, xm_m), s_u1)
+        m_v2 = Mark(s_u1, x=m4, y=xm_m)
 
-        m_w2 = Mark(Vector(m4, xm_m), s_u1 + f_dot)
-        m_w3 = Mark(Vector(m8, xm_m), s_u1)  # need add
-        m_w4 = Mark(Vector(m2, xm_7m), s_k1)
+        m_w2 = Mark(s_u1 + f_dot, x=m4, y=xm_m)
+        m_w3 = Mark(s_u1, x=m8, y=xm_m)
+        m_w4 = Mark(s_k1, x=m2, y=xm_7m)
 
-        m_x1 = Mark(Vector(0, xm_m), cs_x1)
-        m_x2 = Mark(Vector(0, m3), f_dot)
-        m_x3 = Mark(Vector(m6, xm_m), f_dot)
+        m_x1 = Mark(cs_x1, y=xm_m)
+        m_x2 = Mark(f_dot, y=m3)
+        m_x3 = Mark(f_dot, x=m6, y=xm_m)
 
-        m_z1 = Mark(Vector(0, xm_m), s_z1)
-        m_z2 = Mark(Vector(m4, xm_m), s_z2)
-        m_z3 = Mark(Vector(0, xm_5m), (s_z1 + s_z3).add_after(f_f_footer))
+        m_z1 = Mark(s_z1, y=xm_m)
+        m_z2 = Mark(s_z2, x=m4, y=xm_m)
+        m_z3 = Mark((s_z1 + s_z3).add_after(f_f_footer), y=xm_5m)
 
         # glyphs
         default_width = 8 * m
