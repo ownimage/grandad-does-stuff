@@ -3,7 +3,7 @@ from PySide6.QtGui import QAction
 from PySide6.QtSvgWidgets import QSvgWidget
 from PySide6.QtWidgets import (
     QVBoxLayout, QHBoxLayout,
-    QCheckBox, QSlider, QLabel, QMainWindow, QWidget, QFileDialog
+    QCheckBox, QSlider, QLabel, QMainWindow, QWidget, QFileDialog, QTabWidget
 )
 
 from .birdfont_reader import BirdfontReader
@@ -21,11 +21,20 @@ class MainWindow(QMainWindow):
 
         layout = QVBoxLayout()
 
+        layout = QVBoxLayout()
+
         self.svg_width = 2000
         self.svg_height = 600
         self.svg_widget = QSvgWidget()
         self.svg_widget.setFixedSize(self.svg_width, self.svg_height)
         layout.addWidget(self.svg_widget)
+
+        # --- Create tabs ---
+        tabs = QTabWidget()
+
+        # ---------------- TAB 1: GENERAL ----------------
+        tab_general = QWidget()
+        general_layout = QVBoxLayout()
 
         self.filled = QCheckBox()
         self.filled.setChecked(True)
@@ -35,25 +44,43 @@ class MainWindow(QMainWindow):
         filled_row.addWidget(QLabel("Filled:"))
         filled_row.addWidget(self.filled)
         filled_row.addStretch()
+        general_layout.addLayout(filled_row)
 
-        layout.addLayout(filled_row)
+        self.scale = self.createSlider(general_layout, 10, 400, 40, "Scale")
 
-        self.ascender = self.createSlider(layout, 100, 1000, 700, "Ascender")
-        self.tbar = self.createSlider(layout, 100, 1000, 500, "T Bar")
-        self.x_height = self.createSlider(layout, 100, 1000, 300, "X Height")
-        self.descender = self.createSlider(layout, 100, 1000, 700, "Descender")
+        tab_general.setLayout(general_layout)
+        tabs.addTab(tab_general, "General")
 
-        self.pen_width = self.createSlider(layout, 0, 100, 50, "Pen Width")
-        self.line_thickness = self.createSlider(layout, 0, 100, 40, "Line Thickness")
+        # ---------------- TAB 2: PEN ----------------
+        tab_pen = QWidget()
+        pen_layout = QVBoxLayout()
 
-        self.scale = self.createSlider(layout, 10, 400, 40, "Scale")
+        self.pen_width = self.createSlider(pen_layout, 0, 100, 50, "Pen Width")
+        self.line_thickness = self.createSlider(pen_layout, 0, 100, 40, "Line Thickness")
+
+        tab_pen.setLayout(pen_layout)
+        tabs.addTab(tab_pen, "Pen")
+
+        # ---------------- TAB 3: METRICS ----------------
+        tab_metrics = QWidget()
+        metrics_layout = QVBoxLayout()
+
+        self.ascender = self.createSlider(metrics_layout, 100, 1000, 700, "Ascender")
+        self.tbar = self.createSlider(metrics_layout, 100, 1000, 500, "T Bar")
+        self.x_height = self.createSlider(metrics_layout, 100, 1000, 300, "X Height")
+        self.descender = self.createSlider(metrics_layout, 100, 1000, 700, "Descender")
+
+        tab_metrics.setLayout(metrics_layout)
+        tabs.addTab(tab_metrics, "Metrics")
+
+        # Add tabs to main layout
+        layout.addWidget(tabs)
 
         central = QWidget()
         central.setLayout(layout)
         self.setCentralWidget(central)
 
         self.update_svg()
-
     def createSlider(self, layout, min, max, value, name):
         slider = QSlider(Qt.Horizontal)
         slider.setRange(min, max)
