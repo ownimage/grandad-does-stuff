@@ -7,6 +7,8 @@ from PySide6.QtWidgets import (
 )
 
 from font_generator.ownimage.font_generator.compound_pen_outline import CompoundPenOutline
+from font_generator.ownimage.font_generator.compound_pen_outline_ring import CompoundPenOutlineRing
+from font_generator.ownimage.font_generator.compound_pen_outline_unified import CompoundPenOutlineRingUnified
 from font_generator.ownimage.font_generator.compound_pen_stroke import CompoundPenStroke
 from font_generator.ownimage.font_generator.compound_pen_stroke_layered import CompoundPenStrokeLayered
 from font_generator.ownimage.font_generator.pen_nib import PenNib
@@ -72,7 +74,8 @@ class MainWindow(QMainWindow):
             pos=Vector(0, 0)
         )
 
-        outline = CompoundPenOutline(nib, self.points)
+        ring = CompoundPenOutlineRing(nib, self.points, edge=nib.thickness)
+
 
         W, H = 600, 400
 
@@ -84,11 +87,16 @@ class MainWindow(QMainWindow):
     <rect x="0" y="0" width="{W}" height="{H}" fill="white" />
 
     <!-- Debug: show points -->
-    {"".join(f'<circle cx="{p.x}" cy="{p.y}" r="4" fill="red" />' for p in self.points)}
 
-    {outline.svg_path()}
+
+    {ring.svg_paths()}
+    
+    {"".join(f'<circle cx="{p.x}" cy="{p.y}" r="10" fill="red" />' for p in self.points)}
+
 </svg>
 """
+
+
 
         print(svg)
         self.svg.load(bytearray(svg, encoding="utf-8"))
