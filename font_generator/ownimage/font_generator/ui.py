@@ -46,7 +46,7 @@ class MainWindow(QMainWindow):
         filled_row.addStretch()
         general_layout.addLayout(filled_row)
 
-        self.scale = self.createSlider(general_layout, 10, 400, 40, "Scale")
+        self.scale = self.create_slider(general_layout, 10, 400, 40, "Scale")
 
         tab_general.setLayout(general_layout)
         tabs.addTab(tab_general, "General")
@@ -55,8 +55,9 @@ class MainWindow(QMainWindow):
         tab_pen = QWidget()
         pen_layout = QVBoxLayout()
 
-        self.pen_width = self.createSlider(pen_layout, 0, 100, 50, "Pen Width")
-        self.line_thickness = self.createSlider(pen_layout, 0, 100, 40, "Line Thickness")
+        self.pen_width = self.create_slider(pen_layout, 0, 100, 50, "Pen Width")
+        self.pen_thickness = self.create_slider(pen_layout, 0, 100, 10, "Pen Thickness")
+        self.pen_angle = self.create_slider(pen_layout, 0, 180, 90, "Pen Angle")
 
         tab_pen.setLayout(pen_layout)
         tabs.addTab(tab_pen, "Pen")
@@ -65,10 +66,10 @@ class MainWindow(QMainWindow):
         tab_metrics = QWidget()
         metrics_layout = QVBoxLayout()
 
-        self.ascender = self.createSlider(metrics_layout, 100, 1000, 700, "Ascender")
-        self.tbar = self.createSlider(metrics_layout, 100, 1000, 500, "T Bar")
-        self.x_height = self.createSlider(metrics_layout, 100, 1000, 300, "X Height")
-        self.descender = self.createSlider(metrics_layout, 100, 1000, 700, "Descender")
+        self.ascender = self.create_slider(metrics_layout, 100, 1000, 700, "Ascender")
+        self.tbar = self.create_slider(metrics_layout, 100, 1000, 500, "T Bar")
+        self.x_height = self.create_slider(metrics_layout, 100, 1000, 300, "X Height")
+        self.descender = self.create_slider(metrics_layout, 100, 1000, 700, "Descender")
 
         tab_metrics.setLayout(metrics_layout)
         tabs.addTab(tab_metrics, "Metrics")
@@ -81,7 +82,8 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(central)
 
         self.update_svg()
-    def createSlider(self, layout, min, max, value, name):
+
+    def create_slider(self, layout, min, max, value, name):
         slider = QSlider(Qt.Horizontal)
         slider.setRange(min, max)
         slider.setValue(value)
@@ -100,13 +102,24 @@ class MainWindow(QMainWindow):
         svg_data = self.make_svg(radius)
         self.svg_widget.load(bytearray(svg_data, encoding="utf-8"))
 
-    def get_fontParameters(self):
-        return FontParameters(self.pen_width.value() / 100, self.filled.isChecked(), self.ascender.value() / 100, self.tbar.value() / 100,
-                              self.x_height.value() / 100, 0,
-                              -self.descender.value() / 100, self.line_thickness.value() / 100)
+    def get_font_parameters(self):
+        width = self.pen_width.value() / 100
+        return FontParameters(width,
+                              width * self.pen_thickness.value() / 200,
+                              self.pen_angle.value() / 2,
+                              self.filled.isChecked(),
+                              self.ascender.value() / 100,
+                              self.tbar.value() / 100,
+                              self.x_height.value() / 100,
+                              0,
+                              -self.descender.value() / 100
+                              )
 
     def make_svg(self, scale: float) -> str:
-        self.blackletter = Blackletter(self.get_fontParameters())
+        fp = self.get_font_parameters()
+        print(f"scale = {scale}")
+        print(f"fp={fp}")
+        self.blackletter = Blackletter(fp)
 
         offset = 300
 
@@ -116,6 +129,11 @@ class MainWindow(QMainWindow):
     
         <rect x="0" y="{-offset}" width="{self.svg_width}" height="{self.svg_height + offset}" fill="white"/>
         <g transform="translate(0, {self.svg_height - offset}) scale(1, -1)">
+            <line x1="0" y1="{fp.ascender * scale}" x2="{self.svg_width}" y2="{fp.ascender * scale}" stroke="black" stroke-width="1" />
+            <line x1="0" y1="{fp.tbar * scale}" x2="{self.svg_width}" y2="{fp.tbar * scale}" stroke="black" stroke-width="1" />
+            <line x1="0" y1="{fp.x_height * scale}" x2="{self.svg_width}" y2="{fp.x_height * scale}" stroke="black" stroke-width="1" />
+            <line x1="0" y1="{fp.baseline * scale}" x2="{self.svg_width}" y2="{fp.baseline * scale}" stroke="black" stroke-width="1" />
+            <line x1="0" y1="{fp.descender * scale}" x2="{self.svg_width}" y2="{fp.descender * scale}" stroke="black" stroke-width="1" />
             {self.blackletter.svg_known(Vector(1, 0), scale)}
         </g>
     </svg>

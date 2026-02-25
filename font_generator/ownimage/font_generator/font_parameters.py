@@ -3,11 +3,13 @@ from dataclasses import dataclass
 
 @dataclass(frozen=True)
 class FontParameters:
+    pen_width: float
     pen_thickness: float
+    pen_angle: float
     filled: bool
     ascender: float
     tbar: float
     x_height: float
     baseline: float
     descender: float
-    line_thickness: float
+

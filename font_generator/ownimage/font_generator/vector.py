@@ -33,3 +33,7 @@ class Vector:
         s = math.sin(r)
         return Vector(self.x * c - self.y * s,
                     self.x * s + self.y * c)
+
+    def cross(self, other: "Vector") -> float:
+        """2D cross product (returns scalar)."""
+        return self.x * other.y - self.y * other.x

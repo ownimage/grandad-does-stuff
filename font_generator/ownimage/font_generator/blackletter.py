@@ -4,6 +4,7 @@ from .compound_stroke import CompoundStroke
 from .font_parameters import FontParameters
 from .glyph import Glyph
 from .mark import Mark
+from .pen_nib import PenNib
 from .stroke import Stroke
 from .stroke_line import StrokeLine
 from .stroke_type import StrokeType
@@ -15,9 +16,32 @@ class Blackletter:
         self.fp = fp
 
         # calculated values
-        m = fp.pen_thickness / (2 * math.sqrt(2))
-        m2 = 2 * m
-        m3 = 3 * m
+        r2 = math.sqrt(2)
+        w = fp.pen_width
+        t = fp.pen_thickness
+        a = fp.ascender
+        x = fp.x_height
+        b = fp.baseline
+        d = fp.descender
+        m = w / (2 * r2) + t * (1 + r2) / 4
+        h = (2 * w + (1 + 1 / r2) * t) / r2
+
+        nib = PenNib.from_font_parameters(fp)
+
+        am1 = a - nib.tr.y
+
+        xp1 = x + abs((nib.tr.x - nib.tl.x) * nib.normal.y / nib.normal.x) - nib.tl.y
+        xm1 = x - nib.tr.y
+        xm2 = x - nib.tr.y - (nib.direction * w).y
+
+        bp1 = b - nib.bl.y + (w - t) * nib.normal.y
+
+        m1 = -nib.tl.x
+        m2 = m1 + nib.direction.x * w
+        m3 = m2 - nib.normal.x * (w - t)
+
+        # m2 = 2 * m
+
         m4 = 4 * m
         m5 = 5 * m
         m6 = 6 * m
@@ -38,17 +62,19 @@ class Blackletter:
         xm_5m = fp.x_height - m5
         xm_7m = fp.x_height - m7
 
+        bp = (1.5 * w + t) / r2
         bp_m = fp.baseline + m
         bp_2m = fp.baseline + m2
         bp_3m = fp.baseline + m3
 
+        dp = d + (1.5 * w + t) / r2
         dp_3m = fp.descender + m3
 
         # flourishes
-        f_dot = Stroke(Vector(m2, -m2))
+        f_dot = Stroke(nib.normal * (t - w))
 
         f_f_footer = CompoundStroke([
-            Stroke(Vector(-m4, 0), StrokeType.Move),
+            Stroke(Vector(-h, ((1 / r2 - 1) * w - (1 + r2) * t) / 2), StrokeType.Move),
             f_dot
         ])
 
@@ -59,24 +85,27 @@ class Blackletter:
         ])
 
         # strokes
-        s_a1 = Stroke.down(xm_3m - bp_3m)
+        s_a1 = Stroke.down(xm2 - bp1)
+        s_a2 = Stroke.down(x - nib.tr.y - 2 * nib.normal.y * (w - t) + nib.bl.y)
 
-        s_b1 = Stroke.down(am_m - bp_3m)
+        s_b1 = Stroke.down(am1 - bp1)
 
         s_c1 = Stroke(Vector(m, m), StrokeType.Move) + StrokeLine(Vector(m2, m2))
 
-        s_d1 = Stroke(Vector(m4, -m4))
+        s_d1 = Stroke.down(xm1 - bp1)
+        s_d3 = Stroke(nib.normal * ((m3 - m1) / nib.normal.x))
+        s_d4 = Stroke.down(xp1 + s_d3.vec.y - (nib.direction.y * w - nib.bl.y))
 
-        s_f1 = Stroke.down(am_3m - dp_3m)
+        s_f1 = Stroke.down(am_3m - (dp + t * r2))
         s_f2 = Stroke.right(m6)
 
-        s_g1 = Stroke.down(xm_3m - dp_3m)
+        s_g1 = Stroke.down(xm_3m - dp)
 
         s_h1 = Stroke.down(am_2m)
 
         s_i1 = Stroke.down(xm_m - m)
 
-        s_j1 = Stroke.down(xm_m - dp_3m)
+        s_j1 = Stroke.down(xm_m - dp)
 
         s_k1 = Stroke.right(m4)
         s_k2 = Stroke.down(fp.x_height - 10 * m)
@@ -95,38 +124,42 @@ class Blackletter:
 
         s_z1 = Stroke.right(m4)
         s_z2 = StrokeLine(Vector(-m4, -m4))
-        s_z3 = Stroke.down(xm_5m - dp_3m)
+        s_z3 = Stroke.down(xm_5m - dp)
 
         # compound strokes
         cs_a1 = s_a1 + f_dot
-        cs_a2 = f_dot + s_a1 + f_dot
+        cs_a2 = f_dot + s_a2 + f_dot
 
         cs_b1 = s_b1 + f_dot
         cs_b2 = f_dot + s_a1
 
-        cs_c1 = s_a1, f_dot, s_c1
+        cs_c1 = s_a1 + f_dot + s_c1
+
+        cs_d1 = s_d1 + f_dot
+        cs_d2 = s_d3 + s_d4
 
         cs_g1 = f_dot + s_g1
 
         cs_k1 = s_k1 + s_k2 + f_dot
 
-        cs_a2 = f_dot + s_a1 + f_dot
+        # cs_a2 = f_dot + s_a1.extend(t * r2) + f_dot
 
         cs_m2 = (f_dot + s_m2).add_after(f_i_footer)
 
         cs_x1 = s_k1 + s_x2 + f_dot
 
         # marks
-        m_a1 = Mark(cs_a1, y=xm_3m)
-        m_a2 = Mark(cs_a2, x=m2, y=xm_m)
+        m_a1 = Mark(cs_a1, x=m1, y=xm2)
+        m_a2 = Mark(cs_a2, x=m2, y=xm1)
 
-        m_b1 = Mark(cs_b1, y=am_m)
-        m_b2 = Mark(cs_b2, x=m2, y=xm_m)
+        m_b1 = Mark(cs_b1, x=m1, y=am1)
+        m_b2 = Mark(cs_b2, x=m2, y=xm1)
 
-        m_c1 = Mark(cs_c1, y=xm_3m)
-        m_c2 = Mark(f_dot, x=m2, y=xm_m)
+        m_c1 = Mark(cs_c1, x=m1, y=xm2)
+        m_c2 = Mark(f_dot, x=m2, y=xm1)
 
-        m_d1 = Mark(s_d1 + s_a1, y=xp_m)
+        m_d1 = Mark(cs_d1, x=m1, y=xm1)
+        m_d2 = Mark(cs_d2, x=m1, y=xp1)
 
         m_e1 = Mark(s_c1, y=xm_7m)
 
@@ -179,7 +212,7 @@ class Blackletter:
             'a': Glyph([m_a1, m_a2], default_width),
             'b': Glyph([m_b1, m_b2], default_width),
             'c': Glyph([m_c1, m_c2], default_width),
-            'd': Glyph([m_a1, m_d1], default_width),
+            'd': Glyph([m_d1, m_d2], default_width),
             'e': Glyph([m_c1, m_c2, m_e1], default_width),
             'f': Glyph([m_f1, m_f2, m_f3], m4),
             'g': Glyph([m_a1, m_g1], default_width),

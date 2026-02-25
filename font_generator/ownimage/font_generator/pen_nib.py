@@ -2,7 +2,8 @@ from dataclasses import dataclass, field
 from math import cos, sin, radians
 from typing import Tuple
 
-from font_generator.ownimage.font_generator.vector import Vector
+from .font_parameters import FontParameters
+from .vector import Vector
 
 
 @dataclass(frozen=True)
@@ -27,31 +28,51 @@ class PenNib:
         ny = dx
         object.__setattr__(self, "normal", Vector(nx, ny).normalized())
 
+    @staticmethod
+    def from_font_parameters(fp: FontParameters) -> "PenNib":
+        return PenNib(fp.pen_width, fp.pen_thickness, fp.pen_angle)
+
+    def at(self, pos: Vector) -> "PenNib":
+        return PenNib(
+            width=self.width,
+            thickness=self.thickness,
+            angle=self.angle,
+            pos=pos
+        )
+
+    def move(self, delta: Vector) -> "PenNib":
+        return PenNib(
+            width=self.width,
+            thickness=self.thickness,
+            angle=self.angle,
+            pos=self.pos + delta
+        )
+
     # --- Corner helpers -----------------------------------------------------
 
-    def _corner(self, dx: float, dy: float) -> Vector:
+    def _offset(self, dx: float, dy: float) -> Vector:
         """Return pos + dx*direction + dy*normal."""
         return self.pos + self.direction * dx + self.normal * dy
 
     # Named points (top-left, left, bottom-left, bottom, bottom-right, right, top-right, top)
     @property
-    def tl(self): return self._corner(-self.width/2,  self.thickness/2)
+    def tl(self): return self._offset(-self.width / 2, self.thickness / 2)
     @property
-    def l(self):  return self._corner(-self.width/2,  0)
+    def l(self):  return self._offset(-self.width / 2, 0)
     @property
-    def bl(self): return self._corner(-self.width/2, -self.thickness/2)
+    def bl(self): return self._offset(-self.width / 2, -self.thickness / 2)
 
     @property
-    def b(self):  return self._corner(0, -self.thickness/2)
+    def b(self):  return self._offset(0, -self.thickness / 2)
     @property
-    def t(self):  return self._corner(0,  self.thickness/2)
+    def t(self):  return self._offset(0, self.thickness / 2)
 
     @property
-    def br(self): return self._corner(self.width/2, -self.thickness/2)
+    def br(self): return self._offset(self.width / 2, -self.thickness / 2)
     @property
-    def r(self):  return self._corner(self.width/2,  0)
+    def r(self):  return self._offset(self.width / 2, 0)
     @property
-    def tr(self): return self._corner(self.width/2,  self.thickness/2)
+    def tr(self): return self._offset(self.width / 2, self.thickness / 2)
 
     # --- Move / copy --------------------------------------------------------
 

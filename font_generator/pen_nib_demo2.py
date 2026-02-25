@@ -8,6 +8,7 @@ from PySide6.QtWidgets import (
 
 from font_generator.ownimage.font_generator.compound_pen_outline import CompoundPenOutline
 from font_generator.ownimage.font_generator.compound_pen_outline_ring import CompoundPenOutlineRing
+from font_generator.ownimage.font_generator.compound_pen_outline_ring_clipper import CompoundPenOutlineRingClipper
 from font_generator.ownimage.font_generator.compound_pen_outline_unified import CompoundPenOutlineRingUnified
 from font_generator.ownimage.font_generator.compound_pen_stroke import CompoundPenStroke
 from font_generator.ownimage.font_generator.compound_pen_stroke_layered import CompoundPenStrokeLayered
@@ -74,8 +75,11 @@ class MainWindow(QMainWindow):
             pos=Vector(0, 0)
         )
 
-        ring = CompoundPenOutlineRing(nib, self.points, edge=nib.thickness)
-
+        ring = CompoundPenOutlineRingClipper(
+            nib=nib,
+            points=self.points,
+            inset=nib.thickness  # or whatever border thickness you want
+        )
 
         W, H = 600, 400
 

@@ -18,6 +18,9 @@ class CompoundStroke(Strokeable):
         if isinstance(other, Stroke):
             return CompoundStroke(self.strokes + [other])
 
+        if isinstance(other, CompoundStroke):
+            return CompoundStroke(self.strokes + other.strokes)
+
         raise NotImplemented
 
     def get_geom(self, start: Vector, fp: FontParameters, scale: float, prev: Strokeable, next: Strokeable, geom_set: GeometrySet):

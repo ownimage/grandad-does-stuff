@@ -36,7 +36,7 @@ class StrokeLine(Strokeable):
 
     def get_geom(self, start: Vector, fp: FontParameters, scale: float, prev: Strokeable, next: Strokeable, geom_set: GeometrySet):
         unit = self.vec.normalized()
-        offset = unit.rotated(90) * fp.line_thickness * fp.pen_thickness * scale * .5
+        offset = unit.rotated(90) * fp.pen_thickness * fp.pen_width * scale * .5
         p1 = start * scale
         p2 = (start + self.vec) * scale
         p3 = p2 + offset

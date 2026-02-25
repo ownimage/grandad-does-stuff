@@ -1,7 +1,9 @@
 from dataclasses import dataclass
 
+from .geometry_set import GeometrySet
 from .pen_nib import PenNib
 from .vector import Vector
+from .vector_math import VectorMath as VM
 
 
 @dataclass(frozen=True)
@@ -9,38 +11,30 @@ class PenStroke:
     start: PenNib
     end: PenNib
 
-    def _hull(self, pts: list[Vector]) -> list[Vector]:
-        pts = sorted(pts, key=lambda p: (p.x, p.y))
+    def get_geom(self, start: Vector, scale: float, geom_set: GeometrySet) -> GeometrySet:
+        dpl = VM.distance_point_to_line
 
-        def cross(o, a, b):
-            return (a.x - o.x)*(b.y - o.y) - (a.y - o.y)*(b.x - o.x)
+        def T(pt: Vector) -> Vector:
+            return (pt + start) * scale
 
-        lower = []
-        for p in pts:
-            while len(lower) >= 2 and cross(lower[-2], lower[-1], p) <= 0:
-                lower.pop()
-            lower.append(p)
+        outline = [T(self.start.tl)]
 
-        upper = []
-        for p in reversed(pts):
-            while len(upper) >= 2 and cross(upper[-2], upper[-1], p) <= 0:
-                upper.pop()
-            upper.append(p)
+        if dpl(self.start.pos, self.end.pos, self.start.bl) > dpl(self.start.pos, self.end.pos, self.start.tl):
+            outline.append(T(self.start.bl))
 
-        return lower[:-1] + upper[:-1]
+        if dpl(self.start.pos, self.end.pos, self.end.tl) > dpl(self.start.pos, self.end.pos, self.end.bl):
+            outline.append(T(self.end.tl))
 
-    def svg_path(self) -> str:
-        pts = [
-            self.start.tl, self.start.tr, self.start.br, self.start.bl,
-            self.end.tl,   self.end.tr,   self.end.br,   self.end.bl,
-        ]
+        outline.append(T(self.end.bl))
+        outline.append(T(self.end.br))
 
-        hull = self._hull(pts)
-        if not hull:
-            return ""
+        if dpl(self.start.pos, self.end.pos, self.end.tr) > dpl(self.start.pos, self.end.pos, self.end.br):
+            outline.append(T(self.end.tr))
 
-        d = f"M {hull[0].x} {hull[0].y} " + " ".join(
-            f"L {p.x} {p.y}" for p in hull[1:]
-        ) + " Z"
+        if dpl(self.start.pos, self.end.pos, self.start.br) > dpl(self.start.pos, self.end.pos, self.start.tr):
+            outline.append(T(self.start.br))
 
-        return f'<path d="{d}" fill="black" stroke="none" />'
+        outline.append(T(self.start.tr))
+
+        geom_set.add_new_outline(outline)
+        return geom_set
