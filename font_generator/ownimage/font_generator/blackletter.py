@@ -111,9 +111,9 @@ class Blackletter:
 
         s_h1 = Stroke.down(am1 - bp1)
 
-        s_i1 = Stroke.down(xm_m - m)
+        s_i1 = Stroke.down(xm1 - bp1)
 
-        s_j1 = Stroke.down(xm_m - dp)
+        s_j1 = Stroke.down(xm1 - dp2)
 
         s_k1 = Stroke.right(m4)
         s_k2 = Stroke.down(fp.x_height - 10 * m)
@@ -179,10 +179,10 @@ class Blackletter:
 
         m_h1 = Mark(CompoundStroke(s_h1).add_after(f_i_footer), x=m1, y=am1)
 
-        m_i1 = Mark(CompoundStroke(s_i1).add_after(f_i_footer), x=m1, y=fp.x_height - m)
+        m_i1 = Mark(CompoundStroke(s_i1).add_after(f_i_footer), x=m1, y=xm1)
         m_i_dot = Mark(f_dot, x=m1 - 0.5 * f_dot.vec.x, y=fp.tbar - 0.5 * f_dot.vec.y)
 
-        m_j1 = Mark(CompoundStroke(s_j1).add_after(f_f_footer), y=xm_m)
+        m_j1 = Mark(CompoundStroke(s_j1).add_after(f_f_footer), x=m1, y=xm1)
 
         m_k1 = Mark(cs_k1, y=xm_7m)
 
