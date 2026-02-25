@@ -29,13 +29,11 @@ class MainWindow(QMainWindow):
         self.svg_widget.setFixedSize(self.svg_width, self.svg_height)
         layout.addWidget(self.svg_widget)
 
-        # --- Create tabs ---
-        tabs = QTabWidget()
+        # --- Create three side-by-side panels ---
+        panels = QHBoxLayout()
 
-        # ---------------- TAB 1: GENERAL ----------------
-        tab_general = QWidget()
-        general_layout = QVBoxLayout()
-
+        # ---------------- PANEL 1: GENERAL ----------------
+        panel_general = QVBoxLayout()
         self.filled = QCheckBox()
         self.filled.setChecked(True)
         self.filled.stateChanged.connect(self.update_svg)
@@ -44,38 +42,39 @@ class MainWindow(QMainWindow):
         filled_row.addWidget(QLabel("Filled:"))
         filled_row.addWidget(self.filled)
         filled_row.addStretch()
-        general_layout.addLayout(filled_row)
+        panel_general.addLayout(filled_row)
 
-        self.scale = self.create_slider(general_layout, 10, 400, 40, "Scale")
+        self.scale = self.create_slider(panel_general, 10, 400, 40, "Scale")
 
-        tab_general.setLayout(general_layout)
-        tabs.addTab(tab_general, "General")
+        general_widget = QWidget()
+        general_widget.setLayout(panel_general)
+        panels.addWidget(general_widget)
 
-        # ---------------- TAB 2: PEN ----------------
-        tab_pen = QWidget()
-        pen_layout = QVBoxLayout()
+        # ---------------- PANEL 2: PEN ----------------
+        panel_pen = QVBoxLayout()
 
-        self.pen_width = self.create_slider(pen_layout, 0, 100, 50, "Pen Width")
-        self.pen_thickness = self.create_slider(pen_layout, 0, 100, 10, "Pen Thickness")
-        self.pen_angle = self.create_slider(pen_layout, 0, 180, 90, "Pen Angle")
+        self.pen_width = self.create_slider(panel_pen, 0, 100, 50, "Pen Width")
+        self.pen_thickness = self.create_slider(panel_pen, 0, 100, 10, "Pen Thickness")
+        self.pen_angle = self.create_slider(panel_pen, 0, 180, 90, "Pen Angle")
 
-        tab_pen.setLayout(pen_layout)
-        tabs.addTab(tab_pen, "Pen")
+        pen_widget = QWidget()
+        pen_widget.setLayout(panel_pen)
+        panels.addWidget(pen_widget)
 
-        # ---------------- TAB 3: METRICS ----------------
-        tab_metrics = QWidget()
-        metrics_layout = QVBoxLayout()
+        # ---------------- PANEL 3: METRICS ----------------
+        panel_metrics = QVBoxLayout()
 
-        self.ascender = self.create_slider(metrics_layout, 100, 1000, 700, "Ascender")
-        self.tbar = self.create_slider(metrics_layout, 100, 1000, 500, "T Bar")
-        self.x_height = self.create_slider(metrics_layout, 100, 1000, 300, "X Height")
-        self.descender = self.create_slider(metrics_layout, 100, 1000, 700, "Descender")
+        self.ascender = self.create_slider(panel_metrics, 100, 1000, 700, "Ascender")
+        self.tbar = self.create_slider(panel_metrics, 100, 1000, 500, "T Bar")
+        self.x_height = self.create_slider(panel_metrics, 100, 1000, 300, "X Height")
+        self.descender = self.create_slider(panel_metrics, 100, 1000, 700, "Descender")
 
-        tab_metrics.setLayout(metrics_layout)
-        tabs.addTab(tab_metrics, "Metrics")
+        metrics_widget = QWidget()
+        metrics_widget.setLayout(panel_metrics)
+        panels.addWidget(metrics_widget)
 
-        # Add tabs to main layout
-        layout.addWidget(tabs)
+        # Add the panels to the main layout
+        layout.addLayout(panels)
 
         central = QWidget()
         central.setLayout(layout)
@@ -101,7 +100,6 @@ class MainWindow(QMainWindow):
         radius = float(self.scale.value())
         svg_data = self.make_svg(radius)
         self.svg_widget.load(bytearray(svg_data, encoding="utf-8"))
-
     def get_font_parameters(self):
         width = self.pen_width.value() / 100
         return FontParameters(width,
