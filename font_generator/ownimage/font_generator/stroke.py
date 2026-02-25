@@ -69,13 +69,18 @@ class Stroke(Strokeable):
 
 
     def get_geom(self, start: Vector, fp: FontParameters, scale: float, before: Strokeable, after: Strokeable, geom_set: GeometrySet):
-        start_nib = PenNib.from_font_parameters(fp)
-        end_nib = start_nib.move(self.vec)
-        pen_stroke = PenStroke(start_nib, end_nib)
-        pen_stroke.get_geom(start, scale, geom_set)
+        if self.stroke_type == StrokeType.Block or self.stroke_type == StrokeType.Line:
+            start_nib = PenNib.from_font_parameters(fp)
+            end_nib = start_nib.move(self.vec)
+            pen_stroke = PenStroke(start_nib, end_nib)
+            pen_stroke.get_geom(start, scale, geom_set)
 
         return start + self.vec
 
     def bl(self, fp: FontParameters):
         nib = PenNib.from_font_parameters(fp)
         return self.vec + nib.bl
+
+    def tr(self, fp: FontParameters):
+        nib = PenNib.from_font_parameters(fp)
+        return self.vec + nib.tr

@@ -27,14 +27,23 @@ class Blackletter:
         h = (2 * w + (1 + 1 / r2) * t) / r2
 
         nib = PenNib.from_font_parameters(fp)
+        f_dot = Stroke(nib.normal * (t - w))
+        dot_width = f_dot.tr(fp).x - f_dot.bl(fp).x
 
         am1 = a - nib.tr.y
+        am2 = a - nib.tr.y - (nib.direction * w).y
 
         xp1 = x + abs((nib.tr.x - nib.tl.x) * nib.normal.y / nib.normal.x) - nib.tl.y
+        xp1 = x - f_dot.bl(fp).y
         xm1 = x - nib.tr.y
         xm2 = x - nib.tr.y - (nib.direction * w).y
+        xm3 = x - nib.tr.y + f_dot.vec.y
 
-        bp1 = b - nib.bl.y + (w - t) * nib.normal.y
+        bp2 = b - nib.bl.y + (w - t) * nib.normal.y
+        bp1 = b - nib.bl.y
+
+        dp1 = d - nib.bl.y
+        dp2 = d - nib.bl.y + w * nib.direction.y
 
         m1 = -nib.tl.x
         m2 = m1 + nib.direction.x * w
@@ -71,37 +80,36 @@ class Blackletter:
         dp_3m = fp.descender + m3
 
         # flourishes
-        f_dot = Stroke(nib.normal * (t - w))
 
         f_f_footer = CompoundStroke([
-            Stroke(Vector(-h, ((1 / r2 - 1) * w - (1 + r2) * t) / 2), StrokeType.Move),
+            Stroke(nib.direction * -w - f_dot.vec, StrokeType.Move),
             f_dot
         ])
 
         f_i_footer = CompoundStroke([
-            Stroke(Vector(0, m), StrokeType.Extend),
-            Stroke(Vector(-m, m), StrokeType.Move),
+            Stroke.down(nib.bl.y, StrokeType.Extend),
+            Stroke(Vector(f_dot.vec.x * -.5, 2 * nib.bl.y - f_dot.bl(fp).y), StrokeType.Move),
             f_dot
         ])
 
         # strokes
-        s_a1 = Stroke.down(xm2 - bp1)
+        s_a1 = Stroke.down(xm2 - bp2)
         s_a2 = Stroke.down(x - nib.tr.y - 2 * nib.normal.y * (w - t) + nib.bl.y)
 
-        s_b1 = Stroke.down(am1 - bp1)
+        s_b1 = Stroke.down(am1 - bp2)
 
         s_c1 = Stroke(Vector(m, m), StrokeType.Move) + StrokeLine(Vector(m2, m2))
 
-        s_d1 = Stroke.down(xm1 - bp1)
+        s_d1 = Stroke.down(xm1 - bp2)
         s_d3 = Stroke(nib.normal * ((m3 - m1) / nib.normal.x))
         s_d4 = Stroke.down(xp1 + s_d3.vec.y - (nib.direction.y * w - nib.bl.y))
 
-        s_f1 = Stroke.down(am_3m - (dp + t * r2))
-        s_f2 = Stroke.right(m6)
+        s_f1 = Stroke.down(am2 - dp2)
+        s_f2 = Stroke.right(3 * dot_width)
 
-        s_g1 = Stroke.down(xm_3m - dp)
+        s_g1 = Stroke.down(xm3 - dp2)
 
-        s_h1 = Stroke.down(am_2m)
+        s_h1 = Stroke.down(am1 - bp1)
 
         s_i1 = Stroke.down(xm_m - m)
 
@@ -161,18 +169,18 @@ class Blackletter:
         m_d1 = Mark(cs_d1, x=m1, y=xm1)
         m_d2 = Mark(cs_d2, x=m1, y=xp1)
 
-        m_e1 = Mark(s_c1, y=xm_7m)
+        m_e1 = Mark(s_c1, x=m1, y=xm_7m)
 
-        m_f1 = Mark(CompoundStroke(s_f1).add_after(f_f_footer), y=am_3m)
-        m_f2 = Mark(f_dot, x=m2, y=am_m)
-        m_f3 = Mark(s_f2, x=-m3, y=fp.tbar)
+        m_f1 = Mark(CompoundStroke(s_f1).add_after(f_f_footer), x=m1, y=am2)
+        m_f2 = Mark(f_dot, x=m2, y=am1)
+        m_f3 = Mark(s_f2, x=m1 - 1.5 * dot_width, y=fp.tbar)
 
-        m_g1 = Mark(cs_g1.add_after(f_f_footer), x=m2, y=xm_m)
+        m_g1 = Mark(cs_g1.add_after(f_f_footer), x=m2, y=xm1)
 
-        m_h1 = Mark(CompoundStroke(s_h1).add_after(f_i_footer), y=fp.ascender - m)
+        m_h1 = Mark(CompoundStroke(s_h1).add_after(f_i_footer), x=m1, y=am1)
 
-        m_i1 = Mark(CompoundStroke(s_i1).add_after(f_i_footer), y=fp.x_height - m)
-        m_i_dot = Mark(f_dot, x=-m, y=fp.tbar)
+        m_i1 = Mark(CompoundStroke(s_i1).add_after(f_i_footer), x=m1, y=fp.x_height - m)
+        m_i_dot = Mark(f_dot, x=m1 - 0.5 * f_dot.vec.x, y=fp.tbar - 0.5 * f_dot.vec.y)
 
         m_j1 = Mark(CompoundStroke(s_j1).add_after(f_f_footer), y=xm_m)
 
