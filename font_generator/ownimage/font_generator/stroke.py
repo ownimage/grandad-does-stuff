@@ -83,4 +83,4 @@ class Stroke(Strokeable):
 
     def tr(self, fp: FontParameters):
         nib = PenNib.from_font_parameters(fp)
-        return self.vec + nib.tr
+        return nib.tr

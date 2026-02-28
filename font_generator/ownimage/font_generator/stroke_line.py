@@ -36,12 +36,11 @@ class StrokeLine(Strokeable):
 
     def get_geom(self, start: Vector, fp: FontParameters, scale: float, prev: Strokeable, next: Strokeable, geom_set: GeometrySet):
         unit = self.vec.normalized()
-        offset = unit.rotated(90) * fp.pen_thickness * fp.pen_width * scale * .5
-        p1 = start * scale
-        p2 = (start + self.vec) * scale
-        p3 = p2 + offset
-        p4 = p1 + offset
-        geom_set.get_current_outline().extend([p3, p4, p1, p2])
-        geom_set.add_new_outline()
+        offset = unit.rotated(90) * fp.pen_thickness * scale
+        p1 = start * scale + offset * 0.5
+        p2 = (start + self.vec) * scale + offset * 0.5
+        p3 = p2 - offset
+        p4 = p1 - offset
+        geom_set.add_new_outline([p3, p4, p1, p2])
         geom_set.add_new_hole()
         return start + self.vec

@@ -37,4 +37,5 @@ class PenStroke:
         outline.append(T(self.start.tr))
 
         geom_set.add_new_outline(outline)
+        geom_set.add_new_hole()
         return geom_set
