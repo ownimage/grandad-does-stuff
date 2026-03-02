@@ -132,7 +132,7 @@ class MainWindow(QMainWindow):
             <line x1="0" y1="{fp.x_height * scale}" x2="{self.svg_width}" y2="{fp.x_height * scale}" stroke="black" stroke-width="1" />
             <line x1="0" y1="{fp.baseline * scale}" x2="{self.svg_width}" y2="{fp.baseline * scale}" stroke="black" stroke-width="1" />
             <line x1="0" y1="{fp.descender * scale}" x2="{self.svg_width}" y2="{fp.descender * scale}" stroke="black" stroke-width="1" />
-            {self.blackletter.svg_known(Vector(1, 0), scale)}
+            {self.blackletter.svg_known(Vector(1, 0), scale, True)}
         </g>
     </svg>
     """

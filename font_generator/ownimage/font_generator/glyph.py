@@ -5,10 +5,14 @@ from .mark import Mark
 from .vector import Vector
 
 class Glyph:
-    def __init__(self, marks: List[Mark], width, vec: Vector = Vector(0,0)):
-        self.vec = vec
+    def __init__(self, marks: List[Mark], fp: FontParameters):
         self.marks = marks
-        self.width = width
+
+        left = min([mark.left(fp) for mark in marks])
+        right = max([mark.right(fp) for mark in marks])
+
+        self.vec = Vector(-left,0)
+        self.width = right - left
 
     def svg(self, posn: Vector, fp: FontParameters, scale: float):
         svg = ""
