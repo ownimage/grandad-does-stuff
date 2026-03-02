@@ -3,7 +3,7 @@ from PySide6.QtGui import QAction
 from PySide6.QtSvgWidgets import QSvgWidget
 from PySide6.QtWidgets import (
     QVBoxLayout, QHBoxLayout,
-    QCheckBox, QSlider, QLabel, QMainWindow, QWidget, QFileDialog
+    QCheckBox, QSlider, QLabel, QMainWindow, QWidget, QFileDialog, QTabWidget
 )
 
 from .birdfont_reader import BirdfontReader
@@ -21,12 +21,19 @@ class MainWindow(QMainWindow):
 
         layout = QVBoxLayout()
 
+        layout = QVBoxLayout()
+
         self.svg_width = 2000
         self.svg_height = 600
         self.svg_widget = QSvgWidget()
         self.svg_widget.setFixedSize(self.svg_width, self.svg_height)
         layout.addWidget(self.svg_widget)
 
+        # --- Create three side-by-side panels ---
+        panels = QHBoxLayout()
+
+        # ---------------- PANEL 1: GENERAL ----------------
+        panel_general = QVBoxLayout()
         self.filled = QCheckBox()
         self.filled.setChecked(True)
         self.filled.stateChanged.connect(self.update_svg)
@@ -35,18 +42,39 @@ class MainWindow(QMainWindow):
         filled_row.addWidget(QLabel("Filled:"))
         filled_row.addWidget(self.filled)
         filled_row.addStretch()
+        panel_general.addLayout(filled_row)
 
-        layout.addLayout(filled_row)
+        self.scale = self.create_slider(panel_general, 10, 400, 40, "Scale")
 
-        self.ascender = self.createSlider(layout, 100, 1000, 700, "Ascender")
-        self.tbar = self.createSlider(layout, 100, 1000, 500, "T Bar")
-        self.x_height = self.createSlider(layout, 100, 1000, 300, "X Height")
-        self.descender = self.createSlider(layout, 100, 1000, 700, "Descender")
+        general_widget = QWidget()
+        general_widget.setLayout(panel_general)
+        panels.addWidget(general_widget)
 
-        self.pen_width = self.createSlider(layout, 0, 100, 50, "Pen Width")
-        self.line_thickness = self.createSlider(layout, 0, 100, 40, "Line Thickness")
+        # ---------------- PANEL 2: PEN ----------------
+        panel_pen = QVBoxLayout()
 
-        self.scale = self.createSlider(layout, 10, 400, 40, "Scale")
+        self.pen_width = self.create_slider(panel_pen, 0, 100, 50, "Pen Width")
+        self.pen_thickness = self.create_slider(panel_pen, 0, 100, 10, "Pen Thickness")
+        self.pen_angle = self.create_slider(panel_pen, 0, 180, 90, "Pen Angle")
+
+        pen_widget = QWidget()
+        pen_widget.setLayout(panel_pen)
+        panels.addWidget(pen_widget)
+
+        # ---------------- PANEL 3: METRICS ----------------
+        panel_metrics = QVBoxLayout()
+
+        self.ascender = self.create_slider(panel_metrics, 100, 1000, 700, "Ascender")
+        self.tbar = self.create_slider(panel_metrics, 100, 1000, 500, "T Bar")
+        self.x_height = self.create_slider(panel_metrics, 100, 1000, 300, "X Height")
+        self.descender = self.create_slider(panel_metrics, 100, 1000, 700, "Descender")
+
+        metrics_widget = QWidget()
+        metrics_widget.setLayout(panel_metrics)
+        panels.addWidget(metrics_widget)
+
+        # Add the panels to the main layout
+        layout.addLayout(panels)
 
         central = QWidget()
         central.setLayout(layout)
@@ -54,7 +82,7 @@ class MainWindow(QMainWindow):
 
         self.update_svg()
 
-    def createSlider(self, layout, min, max, value, name):
+    def create_slider(self, layout, min, max, value, name):
         slider = QSlider(Qt.Horizontal)
         slider.setRange(min, max)
         slider.setValue(value)
@@ -72,14 +100,24 @@ class MainWindow(QMainWindow):
         radius = float(self.scale.value())
         svg_data = self.make_svg(radius)
         self.svg_widget.load(bytearray(svg_data, encoding="utf-8"))
-
-    def get_fontParameters(self):
-        return FontParameters(self.pen_width.value() / 100, self.filled.isChecked(), self.ascender.value() / 100, self.tbar.value() / 100,
-                              self.x_height.value() / 100, 0,
-                              -self.descender.value() / 100, self.line_thickness.value() / 100)
+    def get_font_parameters(self):
+        width = self.pen_width.value() / 100
+        return FontParameters(width,
+                              width * self.pen_thickness.value() / 200,
+                              self.pen_angle.value() / 2,
+                              self.filled.isChecked(),
+                              self.ascender.value() / 100,
+                              self.tbar.value() / 100,
+                              self.x_height.value() / 100,
+                              0,
+                              -self.descender.value() / 100
+                              )
 
     def make_svg(self, scale: float) -> str:
-        self.blackletter = Blackletter(self.get_fontParameters())
+        fp = self.get_font_parameters()
+        print(f"scale = {scale}")
+        print(f"fp={fp}")
+        self.blackletter = Blackletter(fp)
 
         offset = 300
 
@@ -89,6 +127,11 @@ class MainWindow(QMainWindow):
     
         <rect x="0" y="{-offset}" width="{self.svg_width}" height="{self.svg_height + offset}" fill="white"/>
         <g transform="translate(0, {self.svg_height - offset}) scale(1, -1)">
+            <line x1="0" y1="{fp.ascender * scale}" x2="{self.svg_width}" y2="{fp.ascender * scale}" stroke="black" stroke-width="1" />
+            <line x1="0" y1="{fp.tbar * scale}" x2="{self.svg_width}" y2="{fp.tbar * scale}" stroke="black" stroke-width="1" />
+            <line x1="0" y1="{fp.x_height * scale}" x2="{self.svg_width}" y2="{fp.x_height * scale}" stroke="black" stroke-width="1" />
+            <line x1="0" y1="{fp.baseline * scale}" x2="{self.svg_width}" y2="{fp.baseline * scale}" stroke="black" stroke-width="1" />
+            <line x1="0" y1="{fp.descender * scale}" x2="{self.svg_width}" y2="{fp.descender * scale}" stroke="black" stroke-width="1" />
             {self.blackletter.svg_known(Vector(1, 0), scale)}
         </g>
     </svg>

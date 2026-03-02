@@ -6,6 +6,15 @@ class VectorMath:
     """Utility methods for simple vector-style operations on Shapely Points."""
 
     @staticmethod
+    def distance_point_to_line(start: Vector, end: Vector, point: Vector) -> float:
+        line_vec = end - start
+        point_vec = point - start
+
+        # Area of parallelogram = |line_vec × point_vec|
+        # Distance = area / |line_vec|
+        return abs(line_vec.cross(point_vec)) / line_vec.length()
+
+    @staticmethod
     def line_intersection(p1: Vector, p2: Vector, p3: Vector, p4: Vector) -> Vector:
         """Return instsection of line between p1, p2 and p3, p4"""
         x1, y1 = p1.x, p1.y

@@ -4,6 +4,7 @@ from .compound_stroke import CompoundStroke
 from .font_parameters import FontParameters
 from .glyph import Glyph
 from .mark import Mark
+from .pen_nib import PenNib
 from .stroke import Stroke
 from .stroke_line import StrokeLine
 from .stroke_type import StrokeType
@@ -15,163 +16,335 @@ class Blackletter:
         self.fp = fp
 
         # calculated values
-        m = fp.pen_thickness / (2 * math.sqrt(2))
-        m2 = 2 * m
-        m3 = 3 * m
-        m4 = 4 * m
-        m5 = 5 * m
-        m6 = 6 * m
-        m7 = 7 * m
-        m8 = 8 * m
-        m9 = 9 * m
+        r2 = math.sqrt(2)
+        pen_width = fp.pen_width
+        pen_thickness = fp.pen_thickness
+        a = fp.ascender
+        t = fp.tbar
+        x = fp.x_height
+        b = fp.baseline
+        d = fp.descender
+        m = pen_width / (2 * r2) + pen_thickness * (1 + r2) / 4
 
-        am_m = fp.ascender - m
-        am_3m = fp.ascender - m3
-        am_7m = fp.ascender - m7
+        nib = PenNib.from_font_parameters(fp)
+        f_dot = Stroke(nib.normal * (pen_thickness - pen_width))
 
-        xp_m = fp.x_height + m
-        xm_m = fp.x_height - m
-        xm_2m = fp.x_height - m2
-        xm_3m = fp.x_height - m3
-        xm_4m = fp.x_height - m4
-        xm_7m = fp.x_height - m7
-
-        bp_m = fp.baseline + m
-        bp_2m = fp.baseline + m2
-        bp_3m = fp.baseline + m3
-
-        dp_3m = fp.descender + m3
+        am = Mark(f_dot).top_at(a, fp)
+        xm = Mark(f_dot).top_at(x, fp)
+        xb2 = x / 2
+        bp = Mark(f_dot).bottom_at(b, fp)
 
         # flourishes
-        f_dot = Stroke(Vector(m2, -m2))
-
         f_f_footer = CompoundStroke([
-            Stroke(Vector(-m4, 0), StrokeType.Move),
+            Stroke(nib.direction * -pen_width - f_dot.vec, StrokeType.Move),
             f_dot
         ])
 
         f_i_footer = CompoundStroke([
-            Stroke(Vector(0, m), StrokeType.Extend),
-            Stroke(Vector(-m, m), StrokeType.Move),
+            Stroke(f_dot.vec * -0.5, StrokeType.Move),
             f_dot
         ])
 
-        # strokes
-        s_a1 = Stroke(Vector(0, bp_3m - xm_3m))
-
-        s_b1 = Stroke(Vector(0, bp_3m - am_m))
-
-        s_c1 = CompoundStroke([Stroke(Vector(m, m), StrokeType.Move), StrokeLine(Vector(m2, m2))])
-
-        s_d1 = Stroke(Vector(m4, -m4))
-
-        s_f1 = Stroke(Vector(0, dp_3m - am_3m))
-        s_f2 = Stroke(Vector(m6, 0))
-
-        s_g1 = Stroke(Vector(0, dp_3m - xm_3m))
-
-        s_h1 = Stroke(Vector(0, 0 - (fp.ascender - m2)))
-
-        s_i1 = Stroke(Vector(0, m - xm_m))
-
-        s_j1 = Stroke(Vector(0, dp_3m - xm_m))
-
-        s_k1 = Stroke(Vector(m4, 0))
-        s_k2 = Stroke(Vector(0, 10 * m - fp.x_height))
-
-        s_l1 = Stroke(Vector(0, m2 - (fp.ascender - m2)))
-
-        s_m2 = Stroke(Vector(0, -xm_4m))
-
-        s_s1 = Stroke.down(m6)
-        s_s2 = StrokeLine.right(m4)
-        s_s3 = Stroke.down(fp.x_height - 10 * m)
-
-        # compound strokes
-        cs_a1 = CompoundStroke([s_a1, f_dot])
-        cs_a2 = CompoundStroke([f_dot, s_a1, f_dot])
-
-        cs_b1 = CompoundStroke([s_b1, f_dot])
-        cs_b2 = CompoundStroke([f_dot, s_a1])
-
-        cs_c1 = CompoundStroke([s_a1, f_dot, s_c1])
-
-        cs_g1 = CompoundStroke([f_dot, s_g1])
-
-        cs_k1 = CompoundStroke([s_k1, s_k2, f_dot])
-
-        cs_a2 = CompoundStroke([f_dot, s_a1, f_dot])
-
-        cs_m2 = CompoundStroke([f_dot, s_m2]).add_after(f_i_footer)
-
-        # marks
-        m_a1 = Mark(Vector(0, xm_3m), cs_a1)
-        m_a2 = Mark(Vector(m2, xm_m), cs_a2)
-
-        m_b1 = Mark(Vector(0, am_m), cs_b1)
-        m_b2 = Mark(Vector(m2, xm_m), cs_b2)
-
-        m_c1 = Mark(Vector(0, xm_3m), cs_c1)
-        m_c2 = Mark(Vector(m2, xm_m), f_dot)
-
-        m_d1 = Mark(Vector(0, xp_m), [s_d1, s_a1])
-
-        m_e1 = Mark(Vector(0, xm_7m), s_c1)
-
-        m_f1 = Mark(Vector(0, am_3m), CompoundStroke(s_f1).add_after(f_f_footer))
-        m_f2 = Mark(Vector(m2, am_m), f_dot)
-        m_f3 = Mark(Vector(-m3, fp.tbar), s_f2)
-
-        m_g1 = Mark(Vector(m2, xm_m), cs_g1.add_after(f_f_footer))
-
-        m_h1 = Mark(Vector(0, fp.ascender - m), CompoundStroke(s_h1).add_after(f_i_footer))
-
-        m_i1 = Mark(Vector(0, fp.x_height - m), CompoundStroke(s_i1).add_after(f_i_footer))
-        m_i_dot = Mark(Vector(-m, fp.tbar), f_dot)
-
-        m_j1 = Mark(Vector(0, xm_m), CompoundStroke(s_j1).add_after(f_f_footer))
-
-        m_k1 = Mark(Vector(0, fp.x_height - 7 * m), cs_k1)
-
-        m_l1 = Mark(Vector(0, fp.ascender - m), CompoundStroke([s_l1, f_dot]))
-
-        m_m2 = Mark(Vector(m2, fp.x_height - m), cs_m2)
-        m_m3 = m_a2.plus(Vector(m4, 0))
-
-        m_p1 = Mark(Vector(0, xm_m), s_j1)
-        m_p3 = Mark(Vector(-m2, m5), Stroke.from_xy(m4, -m4))
-
-        m_s1 = Mark(Vector(0, fp.x_height - m), CompoundStroke([s_s1, s_s2, s_s3]).add_after(f_f_footer))
+        f_i_dot = Mark(f_dot, x=0.5 * f_dot.vec.x, y=fp.tbar - 0.5 * f_dot.vec.y)
 
         # glyphs
         default_width = 8 * m
-        self.glyph_map = {
-            'a': Glyph(Vector(0, 0), [m_a1, m_a2], default_width),
-            'b': Glyph(Vector(0, 0), [m_b1, m_b2], default_width),
-            'c': Glyph(Vector(0, 0), [m_c1, m_c2], default_width),
-            'd': Glyph(Vector(0, 0), [m_a1, m_d1], default_width),
-            'e': Glyph(Vector(0, 0), [m_c1, m_c2, m_e1], default_width),
-            'f': Glyph(Vector(0, 0), [m_f1, m_f2, m_f3], m4),
-            'g': Glyph(Vector(0, 0), [m_a1, m_g1], default_width),
-            'h': Glyph(Vector(0, 0), [m_h1, m_a2], m9),
-            'i': Glyph(Vector(0, 0), [m_i1, m_i_dot], m4),
-            'j': Glyph(Vector(0, 0), [m_j1, m_i_dot], m4),
-            'k': Glyph(Vector(0, 0), [m_h1, m_c2, m_e1, m_k1], m9),
-            'l': Glyph(Vector(0, 0), [m_l1], m5),
-            'm': Glyph(Vector(0, 0), [m_i1, m_m2, m_m3], 13 * m),
-            'n': Glyph(Vector(0, 0), [m_i1, m_a2], default_width),
-            'o': Glyph(Vector(0, 0), [m_a1, m_b2], default_width),
-            'p': Glyph(Vector(0, 0), [m_p1, m_b2, m_p3], default_width),
-            'r': Glyph(Vector(0, 0), [m_i1, m_c2], default_width),
-            's': Glyph(Vector(0, 0), [m_s1, m_c2], m4),
+        self.glyph_map = {}
 
-        }
+        # a
+        m_a1 = (Mark(Stroke.down() + f_dot)
+                .top_at(xm.stroke_tl(0, fp).y, fp)
+                .extend_downstroke_to_set_bottom_at(0, b, fp)
+                )
+        m_a2 = (Mark(f_dot + Stroke.down() + f_dot)
+                .top_at(x, fp)
+                .extend_downstroke_to_set_bottom_at(1, b, fp)
+                .left_at(m_a1.stroke_tr(0, fp).x, fp)
+                )
+        self.glyph_map['a'] = Glyph([m_a1, m_a2], default_width)
+
+        # b
+        m_b1 = (Mark(Stroke.down() + f_dot)
+                .top_at(a, fp)
+                .extend_downstroke_to_set_bottom_at(0, b, fp)
+                )
+        m_b2 = (Mark(f_dot + Stroke.down())
+                .top_at(x, fp)
+                .extend_downstroke_to_set_bottom_at(1, bp.stroke_br(0, fp).y, fp)
+                .left_at(m_b1.stroke_tr(0, fp).x, fp)
+                )
+        self.glyph_map['b'] = Glyph([m_b1, m_b2], default_width)
+
+        # c
+        s_c1 = Stroke(nib.direction * pen_width / 2, StrokeType.Move) + StrokeLine(nib.direction * pen_width)
+        m_c1 = (Mark(Stroke.down() + f_dot + s_c1)
+                .top_at(xm.stroke_tl(0, fp).y, fp)
+                .extend_downstroke_to_set_bottom_at(0, b, fp)
+                )
+        m_c2 = (Mark(f_dot)
+                .top_at(x, fp)
+                .left_at(m_a1.stroke_tr(0, fp).x, fp)
+                )
+        self.glyph_map['c'] = Glyph([m_c1, m_c2], default_width)
+
+        # d
+        m_d1 = m_a1
+        m_d2 = (Mark(f_dot + Stroke.down())
+                .top_at(x, fp)
+                .left_at(m_d1.stroke_tr(0, fp).x, fp)
+                .extend_downstroke_to_set_bottom_at(1, bp.stroke_br(0, fp).y, fp)
+                .extend_stroke_backwards_to_x(0, m_d1.stroke_tl(0, fp).x, fp)
+                )
+        self.glyph_map['d'] = Glyph([m_d1, m_d2], default_width)
+
+        # e
+        s_e1 = Stroke(nib.direction * pen_width / 2, StrokeType.Move) + StrokeLine(nib.direction * pen_width)
+        m_e1 = (Mark(Stroke.down() + f_dot + s_e1)
+                .top_at(xm.stroke_tl(0, fp).y, fp)
+                .extend_downstroke_to_set_bottom_at(0, b, fp)
+                )
+        m_e2 = (Mark(f_dot + Stroke(nib.direction * -pen_width / 2, StrokeType.Move) + StrokeLine(nib.direction * -pen_width))
+                .top_at(x, fp)
+                .left_at(m_a1.stroke_tr(0, fp).x, fp)
+                )
+        self.glyph_map['e'] = Glyph([m_e1, m_e2], default_width)
+
+        # f
+        m_f1 = (Mark(Stroke.down() + f_f_footer)
+                .top_at(am.stroke_tl(0, fp).y, fp)
+                .extend_downstroke_to_set_bottom_at(0, d, fp)
+                )
+        m_f3 = am.left_at(m_f1.stroke_tr(0, fp).x, fp)
+        s_f4 = (Stroke.right()
+                .make_width(m_f1.width(fp) + m_f3.width(fp), fp)
+                )
+        m_f4 = (Mark(s_f4, Vector(0, t))
+                .left_at(m_f1.left(fp), fp)
+                )
+        self.glyph_map['f'] = Glyph([m_f1, m_f3, m_f4], default_width)
+
+        # g
+        m_g1 = (Mark(Stroke.down() + f_dot)
+                .top_at(xm.stroke_tl(0, fp).y, fp)
+                .extend_downstroke_to_set_bottom_at(0, b, fp)
+                )
+        m_g2 = (Mark(f_dot + Stroke.down() + f_f_footer)
+                .top_at(x, fp)
+                .extend_downstroke_to_set_bottom_at(1, d, fp)
+                .left_at(m_g1.left(fp), fp)
+                )
+        self.glyph_map['g'] = Glyph([m_g1, m_g2], default_width)
+
+        # h
+        m_h1 = (Mark(Stroke.down() + f_i_footer)
+                .top_at(t, fp)
+                .extend_downstroke_to_set_bottom_at(0, b, fp)
+                )
+        m_h2 = (Mark(f_dot + Stroke.down() + f_dot)
+                .top_at(x, fp)
+                .extend_downstroke_to_set_bottom_at(1, b, fp)
+                .left_at(m_h1.stroke_tr(1, fp).x, fp)
+                )
+        self.glyph_map['h'] = Glyph([m_h1, m_h2], default_width)
+
+        # i
+        m_i1 = (Mark(Stroke.down() + f_i_footer)
+                .top_at(x, fp)
+                .extend_downstroke_to_set_bottom_at(0, b, fp)
+                )
+        m_i2 = (f_i_dot
+                .centre_at(m_i1.vec.x, fp)
+                )
+        self.glyph_map['i'] = Glyph([m_i1, m_i2], default_width)
+
+        # j
+        m_j1 = (Mark(Stroke.down() + f_f_footer)
+                .top_at(x, fp)
+                .extend_downstroke_to_set_bottom_at(0, d, fp)
+                )
+        m_j2 = (f_i_dot
+                .centre_at(m_j1.vec.x, fp)
+                )
+        self.glyph_map['j'] = Glyph([m_j1, m_j2], default_width)
+
+        # k
+        m_k1 = (Mark(Stroke.down() + f_i_footer)
+                .top_at(t, fp)
+                .extend_downstroke_to_set_bottom_at(0, b, fp)
+                )
+        m_k2 = m_e2
+        m_k3 = (Mark(Stroke.right(xm.width(fp)) + Stroke.down() + f_dot)
+                .top_at(xb2, fp)
+                .extend_downstroke_to_set_bottom_at(1, b, fp)
+                )
+        self.glyph_map['k'] = Glyph([m_k1, m_k2, m_k3], default_width)
+
+        # l
+        m_l1 = (Mark(Stroke.down() + f_dot).top_at(a, fp)
+                .extend_downstroke_to_set_bottom_at(0, b, fp)
+                )
+        self.glyph_map['l'] = Glyph([m_l1], default_width)
+
+        # m
+        m_m1 = (Mark(Stroke.down() + f_i_footer).top_at(x, fp)
+                .extend_downstroke_to_set_bottom_at(0, b, fp)
+                )
+        m_m2 = (Mark(f_dot + Stroke.down() + f_i_footer)
+                .top_at(x, fp)
+                .extend_downstroke_to_set_bottom_at(1, b, fp)
+                .left_at(m_h1.stroke_tr(1, fp).x, fp)
+                )
+        m_m3 = (Mark(f_dot + Stroke.down() + f_dot)
+                .top_at(x, fp)
+                .extend_downstroke_to_set_bottom_at(1, b, fp)
+                .left_at(m_m2.stroke_tr(1, fp).x, fp)
+                )
+        self.glyph_map['m'] = Glyph([m_m1, m_m2, m_m3], default_width * 2)
+
+        # n
+        m_n1 = (Mark(Stroke.down() + f_i_footer)
+                .top_at(x, fp)
+                .extend_downstroke_to_set_bottom_at(0, b, fp)
+                )
+        m_n2 = m_h2
+        self.glyph_map['n'] = Glyph([m_n1, m_n2], default_width)
+
+        # o
+        m_o1 = m_a1
+        m_o2 = m_b2
+        self.glyph_map['o'] = Glyph([m_o1, m_o2], default_width)
+
+        # p
+        m_p1 = (Mark(Stroke.down())
+                .top_at(x, fp)
+                .extend_downstroke_to_set_bottom_at(0, d, fp)
+                )
+        m_p2 = (Mark(f_dot + Stroke.down())
+                .top_at(x, fp)
+                .left_at(m_p1.stroke_tr(0, fp).x, fp)
+                .extend_downstroke_to_set_bottom_at(1, b, fp)
+                )
+        m_p3 = (Mark(f_dot)
+                .bottom_at(b, fp)
+                .left_at(m_p2.left(fp), fp)
+                .extend_stroke_backwards_to_x(0, -m_i2.width(fp) /2, fp)
+                )
+        self.glyph_map['p'] = Glyph([m_p1, m_p2, m_p3], default_width)
+
+        # q
+        m_q1 = m_a1
+        m_q2 = (Mark(f_dot + Stroke.down())
+                .top_at(x, fp)
+                .extend_downstroke_to_set_bottom_at(1, d, fp)
+                .left_at(m_o1.stroke_tr(0, fp).x, fp)
+                )
+        self.glyph_map['q'] = Glyph([m_q1, m_q2], default_width)
+
+        # r
+        m_r1 = (Mark(Stroke.down() + f_i_footer)
+                .top_at(x, fp)
+                .extend_downstroke_to_set_bottom_at(0, b, fp)
+                )
+        m_r2 = (f_i_dot
+                .top_at(x, fp)
+                .left_at(m_r1.stroke_tr(1, fp).x, fp)
+                )
+        self.glyph_map['r'] = Glyph([m_r1, m_r2], default_width)
+
+        # s
+        sw = xm.width(fp)
+        m_s1 = (Mark(Stroke.down(xm.vec.y - xb2) + StrokeLine(Vector(sw, 0)) + Stroke.down() + f_f_footer)
+                .top_at(x, fp)
+                .extend_downstroke_to_set_bottom_at(2, b, fp)
+                )
+        m_s2 = (xm
+                .left_at(m_s1.stroke_tr(0, fp).x, fp)
+                )
+
+        self.glyph_map['s'] = Glyph([m_s1, m_s2], default_width)
+
+        # t
+        m_t1 = (Mark(Stroke.down() + f_dot)
+                .top_at(a, fp)
+                .extend_downstroke_to_set_bottom_at(0, b, fp)
+                )
+        m_t2 = m_f4
+        self.glyph_map['t'] = Glyph([m_t1, m_t2], default_width)
+
+        # u
+        m_u1 = (Mark(Stroke.down() + f_dot)
+                .top_at(x, fp)
+                .extend_downstroke_to_set_bottom_at(0, b, fp)
+                )
+        m_u2 = (Mark(Stroke.down())
+                .top_at(x, fp)
+                .extend_downstroke_to_set_bottom_at(0, m_u1.stroke_br(1, fp).y, fp)
+                .left_at(m_u1.right(fp), fp)
+                )
+        self.glyph_map['u'] = Glyph([m_u1, m_u2], default_width)
+
+        # v
+        m_v1 = (Mark(Stroke.down() + f_dot)
+                .top_at(x, fp)
+                .extend_downstroke_to_set_bottom_at(0, b, fp)
+                )
+        m_v2 = (Mark(Stroke.down() + f_dot)
+                .top_at(x, fp)
+                .extend_downstroke_to_set_bottom_at(0, b, fp)
+                .left_at(m_v1.right(fp), fp)
+                )
+        self.glyph_map['v'] = Glyph([m_v1, m_v2], default_width)
+
+        # w
+        m_w1 = m_u1
+        m_w2 = (Mark(Stroke.down() + f_dot)
+                .top_at(x, fp)
+                .extend_downstroke_to_set_bottom_at(0, b, fp)
+                .left_at(m_w1.right(fp), fp)
+                )
+        m_w3 = (Mark(Stroke.down()).top_at(x, fp)
+                .extend_downstroke_to_set_bottom_at(0, m_w2.stroke_br(1, fp).y, fp)
+                .left_at(m_w2.right(fp), fp)
+                )
+        m_w4 = (Mark(Stroke.right(), Vector(0, xb2))
+                .left_at(m_w1.stroke_tr(0, fp).x, fp)
+                .extend_rightstroke_to_set_right_at(0, m_w3.stroke_bl(0, fp).x, fp)
+                )
+        self.glyph_map['w'] = Glyph([m_w1, m_w2, m_w3, m_w4], default_width * 2)
+
+        # x
+        m_x1 = xm
+        m_x2 = bp
+        m_x3 = (m_u1
+                .left_at(m_w1.right(fp), fp)
+                )
+        m_x4 = (xm
+                .left_at(m_x3.stroke_tr(0, fp).x, fp)
+                )
+        m_x5 = m_w4
+        self.glyph_map['x'] = Glyph([m_x1, m_x2, m_x3, m_x4, m_x5], default_width * 2)
+
+        # y
+        m_y1 = m_u1
+        m_y2 = (m_j1
+                .left_at(m_y1.left(fp), fp)
+                )
+        self.glyph_map['y'] = Glyph([m_y1, m_y2], default_width)
+
+        # z
+        zw = xm.width(fp)
+        m_z1 = (Mark(Stroke.right(zw) + StrokeLine(Vector(-zw, -zw)) + Stroke.right(zw) + Stroke.down() + f_f_footer)
+                .top_at(x, fp)
+                .extend_downstroke_to_set_bottom_at(3, d, fp)
+                )
+        self.glyph_map['z'] = Glyph([m_z1], default_width)
+
 
     def svg(self, posn: Vector, chars: str, scale: float):
         svg = ""
         start = posn
         for c in chars:
-            g = self.glyph_map[c]
+            g: Glyph = self.glyph_map[c]
             svg += f"<!-- char {c} -->\n"
             svg += g.svg(start, self.fp, scale)
             w = g.width

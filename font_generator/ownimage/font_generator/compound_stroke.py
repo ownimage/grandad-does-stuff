@@ -10,9 +10,19 @@ from .vector_math import VectorMath as VM
 
 
 class CompoundStroke(Strokeable):
-    def __init__(self, strokes: Stroke | list[Stroke]):
-        self.strokes: list[Stroke] = [strokes] if isinstance(strokes, Stroke) else strokes
+    def __init__(self, strokes: Strokeable | list[Strokeable]):
+        self.strokes: list[Strokeable] = [strokes] if isinstance(strokes, Strokeable) else strokes
         super().__init__(self.strokes[0].stroke_type)
+
+    def __add__(self, other):
+        if isinstance(other, CompoundStroke):
+            return CompoundStroke(self.strokes + other.strokes)
+
+        if isinstance(other, Strokeable):
+            return CompoundStroke(self.strokes + [other])
+
+
+        raise NotImplemented
 
     def get_geom(self, start: Vector, fp: FontParameters, scale: float, prev: Strokeable, next: Strokeable, geom_set: GeometrySet):
         for i in range(len(self.strokes)):
