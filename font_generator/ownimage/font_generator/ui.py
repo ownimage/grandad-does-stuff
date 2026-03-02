@@ -21,8 +21,6 @@ class MainWindow(QMainWindow):
 
         layout = QVBoxLayout()
 
-        layout = QVBoxLayout()
-
         self.svg_width = 2000
         self.svg_height = 600
         self.svg_widget = QSvgWidget()
