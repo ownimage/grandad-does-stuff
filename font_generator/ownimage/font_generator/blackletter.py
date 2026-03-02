@@ -16,7 +16,6 @@ class Blackletter:
         self.fp = fp
 
         # calculated values
-        r2 = math.sqrt(2)
         pen_width = fp.pen_width
         pen_thickness = fp.pen_thickness
         a = fp.ascender
@@ -24,7 +23,6 @@ class Blackletter:
         x = fp.x_height
         b = fp.baseline
         d = fp.descender
-        m = pen_width / (2 * r2) + pen_thickness * (1 + r2) / 4
 
         nib = PenNib.from_font_parameters(fp)
         f_dot = Stroke(nib.normal * (pen_thickness - pen_width))
