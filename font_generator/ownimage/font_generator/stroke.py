@@ -1,7 +1,6 @@
 from __future__ import annotations
-from dataclasses import dataclass, field
 
-import math
+from dataclasses import dataclass, field
 
 from .font_parameters import FontParameters
 from .geometry_set import GeometrySet
@@ -10,7 +9,7 @@ from .pen_stroke import PenStroke
 from .stroke_type import StrokeType
 from .strokeable import Strokeable
 from .vector import Vector
-from .vector_math import VectorMath as VM
+
 
 @dataclass(frozen=True)
 class Stroke(Strokeable):
@@ -22,7 +21,6 @@ class Stroke(Strokeable):
         direction = self.vec.normalized()
         object.__setattr__(self, "direction", direction)
 
-
     def __add__(self, other):
         from .compound_stroke import CompoundStroke
         from .stroke_line import StrokeLine
@@ -31,11 +29,9 @@ class Stroke(Strokeable):
             return CompoundStroke([self, other])
 
         if isinstance(other, CompoundStroke):
-            return CompoundStroke(other.strokes + [self])
-
+            return CompoundStroke([self] + other.strokes)
 
         raise NotImplemented
-
 
     @staticmethod
     def from_xy(x: float, y: float, stroke_type: StrokeType = StrokeType.Block) -> Stroke:
@@ -46,11 +42,11 @@ class Stroke(Strokeable):
         return Stroke(start - end, stroke_type)
 
     @staticmethod
-    def down(length: float, stroke_type: StrokeType = StrokeType.Block) -> Stroke:
+    def down(length: float = 1, stroke_type: StrokeType = StrokeType.Block) -> Stroke:
         return Stroke(Vector(0, -length), stroke_type)
 
     @staticmethod
-    def right(length: float, stroke_type: StrokeType = StrokeType.Block) -> Stroke:
+    def right(length: float = 1.0, stroke_type: StrokeType = StrokeType.Block) -> Stroke:
         return Stroke(Vector(length, 0), stroke_type)
 
     def extend(self, e: Stroke | Vector | float) -> Stroke:
@@ -66,7 +62,6 @@ class Stroke(Strokeable):
             return Stroke(self.vec + e * self.direction, self.stroke_type)
 
         raise RuntimeError(f"Extension type of {type(e)}.")
-
 
     def get_geom(self, start: Vector, fp: FontParameters, scale: float, before: Strokeable, after: Strokeable, geom_set: GeometrySet):
         if self.stroke_type == StrokeType.Block or self.stroke_type == StrokeType.Line:
@@ -84,3 +79,16 @@ class Stroke(Strokeable):
     def tr(self, fp: FontParameters):
         nib = PenNib.from_font_parameters(fp)
         return nib.tr
+
+    def tl(self, fp: FontParameters):
+        nib = PenNib.from_font_parameters(fp)
+        return nib.tl
+
+    def br(self, fp: FontParameters):
+        nib = PenNib.from_font_parameters(fp)
+        return self.vec + nib.br
+
+    def make_width(self, width, fp):
+        current = self.br(fp).x - self.tl(fp).x
+        delta = width - current
+        return Stroke(self.vec + Vector(delta, 0))

@@ -31,6 +31,43 @@ class GeometrySet:
         self.holes.pop()
         self.add_new_hole(hole)
 
+    def bounding_box(self) -> tuple[Vector, Vector]:
+        """Return (bottom_left, top_right) bounding box of all geometry."""
+        xs = []
+        ys = []
+
+        # Collect all points from outlines, holes, and graffiti
+        for group in (self.outlines, self.holes, self.graffiti):
+            for path in group:
+                for p in path:
+                    if p is not None:
+                        xs.append(p.x)
+                        ys.append(p.y)
+
+        if not xs:
+            # No geometry at all: return a zero box
+            return Vector(0, 0), Vector(0, 0)
+
+        bl = Vector(min(xs), min(ys))
+        tr = Vector(max(xs), max(ys))
+        return bl, tr
+
+    def left(self) -> float:
+        bl, _ = self.bounding_box()
+        return bl.x
+
+    def right(self) -> float:
+        _, tr = self.bounding_box()
+        return tr.x
+
+    def bottom(self) -> float:
+        bl, _ = self.bounding_box()
+        return bl.y
+
+    def top(self) -> float:
+        _, tr = self.bounding_box()
+        return tr.y
+
     def svg(self, filled: bool) -> str:
         svg = self.svg_writer(self.outlines, "black")
 

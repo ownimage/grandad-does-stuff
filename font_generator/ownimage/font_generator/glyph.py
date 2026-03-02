@@ -13,7 +13,7 @@ class Glyph:
     def svg(self, posn: Vector, fp: FontParameters, scale: float):
         svg = ""
         for mark in self.marks:
-            svg += mark.svg(Vector(posn.x + self.vec.x, posn.y + self.vec.y), fp, scale)
+            svg += mark.svg(fp, Vector(posn.x + self.vec.x, posn.y + self.vec.y), scale)
         return svg
 
     def birdfont_path(self, fp: FontParameters, scale: float):

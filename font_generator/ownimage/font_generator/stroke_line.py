@@ -5,6 +5,7 @@ import math
 from .compound_stroke import CompoundStroke
 from .font_parameters import FontParameters
 from .geometry_set import GeometrySet
+from .stroke import Stroke
 from .stroke_type import StrokeType
 from .strokeable import Strokeable
 from .vector import Vector
@@ -29,10 +30,23 @@ class StrokeLine(Strokeable):
     def right(length: float) -> StrokeLine:
         return StrokeLine(Vector(length, 0))
 
+    @staticmethod
+    def down(length: float) -> StrokeLine:
+        return StrokeLine(Vector(0, -length))
+
     def extend(self, e: StrokeLine) -> StrokeLine:
-        if e.stroke_type != StrokeType.Extend:
-            raise RuntimeError("Stroke of wrong type.")
-        return StrokeLine(self.vec + e.vec)
+        if isinstance(e, Stroke):
+            if e.stroke_type == StrokeType.Extend:
+                return StrokeLine(self.vec + e.vec)
+            raise RuntimeError("Can only extend by a Stroke of type Extend.")
+
+        if isinstance(e, Vector):
+            return StrokeLine(self.vec + e)
+
+        if isinstance(e, float):
+            return StrokeLine(self.vec + e * self.vec.normalized())
+
+        raise RuntimeError(f"Extension type of {type(e)}.")
 
     def get_geom(self, start: Vector, fp: FontParameters, scale: float, prev: Strokeable, next: Strokeable, geom_set: GeometrySet):
         unit = self.vec.normalized()
