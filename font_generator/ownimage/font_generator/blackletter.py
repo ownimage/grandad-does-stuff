@@ -1,5 +1,3 @@
-import math
-
 from .compound_stroke import CompoundStroke
 from .font_parameters import FontParameters
 from .glyph import Glyph
@@ -224,7 +222,7 @@ class Blackletter:
         m_p3 = (Mark(f_dot)
                 .bottom_at(b, fp)
                 .left_at(m_p2.left(fp), fp)
-                .extend_stroke_backwards_to_x(0, -m_i2.width(fp) /2, fp)
+                .extend_stroke_backwards_to_x(0, -m_i2.width(fp) / 2, fp)
                 )
         self.glyph_map['p'] = Glyph([m_p1, m_p2, m_p3], fp)
 
@@ -336,24 +334,32 @@ class Blackletter:
                 )
         self.glyph_map['z'] = Glyph([m_z1], fp)
 
+    def svg(self, posn: Vector, chars: str, scale: float, char_lines: bool = False):
 
-    def svg(self, posn: Vector, chars: str, scale: float, char_lines : bool = False):
+        def _char_line(x: float, scale: float) -> str:
+            xs = x * scale
+            return f'<line x1="{xs}" y1="{self.fp.descender * scale}" x2="{xs}" y2="{self.fp.ascender * scale}" stroke="black" stroke-width="1" />\n'
+
         svg = ""
         start = posn
         for c in chars:
             g: Glyph = self.glyph_map[c]
             svg += f"<!-- char {c} -->\n"
             if char_lines:
-                svg += f'<line x1="{start.x * scale}" y1="{self.fp.descender * scale}" x2="{start.x * scale}" y2="{self.fp.ascender * scale}" stroke="black" stroke-width="1" />'
+                svg += _char_line(start.x, scale)
             svg += g.svg(start, self.fp, scale)
             w = g.width
             start = Vector(start.x + w, start.y)
+            if char_lines:
+                svg += _char_line(start.x, scale)
+            start = Vector(start.x + self.fp.padding, start.y)
+
         if char_lines:
-            svg += f'<line x1="{start.x * scale}" y1="{self.fp.descender * scale}" x2="{start.x * scale}" y2="{self.fp.ascender * scale}" stroke="black" stroke-width="1" />'
+            svg += _char_line(start.x, scale)
         print(f"svg={svg}")
         return svg
 
-    def svg_known(self, posn: Vector, scale: float, char_lines : bool = False):
+    def svg_known(self, posn: Vector, scale: float, char_lines: bool = False):
         chars = ''.join(self.glyph_map.keys())
         return self.svg(posn, chars, scale, char_lines)
 
