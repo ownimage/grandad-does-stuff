@@ -68,7 +68,7 @@ class Stroke(Strokeable):
             start_nib = PenNib.from_font_parameters(fp)
             end_nib = start_nib.move(self.vec)
             pen_stroke = PenStroke(start_nib, end_nib)
-            pen_stroke.get_geom(start, scale, geom_set)
+            pen_stroke.get_geom(start, scale, before, after, geom_set)
 
         return start + self.vec
 

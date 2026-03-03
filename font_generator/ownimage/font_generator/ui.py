@@ -110,7 +110,7 @@ class MainWindow(QMainWindow):
                               self.x_height.value() / 100,
                               0,
                               -self.descender.value() / 100,
-                              self.padding.value() * self.pen_thickness.value() / 100
+                              self.padding.value() * width / 100
                               )
 
     def make_svg(self, scale: float) -> str:
