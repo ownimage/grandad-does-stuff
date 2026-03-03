@@ -14,27 +14,27 @@ class PenStroke:
     def get_geom(self, start: Vector, scale: float, geom_set: GeometrySet) -> GeometrySet:
         dpl = VM.distance_point_to_line
 
-        def T(pt: Vector) -> Vector:
+        def add_start_and_scale(pt: Vector) -> Vector:
             return (pt + start) * scale
 
-        outline = [T(self.start.tl)]
+        outline = [add_start_and_scale(self.start.tl)]
 
         if dpl(self.start.pos, self.end.pos, self.start.bl) > dpl(self.start.pos, self.end.pos, self.start.tl):
-            outline.append(T(self.start.bl))
+            outline.append(add_start_and_scale(self.start.bl))
 
         if dpl(self.start.pos, self.end.pos, self.end.tl) > dpl(self.start.pos, self.end.pos, self.end.bl):
-            outline.append(T(self.end.tl))
+            outline.append(add_start_and_scale(self.end.tl))
 
-        outline.append(T(self.end.bl))
-        outline.append(T(self.end.br))
+        outline.append(add_start_and_scale(self.end.bl))
+        outline.append(add_start_and_scale(self.end.br))
 
         if dpl(self.start.pos, self.end.pos, self.end.tr) > dpl(self.start.pos, self.end.pos, self.end.br):
-            outline.append(T(self.end.tr))
+            outline.append(add_start_and_scale(self.end.tr))
 
         if dpl(self.start.pos, self.end.pos, self.start.br) > dpl(self.start.pos, self.end.pos, self.start.tr):
-            outline.append(T(self.start.br))
+            outline.append(add_start_and_scale(self.start.br))
 
-        outline.append(T(self.start.tr))
+        outline.append(add_start_and_scale(self.start.tr))
 
         geom_set.add_new_outline(outline)
         geom_set.add_new_hole()

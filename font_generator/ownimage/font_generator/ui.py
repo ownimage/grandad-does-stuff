@@ -66,6 +66,7 @@ class MainWindow(QMainWindow):
         self.tbar = self.create_slider(panel_metrics, 100, 1000, 500, "T Bar")
         self.x_height = self.create_slider(panel_metrics, 100, 1000, 300, "X Height")
         self.descender = self.create_slider(panel_metrics, 100, 1000, 700, "Descender")
+        self.padding = self.create_slider(panel_metrics, 0, 100, 50, "Padding")
 
         metrics_widget = QWidget()
         metrics_widget.setLayout(panel_metrics)
@@ -108,7 +109,8 @@ class MainWindow(QMainWindow):
                               self.tbar.value() / 100,
                               self.x_height.value() / 100,
                               0,
-                              -self.descender.value() / 100
+                              -self.descender.value() / 100,
+                              self.padding.value() * self.pen_thickness.value() / 100
                               )
 
     def make_svg(self, scale: float) -> str:
