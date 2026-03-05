@@ -55,6 +55,7 @@ class StrokeLine(Strokeable):
         p2 = (start + self.vec) * scale + offset * 0.5
         p3 = p2 - offset
         p4 = p1 - offset
-        geom_set.add_new_outline([p3, p4, p1, p2])
+        geom_set.replace_current_outline([p3, p4, p1, p2])
+        geom_set.add_new_outline()
         geom_set.add_new_hole()
         return start + self.vec

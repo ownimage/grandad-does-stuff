@@ -1,10 +1,12 @@
 from __future__ import annotations
 
+from dataclasses import replace
 from typing import List
 
 from .compound_stroke import CompoundStroke
 from .font_parameters import FontParameters
 from .geometry_set import GeometrySet
+from .pen_nib import PenNib
 from .stroke import Strokeable
 from .vector import Vector
 
@@ -141,7 +143,20 @@ class Mark:
             return self.with_stroke(stroke, lambda s: s.extend(delta))
 
     def svg(self, fp: FontParameters, posn: Vector, scale: float) -> str:
-        geom_set = self.geometry(posn, fp, scale)
+        nib = PenNib.from_font_parameters(fp)
+
+        nib_tips = [
+            (0, fp.pen_width / 2),
+            ((5 / 8) * fp.pen_width, fp.pen_width / 8),
+            ((7 / 8) * fp.pen_width, fp.pen_width / 8)
+        ]
+        geom_set = GeometrySet()
+
+        for start, width in nib_tips:
+            fpt = replace(fp, pen_width=width)
+            posnt = posn + nib.direction * (-0.5 * fp.pen_width + start + 0.5 * width)
+            geom_set = geom_set +  self.geometry(posnt, fpt, scale)
+
         return geom_set.svg(fp.filled) + "\n"
 
     def birdfont_path(self, fp: FontParameters, scale: float):
