@@ -145,15 +145,19 @@ class Mark:
     def svg(self, fp: FontParameters, posn: Vector, scale: float) -> str:
         nib = PenNib.from_font_parameters(fp)
 
-        fp2 = replace(fp, pen_width=fp.pen_width / 4)
-        posn2 = posn - nib.direction * (3 * fp2.pen_width / 4)
-        geom_set = self.geometry(posn2, fp2, scale)
+        nib_tips = [
+            (0, fp.pen_width / 2),
+            ((5 / 8) * fp.pen_width, fp.pen_width / 8),
+            ((7 / 8) * fp.pen_width, fp.pen_width / 8)
+        ]
+        geom_set = GeometrySet()
 
-        fp4 = replace(fp, pen_width=fp.pen_width / 4)
-        posn4 = posn + nib.direction * (3 * fp2.pen_width / 4)
-        geom_set2 = self.geometry(posn4, fp4, scale)
+        for start, width in nib_tips:
+            fpt = replace(fp, pen_width=width)
+            posnt = posn + nib.direction * (-0.5 * fp.pen_width + start + 0.5 * width)
+            geom_set = geom_set +  self.geometry(posnt, fpt, scale)
 
-        return (geom_set + geom_set2).svg(fp.filled) + "\n"
+        return geom_set.svg(fp.filled) + "\n"
 
     def birdfont_path(self, fp: FontParameters, scale: float):
         start = self.vec
