@@ -91,3 +91,23 @@ class GeometrySet:
                 svg += f"""L{p.x} {p.y} """
             svg += f"""Z" fill="{colour}" />\n"""
         return svg
+
+    def __add__(self, other: "GeometrySet") -> "GeometrySet":
+        if not isinstance(other, GeometrySet):
+            return NotImplemented
+
+        new = GeometrySet()
+
+        # Copy outlines
+        new.outlines = [path[:] for path in self.outlines] + \
+                       [path[:] for path in other.outlines]
+
+        # Copy holes
+        new.holes = [path[:] for path in self.holes] + \
+                    [path[:] for path in other.holes]
+
+        # Copy graffiti
+        new.graffiti = [path[:] for path in self.graffiti] + \
+                       [path[:] for path in other.graffiti]
+
+        return new
