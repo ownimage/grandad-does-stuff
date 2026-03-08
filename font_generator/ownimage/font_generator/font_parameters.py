@@ -13,4 +13,5 @@ class FontParameters:
     baseline: float
     descender: float
     padding: float
+    pen_stroke: list[tuple[float, float]]
 

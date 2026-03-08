@@ -3,7 +3,7 @@ from PySide6.QtGui import QAction
 from PySide6.QtSvgWidgets import QSvgWidget
 from PySide6.QtWidgets import (
     QVBoxLayout, QHBoxLayout,
-    QCheckBox, QSlider, QLabel, QMainWindow, QWidget, QFileDialog, QTabWidget
+    QCheckBox, QSlider, QLabel, QMainWindow, QWidget, QFileDialog, QComboBox
 )
 
 from .birdfont_reader import BirdfontReader
@@ -55,6 +55,15 @@ class MainWindow(QMainWindow):
         self.pen_thickness = self.create_slider(panel_pen, 0, 100, 10, "Pen Thickness")
         self.pen_angle = self.create_slider(panel_pen, 0, 180, 90, "Pen Angle")
 
+        pen_stroke_row = QHBoxLayout()
+        pen_stroke_row.addWidget(QLabel("Pen Stroke:"))
+        self.pen_stroke_combo = QComboBox()
+        self.pen_stroke_combo.addItems(["black", "half_and_two_quarters"])
+        self.pen_stroke_combo.currentTextChanged.connect(self.update_svg)
+        pen_stroke_row.addWidget(self.pen_stroke_combo)
+        pen_stroke_row.addStretch()
+        panel_pen.addLayout(pen_stroke_row)
+
         pen_widget = QWidget()
         pen_widget.setLayout(panel_pen)
         panels.addWidget(pen_widget)
@@ -99,19 +108,45 @@ class MainWindow(QMainWindow):
         radius = float(self.scale.value())
         svg_data = self.make_svg(radius)
         self.svg_widget.load(bytearray(svg_data, encoding="utf-8"))
+
     def get_font_parameters(self):
-        width = self.pen_width.value() / 100
-        return FontParameters(width,
-                              width * self.pen_thickness.value() / 200,
-                              self.pen_angle.value() / 2,
-                              self.filled.isChecked(),
-                              self.ascender.value() / 100,
-                              self.tbar.value() / 100,
-                              self.x_height.value() / 100,
-                              0,
-                              -self.descender.value() / 100,
-                              self.padding.value() * width / 100
-                              )
+        width = self._width()
+        thickness = self._thickness()
+        return FontParameters(
+            pen_width=width,
+            pen_thickness=thickness,
+            pen_angle=self.pen_angle.value() / 2,
+            filled=self.filled.isChecked(),
+            ascender=self.ascender.value() / 100,
+            tbar=self.tbar.value() / 100,
+            x_height=self.x_height.value() / 100,
+            baseline=0,
+            descender=-self.descender.value() / 100,
+            padding=self.padding.value() * width / 100,
+            pen_stroke=self._pen_stroke()
+        )
+
+    def _width(self) -> float:
+        return self.pen_width.value() / 100
+
+    def _thickness(self) -> float:
+        width = self._width()
+        return width * self.pen_thickness.value() / 200
+
+    def _pen_stroke_options(self) -> dict[str, list[tuple[float, float]]]:
+        width = self._width()
+        return {
+            "black": [(0, width)],
+            "half_and_two_quarters": [
+                (0, width / 2),
+                ((5 / 8) * width, width / 8),
+                ((7 / 8) * width, width / 8)
+            ]
+        }
+
+    def _pen_stroke(self) -> list[tuple[float, float]]:
+        selected = self.pen_stroke_combo.currentText()
+        return self._pen_stroke_options()[selected]
 
     def make_svg(self, scale: float) -> str:
         fp = self.get_font_parameters()
