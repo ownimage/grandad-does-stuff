@@ -7,7 +7,7 @@ from .compound_stroke import CompoundStroke
 from .font_parameters import FontParameters
 from .geometry_set import GeometrySet
 from .pen_nib import PenNib
-from .stroke import Strokeable
+from .stroke import Stroke, Strokeable
 from .vector import Vector
 
 
@@ -83,13 +83,27 @@ class Mark:
         return self.right_by(shift)
 
     def geometry(self, posn: Vector, fp: FontParameters, scale: float = 1) -> GeometrySet:
+        nib = PenNib.from_font_parameters(fp)
         start = posn + self.vec
         geom_set = GeometrySet()
-        for i in range(len(self.strokes)):
-            prev_item = self.strokes[i - 1] if i > 0 else None
-            curr_item = self.strokes[i]
-            next_item = self.strokes[i + 1] if i < len(self.strokes) - 1 else None
-            start = curr_item.get_geom(start, fp, scale, prev_item, next_item, geom_set)
+
+        for start_offset, width in fp.pen_stroke:
+            fpt = replace(fp, pen_width=width)
+            current_pos = start
+
+            for i in range(len(self.strokes)):
+                curr_item = self.strokes[i]
+                prev_item = self.strokes[i - 1] if i > 0 else None
+                next_item = self.strokes[i + 1] if i < len(self.strokes) - 1 else None
+
+                if isinstance(curr_item, Stroke):
+                    offset_pos = current_pos + nib.direction * (-0.5 * fp.pen_width + start_offset + 0.5 * width)
+                    curr_item.get_geom(offset_pos, fpt, scale, prev_item, next_item, geom_set)
+                else:
+                    curr_item.get_geom(current_pos, fp, scale, prev_item, next_item, geom_set)
+
+                current_pos = curr_item.advance(current_pos)
+
         return geom_set
 
     def bounding_box(self, fp: FontParameters, posn: Vector(0, 0), scale: float):
@@ -143,21 +157,7 @@ class Mark:
             return self.with_stroke(stroke, lambda s: s.extend(delta))
 
     def svg(self, fp: FontParameters, posn: Vector, scale: float) -> str:
-        nib = PenNib.from_font_parameters(fp)
-
-        nib_tips = [
-            (0, fp.pen_width / 2),
-            ((5 / 8) * fp.pen_width, fp.pen_width / 8),
-            ((7 / 8) * fp.pen_width, fp.pen_width / 8)
-        ]
-        geom_set = GeometrySet()
-
-        for start, width in nib_tips:
-            fpt = replace(fp, pen_width=width)
-            posnt = posn + nib.direction * (-0.5 * fp.pen_width + start + 0.5 * width)
-            geom_set = geom_set +  self.geometry(posnt, fpt, scale)
-
-        return geom_set.svg(fp.filled) + "\n"
+        return self.geometry(posn, fp, scale).svg(fp.filled) + "\n"
 
     def birdfont_path(self, fp: FontParameters, scale: float):
         start = self.vec

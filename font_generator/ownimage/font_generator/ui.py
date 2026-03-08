@@ -111,10 +111,9 @@ class MainWindow(QMainWindow):
 
     def get_font_parameters(self):
         width = self._width()
-        thickness = self._thickness()
         return FontParameters(
             pen_width=width,
-            pen_thickness=thickness,
+            pen_thickness=self._thickness(),
             pen_angle=self.pen_angle.value() / 2,
             filled=self.filled.isChecked(),
             ascender=self.ascender.value() / 100,

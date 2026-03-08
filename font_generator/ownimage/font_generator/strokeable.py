@@ -21,3 +21,6 @@ class Strokeable:
 
     def birdfont_path(self, start, fp, scale):
         self._not_implemented("birdfont_path")
+
+    def advance(self, pos: Vector) -> Vector:
+        return pos + self.vec
