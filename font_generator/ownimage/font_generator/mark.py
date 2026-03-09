@@ -87,7 +87,7 @@ class Mark:
         start = posn + self.vec
         geom_set = GeometrySet()
 
-        for start_offset, width in fp.pen_stroke:
+        for idx, (start_offset, width) in enumerate(fp.pen_stroke):
             fpt = replace(fp, pen_width=width)
             current_pos = start
 
@@ -99,7 +99,7 @@ class Mark:
                 if isinstance(curr_item, Stroke):
                     offset_pos = current_pos + nib.direction * (-0.5 * fp.pen_width + start_offset + 0.5 * width)
                     curr_item.get_geom(offset_pos, fpt, scale, prev_item, next_item, geom_set)
-                else:
+                elif idx == 0:
                     curr_item.get_geom(current_pos, fp, scale, prev_item, next_item, geom_set)
 
                 current_pos = curr_item.advance(current_pos)
