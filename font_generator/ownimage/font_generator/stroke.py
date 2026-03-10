@@ -22,16 +22,17 @@ class Stroke(Strokeable):
         object.__setattr__(self, "direction", direction)
 
     def __add__(self, other):
+        from .bezier_stroke import BezierStroke
         from .compound_stroke import CompoundStroke
         from .stroke_line import StrokeLine
 
-        if isinstance(other, (Stroke, StrokeLine)):
+        if isinstance(other, (Stroke, StrokeLine, BezierStroke)):
             return CompoundStroke([self, other])
 
         if isinstance(other, CompoundStroke):
             return CompoundStroke([self] + other.strokes)
 
-        raise NotImplemented
+        raise NotImplementedError(f"Cannot add {type(other)} to Stroke")
 
     @staticmethod
     def from_xy(x: float, y: float, stroke_type: StrokeType = StrokeType.Block) -> Stroke:

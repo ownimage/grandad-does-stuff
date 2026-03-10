@@ -90,6 +90,7 @@ class GeometrySet:
             for p in path[1:]:
                 svg += f"""L{p.x} {p.y} """
             svg += f"""Z" fill="{colour}" />\n"""
+            # svg += f"""Z" fill="none" stroke="black" />\n"""
         return svg
 
     def __add__(self, other: "GeometrySet") -> "GeometrySet":
