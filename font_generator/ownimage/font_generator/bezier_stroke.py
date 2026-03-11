@@ -23,7 +23,7 @@ class BezierStroke(Strokeable):
         object.__setattr__(self, "stroke_type", StrokeType.Block)
 
     @staticmethod
-    def from_points(
+    def from_three_points(
         p0: Vector,
         p1: Vector,
         p2: Vector,

@@ -48,7 +48,7 @@ class Blackletter:
         self.glyph_map = {}
 
         # a
-        curved_stroke = BezierStroke.from_points(
+        curved_stroke = BezierStroke.from_three_points(
             Vector(0, a),  # start at top
             Vector(0.1, 0),  # control point pushes out to the right
             Vector(2 * d, d),  # end point
