@@ -13,7 +13,7 @@ class PenStroke:
     start: PenNib
     end: PenNib
 
-    def get_geom(self, start: Vector, scale: float, before: Strokeable, after: Strokeable, geom_set: GeometrySet):
+    def geometry(self, start: Vector, scale: float, before: Strokeable, after: Strokeable, geom_set: GeometrySet):
         dpl = VM.distance_point_to_line
 
         def add_start_and_scale(pt: Vector) -> Vector:

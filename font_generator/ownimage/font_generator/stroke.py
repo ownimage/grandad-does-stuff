@@ -64,12 +64,12 @@ class Stroke(Strokeable):
 
         raise RuntimeError(f"Extension type of {type(e)}.")
 
-    def get_geom(self, start: Vector, fp: FontParameters, scale: float, before: Strokeable, after: Strokeable, geom_set: GeometrySet):
+    def geometry(self, start: Vector, fp: FontParameters, scale: float, before: Strokeable, after: Strokeable, geom_set: GeometrySet):
         if self.stroke_type == StrokeType.Block or self.stroke_type == StrokeType.Line:
             start_nib = PenNib.from_font_parameters(fp)
             end_nib = start_nib.move(self.vec)
             pen_stroke = PenStroke(start_nib, end_nib)
-            pen_stroke.get_geom(start, scale, before, after, geom_set)
+            pen_stroke.geometry(start, scale, before, after, geom_set)
 
         return start + self.vec
 

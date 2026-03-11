@@ -5,6 +5,7 @@ from .glyph import Glyph
 from .mark import Mark
 from .pen_nib import PenNib
 from .stroke import Stroke
+from .stroke_line import StrokeLine
 from .stroke_type import StrokeType
 from .vector import Vector
 
@@ -50,7 +51,8 @@ class Blackletter:
         curved_stroke = BezierStroke.from_points(
             Vector(0, a),  # start at top
             Vector(0.1, 0),  # control point pushes out to the right
-            Vector(2 * d, d)  # end at bottom
+            Vector(2 * d, d),  # end point
+            debug_visual=True
         )
         m_a1 = (Mark(curved_stroke))
         self.glyph_map['a'] = Glyph([m_a1], fp)
@@ -77,7 +79,7 @@ class Blackletter:
         #         )
         # self.glyph_map['b'] = Glyph([m_b1, m_b2], fp)
         #
-        # # c
+        # c
         # s_c1 = Stroke(nib.direction * pen_width / 2, StrokeType.Move) + StrokeLine(nib.direction * pen_width)
         # m_c1 = (Mark(Stroke.down() + f_dot + s_c1)
         #         .top_at(xm.stroke_tl(0, fp).y, fp)
@@ -89,7 +91,7 @@ class Blackletter:
         #         )
         # self.glyph_map['c'] = Glyph([m_c1, m_c2], fp)
         #
-        # # d
+        # d
         # m_d1 = m_a1
         # m_d2 = (Mark(f_dot + Stroke.down())
         #         .top_at(x, fp)
@@ -99,7 +101,7 @@ class Blackletter:
         #         )
         # self.glyph_map['d'] = Glyph([m_d1, m_d2], fp)
         #
-        # # e
+        # e
         # s_e1 = Stroke(nib.direction * pen_width / 2, StrokeType.Move) + StrokeLine(nib.direction * pen_width)
         # m_e1 = (Mark(Stroke.down() + f_dot + s_e1)
         #         .top_at(xm.stroke_tl(0, fp).y, fp)
@@ -333,13 +335,13 @@ class Blackletter:
         #         )
         # self.glyph_map['y'] = Glyph([m_y1, m_y2], fp)
         #
-        # # z
-        # zw = xm.width(fp)
-        # m_z1 = (Mark(Stroke.right(zw) + StrokeLine(Vector(-zw, -zw)) + Stroke.right(zw) + Stroke.down() + f_f_footer)
-        #         .top_at(x, fp)
-        #         .extend_downstroke_to_set_bottom_at(3, d, fp)
-        #         )
-        # self.glyph_map['z'] = Glyph([m_z1], fp)
+        # z
+        zw = xm.width(fp)
+        m_z1 = (Mark(Stroke.right(zw) + StrokeLine(Vector(-zw, -zw)) + Stroke.right(zw) + Stroke.down() + f_f_footer)
+                .top_at(x, fp)
+                .extend_downstroke_to_set_bottom_at(3, d, fp)
+                )
+        self.glyph_map['z'] = Glyph([m_z1], fp)
 
     def svg(self, posn: Vector, chars: str, scale: float, char_lines: bool = False):
 

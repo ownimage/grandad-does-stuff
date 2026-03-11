@@ -48,7 +48,7 @@ class StrokeLine(Strokeable):
 
         raise RuntimeError(f"Extension type of {type(e)}.")
 
-    def get_geom(self, start: Vector, fp: FontParameters, scale: float, prev: Strokeable, next: Strokeable, geom_set: GeometrySet):
+    def geometry(self, start: Vector, fp: FontParameters, scale: float, prev: Strokeable, next: Strokeable, geom_set: GeometrySet):
         unit = self.vec.normalized()
         offset = unit.rotated(90) * fp.pen_thickness * scale
         p1 = start * scale + offset * 0.5

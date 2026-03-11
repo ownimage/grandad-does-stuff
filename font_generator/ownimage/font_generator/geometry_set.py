@@ -73,9 +73,18 @@ class GeometrySet:
 
         if not filled:
             svg += self.svg_writer(self.holes, "white")
+
+        svg += self.svg_writer(self.graffiti, "red", close_path=False, fill=False, stroke_width=1.2)
         return svg
 
-    def svg_writer(self, paths: list[list[Vector]], colour: str):
+    def svg_writer(
+            self,
+            paths: list[list[Vector]],
+            colour: str,
+            close_path: bool = True,
+            fill: bool = True,
+            stroke_width: float = 1.0,
+    ):
         svg = ""
         for path in paths:
             path = [p for p in path if p is not None]
@@ -89,8 +98,14 @@ class GeometrySet:
             svg += f"""<path d ="M{p0.x} {p0.y} """
             for p in path[1:]:
                 svg += f"""L{p.x} {p.y} """
-            svg += f"""Z" fill="{colour}" />\n"""
-            # svg += f"""Z" fill="none" stroke="black" />\n"""
+
+            if close_path:
+                svg += "Z"
+
+            if fill:
+                svg += f"""" fill="{colour}" />\n"""
+            else:
+                svg += f"""" fill="none" stroke="{colour}" stroke-width="{stroke_width}" />\n"""
         return svg
 
     def __add__(self, other: "GeometrySet") -> "GeometrySet":
