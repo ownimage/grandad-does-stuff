@@ -1,9 +1,58 @@
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
-from typing import Tuple
+from typing import List, Tuple
 
 from .vector import Vector
+
+
+def _solve_cubic(a: float, b: float, c: float, d: float) -> List[float]:
+    """Solve cubic equation ax³ + bx² + cx + d = 0 using Cardano's formula."""
+    if abs(a) < 1e-10:
+        if abs(b) < 1e-10:
+            if abs(c) < 1e-10:
+                return []
+            return [-d / c]
+        disc = c * c - 4 * b * d
+        if disc < 0:
+            return []
+        sqrt_disc = math.sqrt(disc)
+        return [(-c + sqrt_disc) / (2 * b), (-c - sqrt_disc) / (2 * b)]
+
+    b /= a
+    c /= a
+    d /= a
+
+    q = (3 * c - b * b) / 9
+    r = (9 * b * c - 27 * d - 2 * b * b * b) / 54
+    disc = q * q * q + r * r
+
+    roots: List[float] = []
+
+    if disc > 1e-10:
+        s = r + math.sqrt(disc)
+        t = r - math.sqrt(disc)
+        s = math.copysign(abs(s) ** (1/3), s)
+        t = math.copysign(abs(t) ** (1/3), t)
+        root = -b / 3 + s + t
+        roots.append(root)
+    elif abs(disc) < 1e-10:
+        if abs(r) < 1e-10:
+            roots.append(-b / 3)
+        else:
+            s = math.copysign(abs(r) ** (1/3), r)
+            root = -b / 3 + 2 * s
+            roots.append(root)
+            roots.append(-b / 3 - s)
+    else:
+        theta = math.acos(r / math.sqrt(-q * q * q))
+        sqrt_minus_q = math.sqrt(-q)
+        roots.append(-b / 3 + 2 * sqrt_minus_q * math.cos(theta / 3))
+        roots.append(-b / 3 + 2 * sqrt_minus_q * math.cos((theta + 2 * math.pi) / 3))
+        roots.append(-b / 3 + 2 * sqrt_minus_q * math.cos((theta + 4 * math.pi) / 3))
+
+    return [r for r in roots if 0 <= r <= 1]
 
 
 @dataclass(frozen=True)
@@ -67,3 +116,42 @@ class CubicBezier:
     def from_three_points(p0: Vector, p1: Vector, p2: Vector) -> "CubicBezier":
         """Create a cubic bezier simulating a quadratic bezier from three points."""
         return CubicBezier(p0, p1, p1, p2)
+
+    def closet_t_to(self, target: Vector) -> float:
+        """Find the parameter t (0 to 1) on the curve closest to the target point."""
+        candidates = [0.0, 1.0]
+
+        cp0 = self.p0 - target
+        cp1 = self.p1 - target
+        cp2 = self.p2 - target
+        cp3 = self.p3 - target
+
+        def dot(a: Vector, b: Vector) -> float:
+            return a.x * b.x + a.y * b.y
+
+        a = dot(cp3, cp3) - 3 * dot(cp2, cp2) + 3 * dot(cp1, cp1) - dot(cp0, cp0)
+        b = 6 * dot(cp2, cp2) - 12 * dot(cp1, cp1) + 6 * dot(cp0, cp0)
+        c = 3 * dot(cp1, cp1) - 6 * dot(cp0, cp0)
+        d = dot(cp0, cp0)
+
+        roots = _solve_cubic(a, b, c, d)
+        candidates.extend(roots)
+
+        best_t = 0.0
+        best_dist = float('inf')
+
+        for t in candidates:
+            if 0 <= t <= 1:
+                point = self.point_at(t)
+                dist = (point - target).length()
+                if dist < best_dist:
+                    best_dist = dist
+                    best_t = t
+
+        return best_t
+
+    def distance_to(self, target: Vector) -> float:
+        """Calculate the minimum distance from a point to this bezier curve."""
+        closest_t = self.closet_t_to(target)
+        closest_point = self.point_at(closest_t)
+        return (closest_point - target).length()

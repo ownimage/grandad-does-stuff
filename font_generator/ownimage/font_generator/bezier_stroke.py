@@ -49,6 +49,22 @@ class BezierStroke(Strokeable):
             points.append(self.bezier.point_at(t))
         return points
 
+    def _interpolate(self, arr: List[tuple[float, Vector]], t: float) -> Vector:
+        """Interpolate values from a sorted array to find value at t."""
+        if t <= arr[0][0]:
+            return arr[0][1]
+        if t >= arr[-1][0]:
+            return arr[-1][1]
+
+        for i in range(len(arr) - 1):
+            t0, v0 = arr[i]
+            t1, v1 = arr[i + 1]
+            if t0 <= t <= t1:
+                alpha = (t - t0) / (t1 - t0) if t1 != t0 else 0.0
+                return v0 + (v1 - v0) * alpha
+
+        return arr[-1][1]
+
     def geometry(
         self,
         start: Vector,
@@ -65,27 +81,41 @@ class BezierStroke(Strokeable):
         points = self._sample_points()
 
         if len(points) < 2:
-            return start + self.bezier.p2 - self.bezier.p0
+            return start + self.bezier.p3 - self.bezier.p0
 
         nib = PenNib.from_font_parameters(fp)
-        debug_segments: List[tuple[Vector, Vector]] = []
+        tl: List[tuple[float, Vector]] = []
+        tr: List[tuple[float, Vector]] = []
+        bl: List[tuple[float, Vector]] = []
+        br: List[tuple[float, Vector]] = []
+        nibs: List[PenNib] = []
 
-        for point in points:
-            nib_at = nib.at(start + point)
-            debug_segments.append((nib_at.l, nib_at.r))
+        for i in range(len(points)):
+            n = nib.at(points[i])
+            nibs.append(n)
 
-        for i in range(len(points) - 1):
-            segment_start = nib.at(start + points[i])
-            segment_end = nib.at(start + points[i + 1])
-            pen_stroke = PenStroke(segment_start, segment_end)
+            t_tl = self.bezier.closet_t_to(n.tl)
+            tl.append((t_tl, n.tl))
 
+            t_tr = self.bezier.closet_t_to(n.tr)
+            tr.append((t_tr, n.tr))
+
+            t_bl = self.bezier.closet_t_to(n.bl)
+            bl.append((t_bl, n.bl))
+
+            t_br = self.bezier.closet_t_to(n.br)
+            br.append((t_br, n.br))
+
+        tl.sort(key=lambda x: x[0])
+        tr.sort(key=lambda x: x[0])
+        bl.sort(key=lambda x: x[0])
+        br.sort(key=lambda x: x[0])
+
+        for i in range(len(nibs) - 1):
+            pen_stroke = PenStroke(nibs[i], nibs[i + 1])
             segment_before = before if i == 0 else self
-            segment_after = after if i == len(points) - 2 else self
+            segment_after = after if i == len(nibs) - 2 else self
             pen_stroke.geometry(Vector(0, 0), scale, segment_before, segment_after, geom_set)
-
-        if self.debug_visual:
-            for left, right in debug_segments:
-                geom_set.graffiti.append([left * scale, right * scale])
 
         return start + self.bezier.p3 - self.bezier.p0
 
