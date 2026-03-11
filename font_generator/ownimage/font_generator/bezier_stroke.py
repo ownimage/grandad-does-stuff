@@ -7,7 +7,7 @@ from .font_parameters import FontParameters
 from .geometry_set import GeometrySet
 from .pen_nib import PenNib
 from .pen_stroke import PenStroke
-from .quadratic_bezier import QuadraticBezier
+from .bezier import CubicBezier
 from .stroke_type import StrokeType
 from .strokeable import Strokeable
 from .vector import Vector
@@ -15,7 +15,7 @@ from .vector import Vector
 
 @dataclass(frozen=True)
 class BezierStroke(Strokeable):
-    bezier: QuadraticBezier = field(default_factory=lambda: QuadraticBezier(Vector(0, 0), Vector(0, 0), Vector(0, 0)))
+    bezier: CubicBezier = field(default_factory=lambda: CubicBezier(Vector(0, 0), Vector(0, 0), Vector(0, 0), Vector(0, 0)))
     num_samples: int = 20
     debug_visual: bool = False
 
@@ -30,7 +30,7 @@ class BezierStroke(Strokeable):
         num_samples: int = 20,
         debug_visual: bool = False,
     ) -> BezierStroke:
-        bezier = QuadraticBezier(p0, p1, p2)
+        bezier = CubicBezier.from_three_points(p0, p1, p2)
         return BezierStroke(bezier, num_samples, debug_visual)
 
     def _sample_points(self) -> List[Vector]:
@@ -87,19 +87,21 @@ class BezierStroke(Strokeable):
             for left, right in debug_segments:
                 geom_set.graffiti.append([left * scale, right * scale])
 
-        return start + self.bezier.p2 - self.bezier.p0
+        return start + self.bezier.p3 - self.bezier.p0
 
     def svg(self, start: Vector, fp: FontParameters, scale: float) -> str:
         p0 = (start + self.bezier.p0) * scale
         p1 = (start + self.bezier.p1) * scale
         p2 = (start + self.bezier.p2) * scale
-        return f"M {p0.x},{p0.y} Q {p1.x},{p1.y} {p2.x},{p2.y}"
+        p3 = (start + self.bezier.p3) * scale
+        return f"M {p0.x},{p0.y} C {p1.x},{p1.y} {p2.x},{p2.y} {p3.x},{p3.y}"
 
     def birdfont_path(self, start: Vector, fp: FontParameters, scale: float):
         p0 = (start + self.bezier.p0) * scale
         p1 = (start + self.bezier.p1) * scale
         p2 = (start + self.bezier.p2) * scale
-        return (p0, f"Q {p1.x},{p1.y} {p2.x},{p2.y}")
+        p3 = (start + self.bezier.p3) * scale
+        return (p0, f"C {p1.x},{p1.y} {p2.x},{p2.y} {p3.x},{p3.y}")
 
     def advance(self, pos: Vector) -> Vector:
-        return pos + self.bezier.p2 - self.bezier.p0
+        return pos + self.bezier.p3 - self.bezier.p0
