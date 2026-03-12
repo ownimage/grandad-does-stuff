@@ -47,15 +47,23 @@ class Blackletter:
         # glyphs
         self.glyph_map = {}
 
+        #z
+        zw = xm.width(fp)
+        m_z1 = (Mark(Stroke.right(zw) + StrokeLine(Vector(-zw, -zw)) + Stroke.right(zw) + Stroke.down() + f_f_footer)
+                .top_at(x, fp)
+                .extend_downstroke_to_set_bottom_at(3, d, fp)
+                )
+        self.glyph_map['a'] = Glyph([m_z1], fp)
         # a
         curved_stroke = BezierStroke.from_three_points(
             Vector(0, a),  # start at top
             Vector(0.1, 0),  # control point pushes out to the right
             Vector(2 * d, d),  # end point
+            num_samples=20,
             debug_visual=True
         )
         m_a1 = (Mark(curved_stroke))
-        self.glyph_map['a'] = Glyph([m_a1], fp)
+        self.glyph_map['b'] = Glyph([m_a1], fp)
         # m_a1 = (Mark(Stroke.down() + f_dot)
         #         .top_at(xm.stroke_tl(0, fp).y, fp)
         #         .extend_downstroke_to_set_bottom_at(0, b, fp)
