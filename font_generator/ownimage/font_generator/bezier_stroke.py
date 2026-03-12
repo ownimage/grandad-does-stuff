@@ -3,6 +3,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import List
 
+from shapely.geometry import Polygon
+
 from .font_parameters import FontParameters
 from .geometry_set import GeometrySet
 from .pen_nib import PenNib
@@ -74,7 +76,12 @@ class BezierStroke(Strokeable):
             top = [add_start_and_scale(n.tl)] + top + [add_start_and_scale(n.tr)]
             bottom = [add_start_and_scale(n.bl)] + bottom + [add_start_and_scale(n.br)]
 
-        geom_set.replace_current_outline(bottom)
+        top_coords = [(v.x, v.y) for v in reversed(top)]
+        bottom_coords = [(v.x, v.y) for v in bottom]
+        polygon = Polygon(top_coords + bottom_coords + [top_coords[0]])
+        outline = [Vector(x, y) for x, y in polygon.exterior.coords]
+
+        geom_set.replace_current_outline(outline)
         return start + self.bezier.p3 - self.bezier.p0
 
     def svg(self, start: Vector, fp: FontParameters, scale: float) -> str:

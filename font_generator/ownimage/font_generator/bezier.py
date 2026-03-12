@@ -155,3 +155,23 @@ class CubicBezier:
         closest_t = self.closet_t_to(target)
         closest_point = self.point_at(closest_t)
         return (closest_point - target).length()
+
+    def move_to(self, start: Vector) -> "CubicBezier":
+        """Move the bezier curve so that its starting point is at the given vector.
+        
+        This creates a new bezier where all control points are offset by the 
+        vector delta = start - p0.
+        
+        Args:
+            start: The new starting position for the bezier curve
+            
+        Returns:
+            A new CubicBezier with the same shape but starting at the given position
+        """
+        delta = start - self.p0
+        return CubicBezier(
+            self.p0 - delta,
+            self.p1 - delta,
+            self.p2 - delta,
+            self.p3 - delta
+        )
