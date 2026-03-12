@@ -8,6 +8,7 @@ from .geometry_set import GeometrySet
 from .pen_nib import PenNib
 from .pen_stroke import PenStroke
 from .bezier import CubicBezier
+from .stroke import Stroke
 from .stroke_type import StrokeType
 from .strokeable import Strokeable
 from .vector import Vector
@@ -60,7 +61,7 @@ class BezierStroke(Strokeable):
         and approximating it with short PenStroke segments.
         """
         def add_start_and_scale(pt: Vector) -> Vector:
-            return (pt + start) * scale
+            return Stroke.add_start_and_scale(pt, start, scale)
 
         points = self._sample_points()
         nib = PenNib.from_font_parameters(fp)
@@ -73,7 +74,7 @@ class BezierStroke(Strokeable):
             top = [add_start_and_scale(n.tl)] + top + [add_start_and_scale(n.tr)]
             bottom = [add_start_and_scale(n.bl)] + bottom + [add_start_and_scale(n.br)]
 
-        geom_set.replace_current_outline(top)
+        geom_set.replace_current_outline(bottom)
         return start + self.bezier.p3 - self.bezier.p0
 
     def svg(self, start: Vector, fp: FontParameters, scale: float) -> str:

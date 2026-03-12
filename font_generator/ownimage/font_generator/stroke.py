@@ -50,6 +50,10 @@ class Stroke(Strokeable):
     def right(length: float = 1.0, stroke_type: StrokeType = StrokeType.Block) -> Stroke:
         return Stroke(Vector(length, 0), stroke_type)
 
+    @staticmethod
+    def add_start_and_scale(pt: Vector, start: Vector, scale: float) -> Vector:
+        return (pt + start) * scale
+
     def extend(self, e: Stroke | Vector | float) -> Stroke:
         if isinstance(e, Stroke):
             if e.stroke_type == StrokeType.Extend:

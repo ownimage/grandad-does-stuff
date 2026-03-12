@@ -14,10 +14,11 @@ class PenStroke:
     end: PenNib
 
     def geometry(self, start: Vector, scale: float, before: Strokeable, after: Strokeable, geom_set: GeometrySet):
+        from .stroke import Stroke
         dpl = VM.distance_point_to_line
 
         def add_start_and_scale(pt: Vector) -> Vector:
-            return (pt + start) * scale
+            return Stroke.add_start_and_scale(pt, start, scale)
 
         add_start = before is None or before.stroke_type != StrokeType.Block
         add_end = after is None or after.stroke_type != StrokeType.Block
