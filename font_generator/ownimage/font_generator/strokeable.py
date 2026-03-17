@@ -13,6 +13,9 @@ class Strokeable:
     def _not_implemented(self, name: str):
         raise RuntimeError(f"{name}() not implemented in {self.__class__.__name__}")
 
+    def start(self) -> Vector:
+        return Vector(0, 0)
+
     def geometry(self, start, fp, scale, before, after, geom_set):
         self._not_implemented("geometry")
 

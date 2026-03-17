@@ -3,10 +3,11 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import List
 
+from shapely import Polygon
 from shapely.geometry.multipoint import MultiPoint
 from shapely.ops import unary_union
 
-from .bezier import CubicBezier
+from .cubic_bezier import CubicBezier
 from .font_parameters import FontParameters
 from .geometry_set import GeometrySet
 from .pen_nib import PenNib
@@ -29,6 +30,18 @@ class BezierStroke(Strokeable):
             raise ValueError("num_samples must be at least 4")
 
     @staticmethod
+    def from_four_points(
+            p0: Vector,
+            p1: Vector,
+            p2: Vector,
+            p3: Vector,
+            num_samples: int = 20,
+            debug_visual: bool = False,
+    ) -> BezierStroke:
+        bezier = CubicBezier(p0, p1, p2, p3)
+        return BezierStroke(bezier, num_samples, debug_visual)
+
+    @staticmethod
     def from_three_points(
             p0: Vector,
             p1: Vector,
@@ -38,6 +51,21 @@ class BezierStroke(Strokeable):
     ) -> BezierStroke:
         bezier = CubicBezier.from_three_points(p0, p1, p2)
         return BezierStroke(bezier, num_samples, debug_visual)
+
+    @staticmethod
+    def bezier_through(
+            p0: Vector,
+            p1: Vector,
+            p2: Vector,
+            p3: Vector,
+            num_samples: int = 20,
+            debug_visual: bool = False,
+    ) -> BezierStroke:
+        bezier = CubicBezier.bezier_through(p0, p1, p2, p3)
+        return BezierStroke(bezier, num_samples, debug_visual)
+
+    def start(self) -> Vector:
+        return self.bezier.p0
 
     def geometry(
             self,
@@ -54,10 +82,11 @@ class BezierStroke(Strokeable):
         """
 
         def add_start_and_scale(pt: Vector) -> Vector:
-            return Stroke.add_start_and_scale(pt, start, scale)
+            return Stroke.add_start_and_scale(pt, start - self.bezier.p0, scale)
 
         points = self.bezier.sample_points(self.num_samples)
         nib = PenNib.from_font_parameters(fp)
+        geom_set.add_new_outline()
         outline = None
 
         for i in range(len(points) - 1):
@@ -87,3 +116,4 @@ class BezierStroke(Strokeable):
 
     def advance(self, pos: Vector) -> Vector:
         return pos + self.bezier.p3 - self.bezier.p0
+

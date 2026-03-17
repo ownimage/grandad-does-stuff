@@ -26,7 +26,7 @@ class Mark:
         elif x is not None or y is not None:
             self.vec = Vector(x or 0, y or 0)
         else:
-            self.vec = Vector(0, 0)
+            self.vec = None
 
         # Normalise strokes to a flat list of Strokeable
         if isinstance(strokes, Strokeable):
@@ -38,6 +38,9 @@ class Mark:
         else:
             # Already a list/iterable of Strokeable
             self.strokes = list(strokes)
+
+        if self.vec is None:
+            self.vec = self.strokes[0].start()
 
     def __add__(self, v) -> Mark:
         return Mark(self.strokes, self.vec + v)

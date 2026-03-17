@@ -62,6 +62,53 @@ class CubicBezier:
     p2: Vector
     p3: Vector
 
+    @staticmethod
+    def _chord_length_params(points: List[Vector]) -> List[float]:
+        t = [0.0]
+        for i in range(1, len(points)):
+            d = math.dist((points[i - 1].x, points[i - 1].y),
+                          (points[i].x, points[i].y))
+            t.append(t[-1] + d)
+        # normalise to [0,1]
+        total = t[-1]
+        return [ti / total for ti in t]
+
+    @staticmethod
+    def bezier_through(Q0: Vector, Q1: Vector, Q2: Vector, Q3: Vector) -> CubicBezier:
+        # Parameter values
+        t = CubicBezier._chord_length_params([Q0, Q1, Q2, Q3])
+        t0, t1, t2, t3 = t
+
+        # Bernstein basis coefficients
+        def coeffs(t):
+            u = 1 - t
+            return (
+                u * u * u,  # a
+                3 * u * u * t,  # b
+                3 * u * t * t,  # c
+                t * t * t  # d
+            )
+
+        a1, b1, c1, d1 = coeffs(t1)
+        a2, b2, c2, d2 = coeffs(t2)
+
+        # Right-hand sides
+        R1 = Q1 - (a1 * Q0 + d1 * Q3)
+        R2 = Q2 - (a2 * Q0 + d2 * Q3)
+
+        # Solve 2×2 system for P1 and P2
+        #   b1 P1 + c1 P2 = R1
+        #   b2 P1 + c2 P2 = R2
+
+        det = b1 * c2 - b2 * c1
+        if abs(det) < 1e-12:
+            raise ValueError("Degenerate configuration: cannot solve for control points.")
+
+        P1 = (R1 * c2 - R2 * c1) * (1 / det)
+        P2 = (R2 * b1 - R1 * b2) * (1 / det)
+
+        return CubicBezier(Q0, P1, P2, Q3)
+
     def point_at(self, t: float) -> Vector:
         """Evaluate the Bezier curve at parameter t (0 to 1)."""
         mt = 1 - t
