@@ -37,3 +37,6 @@ class Vector:
     def cross(self, other: "Vector") -> float:
         """2D cross product (returns scalar)."""
         return self.x * other.y - self.y * other.x
+
+    def xy(self):
+        return (self.x, self.y)

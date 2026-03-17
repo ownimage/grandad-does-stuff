@@ -4,6 +4,8 @@ from dataclasses import dataclass, field
 from typing import List
 
 from shapely.geometry import Polygon
+from shapely.geometry.multipoint import MultiPoint
+from shapely.ops import unary_union
 
 from .font_parameters import FontParameters
 from .geometry_set import GeometrySet
@@ -69,18 +71,21 @@ class BezierStroke(Strokeable):
         nib = PenNib.from_font_parameters(fp)
         top: List[Vector] = []
         bottom: List[Vector] = []
-        outline = geom_set.get_current_outline()
+        outline = None
 
-        for i in range(len(points)):
-            n = nib.at(points[i])
-            top = [add_start_and_scale(n.tl)] + top + [add_start_and_scale(n.tr)]
-            bottom = [add_start_and_scale(n.bl)] + bottom + [add_start_and_scale(n.br)]
+        for i in range(len(points)-1):
+            n1 = nib.at(points[i])
+            n2 = nib.at(points[i+1])
+            p = [add_start_and_scale(p).xy() for p in n1.corners() + n2.corners()]
+            h = MultiPoint(p).convex_hull
 
-        top_coords = [(v.x, v.y) for v in reversed(top)]
-        bottom_coords = [(v.x, v.y) for v in bottom]
-        polygon = Polygon(top_coords + bottom_coords + [top_coords[0]])
-        outline = [Vector(x, y) for x, y in polygon.exterior.coords]
+            if outline is None:
+                outline = h
+            else:
+                outline = unary_union([outline, h])
 
+        pts = list(outline.exterior.coords)
+        outline = [Vector(p[0], p[1]) for p in pts]
         geom_set.replace_current_outline(outline)
         return start + self.bezier.p3 - self.bezier.p0
 

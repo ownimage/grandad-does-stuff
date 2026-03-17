@@ -156,6 +156,14 @@ class CubicBezier:
         closest_point = self.point_at(closest_t)
         return (closest_point - target).length()
 
+    def sample_points(self, num_samples: int = 20) -> List[Vector]:
+        """Sample points along the curve at evenly spaced t values."""
+        points = []
+        for i in range(num_samples):
+            t = i / (num_samples - 1)
+            points.append(self.point_at(t))
+        return points
+
     def move_to(self, start: Vector) -> "CubicBezier":
         """Move the bezier curve so that its starting point is at the given vector.
         
@@ -175,3 +183,17 @@ class CubicBezier:
             self.p2 - delta,
             self.p3 - delta
         )
+
+    def sample_geometry(self, num_samples: int = 20) -> List[Vector]:
+        """Sample points along the curve for geometric processing.
+        
+        This method provides an easy way to extract points from a cubic bezier
+        for use in geometry generation or other applications.
+        
+        Args:
+            num_samples: Number of evenly spaced samples to take
+            
+        Returns:
+            List of Vector points representing sampled positions along the curve
+        """
+        return self.sample_points(num_samples)

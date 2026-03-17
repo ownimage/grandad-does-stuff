@@ -79,3 +79,7 @@ class PenNib:
     def moved_to(self, x: float, y: float) -> "PenNib":
         """Return a new nib at a new position."""
         return PenNib(self.width, self.thickness, self.angle, Vector(x, y))
+
+    def corners(self) -> list[Vector]:
+        """Return an array of vectors for the nib corners in order: tl, bl, br, tr."""
+        return [self.tl, self.bl, self.br, self.tr]
