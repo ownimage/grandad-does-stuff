@@ -88,7 +88,12 @@ class Blackletter:
                 .top_at(x, fp)
                 .left_at(f_dot.tr(fp).x, fp)
                 )
-        self.glyph_map['A'] = Glyph([m_A1, m_A2, m_A3, m_A4], fp)
+        m_A5 = (Mark(Stroke.down() + f_i_footer)
+                .top_at(a, fp)
+                .extend_downstroke_to_set_bottom_at(0, b, fp)
+                .left_by(f_dot.tl(fp).x - m_A4.right(fp))
+                )
+        self.glyph_map['A'] = Glyph([m_A1, m_A2, m_A3, m_A4, m_A5], fp)
 
         m_a1 = (Mark(Stroke.down() + f_dot)
                 .top_at(xm.stroke_tl(0, fp).y, fp)
