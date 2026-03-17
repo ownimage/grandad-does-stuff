@@ -184,16 +184,3 @@ class CubicBezier:
             self.p3 - delta
         )
 
-    def sample_geometry(self, num_samples: int = 20) -> List[Vector]:
-        """Sample points along the curve for geometric processing.
-        
-        This method provides an easy way to extract points from a cubic bezier
-        for use in geometry generation or other applications.
-        
-        Args:
-            num_samples: Number of evenly spaced samples to take
-            
-        Returns:
-            List of Vector points representing sampled positions along the curve
-        """
-        return self.sample_points(num_samples)

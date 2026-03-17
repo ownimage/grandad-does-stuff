@@ -1,5 +1,7 @@
 from dataclasses import dataclass
 import math
+from typing import Tuple
+
 
 @dataclass(frozen=True)
 class Vector:
@@ -38,5 +40,5 @@ class Vector:
         """2D cross product (returns scalar)."""
         return self.x * other.y - self.y * other.x
 
-    def xy(self):
-        return (self.x, self.y)
+    def xy(self)-> Tuple[float, float]:
+        return self.x, self.y
