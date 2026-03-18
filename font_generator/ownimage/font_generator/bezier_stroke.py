@@ -1,9 +1,8 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import List
+from typing import Union, Tuple
 
-from shapely import Polygon
 from shapely.geometry.multipoint import MultiPoint
 from shapely.ops import unary_union
 
@@ -31,38 +30,61 @@ class BezierStroke(Strokeable):
 
     @staticmethod
     def from_four_points(
-            p0: Vector,
-            p1: Vector,
-            p2: Vector,
-            p3: Vector,
+            p0: Union[Vector, Tuple[float, float]],
+            p1: Union[Vector, Tuple[float, float]],
+            p2: Union[Vector, Tuple[float, float]],
+            p3: Union[Vector, Tuple[float, float]],
             num_samples: int = 20,
             debug_visual: bool = False,
     ) -> BezierStroke:
+        p0, p1, p2, p3 = map(Vector.of, (p0, p1, p2, p3))
         bezier = CubicBezier(p0, p1, p2, p3)
         return BezierStroke(bezier, num_samples, debug_visual)
 
     @staticmethod
     def from_three_points(
-            p0: Vector,
-            p1: Vector,
-            p2: Vector,
+            p0: Union[Vector, Tuple[float, float]],
+            p1: Union[Vector, Tuple[float, float]],
+            p2: Union[Vector, Tuple[float, float]],
             num_samples: int = 20,
             debug_visual: bool = False,
     ) -> BezierStroke:
+        p0, p1, p2 = map(Vector.of, (p0, p1, p2))
         bezier = CubicBezier.from_three_points(p0, p1, p2)
         return BezierStroke(bezier, num_samples, debug_visual)
 
     @staticmethod
     def bezier_through(
-            p0: Vector,
-            p1: Vector,
-            p2: Vector,
-            p3: Vector,
+            p0: Union[Vector, Tuple[float, float]],
+            p1: Union[Vector, Tuple[float, float]],
+            p2: Union[Vector, Tuple[float, float]],
+            p3: Union[Vector, Tuple[float, float]],
             num_samples: int = 20,
             debug_visual: bool = False,
     ) -> BezierStroke:
+        p0, p1, p2, p3 = map(Vector.of, (p0, p1, p2, p3))
         bezier = CubicBezier.bezier_through(p0, p1, p2, p3)
         return BezierStroke(bezier, num_samples, debug_visual)
+
+    @staticmethod
+    def horizontal_flourish(
+            length: float,
+            offset: float,
+            x_start: float = 0,
+            num_samples: int = 20,
+            debug_visual: bool = False,
+    ):
+        return BezierStroke.bezier_through(
+            (x_start, 0),
+            (x_start + length / 4, offset),
+            (x_start + 3 * length / 4, -offset),
+            (x_start + length, 0),
+            num_samples,
+            debug_visual
+        )
+
+    def y_at_x(self, x : float):
+        return self.bezier.y_at_x(x)
 
     def start(self) -> Vector:
         return self.bezier.p0
@@ -116,4 +138,3 @@ class BezierStroke(Strokeable):
 
     def advance(self, pos: Vector) -> Vector:
         return pos + self.bezier.p3 - self.bezier.p0
-

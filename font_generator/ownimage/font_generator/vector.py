@@ -8,6 +8,14 @@ class Vector:
     x: float = 0.0
     y: float = 0.0
 
+    @staticmethod
+    def of(p) -> "Vector":
+        if isinstance(p, Vector):
+            return p
+        if isinstance(p, (tuple, list)) and len(p) == 2:
+            return Vector(float(p[0]), float(p[1]))
+        raise TypeError(f"Cannot convert {p!r} to Vector")
+
     def __add__(self, other):
         return Vector(self.x + other.x, self.y + other.y)
 

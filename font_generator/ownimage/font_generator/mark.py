@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import replace
 from typing import List
 
+from .bezier_stroke import BezierStroke
 from .compound_stroke import CompoundStroke
 from .font_parameters import FontParameters
 from .geometry_set import GeometrySet
@@ -67,6 +68,22 @@ class Mark:
 
     def top_at(self, target: float, fp: FontParameters, posn: Vector = Vector(0, 0), scale: float = 1.0):
         current = self.top(fp, posn, scale)
+        shift = target - current
+        return self.up_by(shift)
+
+    def top_at_bezier(self, fp: FontParameters, mark: Mark, index: int = 0, posn: Vector = Vector(0, 0), scale: float = 1.0):
+        beziers = [s for s in mark.strokes if isinstance(s, BezierStroke)]
+        bezier = beziers[0]
+        current = self.top(fp, posn, scale)
+        target = mark.vec.y + bezier.y_at_x(self.vec.x)[index]
+        shift = target - current
+        return self.up_by(shift)
+
+    def start_at_bezier(self, fp: FontParameters, mark: Mark, index: int = 0, posn: Vector = Vector(0, 0), scale: float = 1.0):
+        beziers = [s for s in mark.strokes if isinstance(s, BezierStroke)]
+        bezier = beziers[0]
+        current = self.vec.y
+        target = mark.vec.y + bezier.y_at_x(self.vec.x)[index]
         shift = target - current
         return self.up_by(shift)
 

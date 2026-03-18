@@ -29,7 +29,7 @@ class Blackletter:
         def f_v_dot_chain(n: int):
             link = f_dot + Stroke(Vector(0, f_dot.bl(fp).y - f_dot.tr(fp).y) - f_dot.vec, StrokeType.Move)
             r = link
-            for i in range(n-1):
+            for i in range(n - 1):
                 r = r + link
             return r
 
@@ -71,13 +71,7 @@ class Blackletter:
             .top_at(a - 2 * pen_width, fp)
             .extend_downstroke_to_set_bottom_at(0, b, fp)
         )
-        m_A2 = (Mark(BezierStroke.bezier_through(
-            Vector(-3 * pen_width, a - pen_width),
-            Vector(-pen_width, a),
-            Vector(pen_width, a - pen_width),
-            Vector(3 * pen_width, a),  # end point
-            num_samples=20,
-            debug_visual=True))
+        m_A2 = (Mark(BezierStroke.horizontal_flourish(6 * pen_width, pen_width / 2, -pen_width * 3))
                 .top_at(a, fp)
                 )
         m_A3 = (Mark(f_v_dot_chain(3))
@@ -89,12 +83,18 @@ class Blackletter:
                 .left_at(f_dot.tr(fp).x, fp)
                 )
         m_A5 = (Mark(Stroke.down() + f_i_footer)
-                .top_at(a, fp)
-                .extend_downstroke_to_set_bottom_at(0, b, fp)
                 .left_by(f_dot.tl(fp).x - m_A4.right(fp))
+                .start_at_bezier(fp, m_A2)
+                .extend_downstroke_to_set_bottom_at(0, b, fp)
                 )
         self.glyph_map['A'] = Glyph([m_A1, m_A2, m_A3, m_A4, m_A5], fp)
 
+        # B
+        m_B2 = (Mark(BezierStroke.horizontal_flourish(6 * pen_width, pen_width / 2))
+                .top_at(a, fp)
+                )
+        self.glyph_map['B'] = Glyph([m_B2], fp)
+        # a
         m_a1 = (Mark(Stroke.down() + f_dot)
                 .top_at(xm.stroke_tl(0, fp).y, fp)
                 .extend_downstroke_to_set_bottom_at(0, b, fp)

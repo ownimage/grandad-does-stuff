@@ -4,6 +4,8 @@ import math
 from dataclasses import dataclass
 from typing import List, Tuple
 
+import numpy as np
+
 from .vector import Vector
 
 
@@ -33,15 +35,15 @@ def _solve_cubic(a: float, b: float, c: float, d: float) -> List[float]:
     if disc > 1e-10:
         s = r + math.sqrt(disc)
         t = r - math.sqrt(disc)
-        s = math.copysign(abs(s) ** (1/3), s)
-        t = math.copysign(abs(t) ** (1/3), t)
+        s = math.copysign(abs(s) ** (1 / 3), s)
+        t = math.copysign(abs(t) ** (1 / 3), t)
         root = -b / 3 + s + t
         roots.append(root)
     elif abs(disc) < 1e-10:
         if abs(r) < 1e-10:
             roots.append(-b / 3)
         else:
-            s = math.copysign(abs(r) ** (1/3), r)
+            s = math.copysign(abs(r) ** (1 / 3), r)
             root = -b / 3 + 2 * s
             roots.append(root)
             roots.append(-b / 3 - s)
@@ -116,18 +118,50 @@ class CubicBezier:
         mt3 = mt2 * mt
         t2 = t * t
         t3 = t2 * t
-        return (self.p0 * mt3 + 
-                self.p1 * (3 * mt2 * t) + 
-                self.p2 * (3 * mt * t2) + 
+        return (self.p0 * mt3 +
+                self.p1 * (3 * mt2 * t) +
+                self.p2 * (3 * mt * t2) +
                 self.p3 * t3)
+
+    def _poly_coeffs(self, p0, p1, p2, p3):
+        A = -p0 + 3 * p1 - 3 * p2 + p3
+        B = 3 * p0 - 6 * p1 + 3 * p2
+        C = -3 * p0 + 3 * p1
+        D = p0
+        return A, B, C, D
+
+    def y_at_x(self, x_target: float):
+        # Polynomial coefficients for x(t)
+        Ax, Bx, Cx, Dx = self._poly_coeffs(
+            self.p0.x, self.p1.x, self.p2.x, self.p3.x
+        )
+
+        # Solve Ax t^3 + Bx t^2 + Cx t + (Dx - x_target) = 0
+        coeffs = [Ax, Bx, Cx, Dx - x_target]
+        roots = np.roots(coeffs)
+
+        # Keep real roots in [0,1]
+        ts = [r.real for r in roots if abs(r.imag) < 1e-9 and 0 <= r.real <= 1]
+
+        # Evaluate y(t) for each valid t
+        def y_of_t(t):
+            u = 1 - t
+            return (
+                    u * u * u * self.p0.y +
+                    3 * u * u * t * self.p1.y +
+                    3 * u * t * t * self.p2.y +
+                    t * t * t * self.p3.y
+            )
+
+        return [y_of_t(t) for t in ts]
 
     def derivative_at(self, t: float) -> Vector:
         """Get the tangent (derivative) at parameter t."""
         mt = 1 - t
         mt2 = mt * mt
         t2 = t * t
-        return ((self.p1 - self.p0) * (3 * mt2) + 
-                (self.p2 - self.p1) * (6 * mt * t) + 
+        return ((self.p1 - self.p0) * (3 * mt2) +
+                (self.p2 - self.p1) * (6 * mt * t) +
                 (self.p3 - self.p2) * (3 * t2))
 
     def normal_at(self, t: float) -> Vector:
@@ -230,4 +264,3 @@ class CubicBezier:
             self.p2 - delta,
             self.p3 - delta
         )
-
