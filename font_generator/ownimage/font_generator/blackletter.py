@@ -382,14 +382,14 @@ class Blackletter:
                 )
         self.glyph_map['z'] = Glyph([m_z1], fp)
 
-    def svg(self, posn: Vector, chars: str, scale: float, char_lines: bool = False):
+    def svg(self, start: Vector, chars: str, scale: float, char_lines: bool = False):
 
         def _char_line(x: float, scale: float) -> str:
             xs = x * scale
             return f'<line x1="{xs}" y1="{self.fp.descender * scale}" x2="{xs}" y2="{self.fp.ascender * scale}" stroke="black" stroke-width="1" />\n'
 
         svg = ""
-        start = posn
+        start = start
         for c in chars:
             g: Glyph = self.glyph_map[c]
             svg += f"<!-- char {c} -->\n"
@@ -407,9 +407,9 @@ class Blackletter:
         print(f"svg={svg}")
         return svg
 
-    def svg_known(self, posn: Vector, scale: float, char_lines: bool = False):
+    def svg_known(self, start: Vector, scale: float, char_lines: bool = False):
         chars = ''.join(self.glyph_map.keys())
-        return self.svg(posn, chars, scale, char_lines)
+        return self.svg(start, chars, scale, char_lines)
 
     def birdfont_path(self, key, scale: float):
         g = self.glyph_map[key]

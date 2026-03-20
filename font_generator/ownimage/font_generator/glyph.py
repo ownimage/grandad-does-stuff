@@ -17,10 +17,10 @@ class Glyph:
         self.vec = Vector(-union.left , 0)
         self.width = union.width
 
-    def svg(self, posn: Vector, fp: FontParameters, scale: float):
+    def svg(self, start: Vector, fp: FontParameters, scale: float):
         svg = ""
         for mark in self.marks:
-            svg += mark.svg(fp, Vector(posn.x + self.vec.x, posn.y + self.vec.y), scale)
+            svg += mark.svg(fp, Vector(start.x + self.vec.x, start.y + self.vec.y), scale)
         return svg
 
     def birdfont_path(self, fp: FontParameters, scale: float):

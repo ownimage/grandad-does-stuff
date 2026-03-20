@@ -19,9 +19,9 @@ class Strokeable:
     def geometry(self, start: Vector, fp: FontParameters, scale: float, before: Strokeable, after: Strokeable, geom_set: GeometrySet) -> Vector:
         self._not_implemented("geometry")
 
-    def boundingBox(self, fp: FontParameters, posn: Vector = Vector(0, 0), scale: float = 1.0):
+    def bounding_box(self, fp: FontParameters, start: Vector = Vector(0, 0), scale: float = 1.0):
         geom_set = GeometrySet()
-        self.geometry(posn, fp, scale, None, None, geom_set)
+        self.geometry(start, fp, scale, None, None, geom_set)
         return geom_set.bounding_box()
 
     def svg(self, start: Vector, fp: FontParameters, scale: float) -> str:

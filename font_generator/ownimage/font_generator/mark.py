@@ -61,25 +61,25 @@ class Mark:
     def down_by(self, amount: float):
         return Mark(self.strokes, Vector(self.vec.x, self.vec.y - amount))
 
-    def bottom_at(self, target: float, fp: FontParameters, posn: Vector = Vector(0, 0), scale: float = 1.0):
-        current = self.bounding_box(fp, posn, scale).bottom
+    def bottom_at(self, target: float, fp: FontParameters, start: Vector = Vector(0, 0), scale: float = 1.0):
+        current = self.bounding_box(fp, start, scale).bottom
         shift = target - current
         return self.up_by(shift)
 
-    def top_at(self, target: float, fp: FontParameters, posn: Vector = Vector(0, 0), scale: float = 1.0):
-        current = self.bounding_box(fp, posn, scale).top
+    def top_at(self, target: float, fp: FontParameters, start: Vector = Vector(0, 0), scale: float = 1.0):
+        current = self.bounding_box(fp, start, scale).top
         shift = target - current
         return self.up_by(shift)
 
-    def top_at_bezier(self, fp: FontParameters, mark: Mark, index: int = 0, posn: Vector = Vector(0, 0), scale: float = 1.0):
+    def top_at_bezier(self, fp: FontParameters, mark: Mark, index: int = 0, start: Vector = Vector(0, 0), scale: float = 1.0):
         beziers = [s for s in mark.strokes if isinstance(s, BezierStroke)]
         bezier = beziers[0]
-        current = self.top(fp, posn, scale)
+        current = self.top(fp, start, scale)
         target = mark.vec.y + bezier.y_at_x(self.vec.x)[index]
         shift = target - current
         return self.up_by(shift)
 
-    def start_at_bezier(self, fp: FontParameters, mark: Mark, index: int = 0, posn: Vector = Vector(0, 0), scale: float = 1.0):
+    def start_at_bezier(self, fp: FontParameters, mark: Mark, index: int = 0, start: Vector = Vector(0, 0), scale: float = 1.0):
         beziers = [s for s in mark.strokes if isinstance(s, BezierStroke)]
         bezier = beziers[0]
         current = self.vec.y
@@ -87,24 +87,24 @@ class Mark:
         shift = target - current
         return self.up_by(shift)
 
-    def left_at(self, target: float, fp: FontParameters, posn: Vector = Vector(0, 0), scale: float = 1.0):
-        current = self.bounding_box(fp, posn, scale).left
+    def left_at(self, target: float, fp: FontParameters, start: Vector = Vector(0, 0), scale: float = 1.0):
+        current = self.bounding_box(fp, start, scale).left
         shift = target - current
         return self.right_by(shift)
 
-    def centre_x_at(self, target: float, fp: FontParameters, posn: Vector = Vector(0, 0), scale: float = 1.0):
-        current = self.bounding_box(fp, posn, scale).cx
+    def centre_x_at(self, target: float, fp: FontParameters, start: Vector = Vector(0, 0), scale: float = 1.0):
+        current = self.bounding_box(fp, start, scale).cx
         shift = target - current
         return self.right_by(shift)
 
-    def right_at(self, target: float, fp: FontParameters, posn: Vector = Vector(0, 0), scale: float = 1.0):
-        current = self.bounding_box(fp, posn, scale).right
+    def right_at(self, target: float, fp: FontParameters, start: Vector = Vector(0, 0), scale: float = 1.0):
+        current = self.bounding_box(fp, start, scale).right
         shift = target - current
         return self.right_by(shift)
 
-    def geometry(self, posn: Vector, fp: FontParameters, scale: float = 1) -> GeometrySet:
+    def geometry(self, start: Vector, fp: FontParameters, scale: float = 1) -> GeometrySet:
         nib = PenNib.from_font_parameters(fp)
-        start = posn + self.vec
+        start = start + self.vec
         geom_set = GeometrySet()
 
         for idx, (start_offset, width) in enumerate(fp.pen_stroke):
@@ -126,8 +126,8 @@ class Mark:
 
         return geom_set
 
-    def bounding_box(self, fp: FontParameters, posn: Vector = Vector(0, 0), scale: float = 1.0):
-        geom = self.geometry(posn, fp, scale)
+    def bounding_box(self, fp: FontParameters, start: Vector = Vector(0, 0), scale: float = 1.0):
+        geom = self.geometry(start, fp, scale)
         return geom.bounding_box()  # -> (bl, tr)
 
     def extend_downstroke_to_set_bottom_at(self, stroke, bottom, fp):
@@ -150,8 +150,8 @@ class Mark:
         else:
             return self.with_stroke(stroke, lambda s: s.extend(delta))
 
-    def svg(self, fp: FontParameters, posn: Vector, scale: float) -> str:
-        return self.geometry(posn, fp, scale).svg(fp.filled) + "\n"
+    def svg(self, fp: FontParameters, start: Vector, scale: float) -> str:
+        return self.geometry(start, fp, scale).svg(fp.filled) + "\n"
 
     def birdfont_path(self, fp: FontParameters, scale: float):
         start = self.vec
