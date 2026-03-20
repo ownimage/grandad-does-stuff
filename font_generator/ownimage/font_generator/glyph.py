@@ -9,11 +9,13 @@ class Glyph:
     def __init__(self, marks: List[Mark], fp: FontParameters):
         self.marks = marks
 
-        left = min([mark.bounding_box(fp).left for mark in marks])
-        right = max([mark.bounding_box(fp).right for mark in marks])
+        union = None
+        for m in self.marks:
+            bb = m.bounding_box(fp)
+            union = bb if union is None else union.union(bb)
 
-        self.vec = Vector(-left, 0)
-        self.width = right - left
+        self.vec = Vector(-union.left , 0)
+        self.width = union.width
 
     def svg(self, posn: Vector, fp: FontParameters, scale: float):
         svg = ""

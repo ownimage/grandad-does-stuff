@@ -106,3 +106,22 @@ class BoundingBox:
     @classmethod
     def zero(cls) -> "BoundingBox":
         return cls(Vector(0.0, 0.0), Vector(0.0, 0.0))
+
+    def union(self, other: "BoundingBox") -> "BoundingBox":
+        """Compute the bounding box that contains both this and the given BoundingBox."""
+        if other is None:
+            return self
+        
+        # Find the combined bounding box by taking min of bottom_left coordinates 
+        # and max of top_right coordinates
+        new_bottom_left = Vector(
+            min(self.bottom_left.x, other.bottom_left.x),
+            min(self.bottom_left.y, other.bottom_left.y)
+        )
+        
+        new_top_right = Vector(
+            max(self.top_right.x, other.top_right.x),
+            max(self.top_right.y, other.top_right.y)
+        )
+        
+        return BoundingBox(new_bottom_left, new_top_right)
