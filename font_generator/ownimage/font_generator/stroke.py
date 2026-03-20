@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from typing import Union
 
 from .font_parameters import FontParameters
 from .geometry_set import GeometrySet
@@ -21,7 +22,7 @@ class Stroke(Strokeable):
         direction = self.vec.normalized()
         object.__setattr__(self, "direction", direction)
 
-    def __add__(self, other):
+    def __add__(self, other: Union[Stroke, 'StrokeLine', 'BezierStroke', 'CompoundStroke']) -> 'CompoundStroke':
         from .bezier_stroke import BezierStroke
         from .compound_stroke import CompoundStroke
         from .stroke_line import StrokeLine
@@ -54,7 +55,7 @@ class Stroke(Strokeable):
     def add_start_and_scale(pt: Vector, start: Vector, scale: float) -> Vector:
         return (pt + start) * scale
 
-    def extend(self, e: Stroke | Vector | float) -> Stroke:
+    def extend(self, e: Union[Stroke, Vector, float]) -> Stroke:
         if isinstance(e, Stroke):
             if e.stroke_type == StrokeType.Extend:
                 return Stroke(self.vec + e.vec, self.stroke_type)
@@ -68,7 +69,7 @@ class Stroke(Strokeable):
 
         raise RuntimeError(f"Extension type of {type(e)}.")
 
-    def geometry(self, start: Vector, fp: FontParameters, scale: float, before: Strokeable, after: Strokeable, geom_set: GeometrySet):
+    def geometry(self, start: Vector, fp: FontParameters, scale: float, before: Strokeable, after: Strokeable, geom_set: GeometrySet) -> Vector:
         if self.stroke_type == StrokeType.Block or self.stroke_type == StrokeType.Line:
             start_nib = PenNib.from_font_parameters(fp)
             end_nib = start_nib.move(self.vec)
@@ -77,23 +78,23 @@ class Stroke(Strokeable):
 
         return start + self.vec
 
-    def bl(self, fp: FontParameters):
+    def bl(self, fp: FontParameters) -> Vector:
         nib = PenNib.from_font_parameters(fp)
         return self.vec + nib.bl
 
-    def tr(self, fp: FontParameters):
+    def tr(self, fp: FontParameters) -> Vector:
         nib = PenNib.from_font_parameters(fp)
         return nib.tr
 
-    def tl(self, fp: FontParameters):
+    def tl(self, fp: FontParameters) -> Vector:
         nib = PenNib.from_font_parameters(fp)
         return nib.tl
 
-    def br(self, fp: FontParameters):
+    def br(self, fp: FontParameters) -> Vector:
         nib = PenNib.from_font_parameters(fp)
         return self.vec + nib.br
 
-    def make_width(self, width, fp):
+    def make_width(self, width: float, fp: FontParameters) -> Stroke:
         current = self.br(fp).x - self.tl(fp).x
         delta = width - current
         return Stroke(self.vec + Vector(delta, 0))

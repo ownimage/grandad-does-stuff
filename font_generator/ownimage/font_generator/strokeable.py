@@ -10,19 +10,24 @@ class Strokeable:
     def __init__(self, stroke_type: StrokeType = StrokeType.Block):
         self.stroke_type = stroke_type
 
-    def _not_implemented(self, name: str):
+    def _not_implemented(self, name: str) -> None:
         raise RuntimeError(f"{name}() not implemented in {self.__class__.__name__}")
 
     def start(self) -> Vector:
         return Vector(0, 0)
 
-    def geometry(self, start, fp, scale, before, after, geom_set):
+    def geometry(self, start: Vector, fp: FontParameters, scale: float, before: Strokeable, after: Strokeable, geom_set: GeometrySet) -> Vector:
         self._not_implemented("geometry")
 
-    def svg(self, start, fp, scale):
+    def boundingBox(self, fp: FontParameters, posn: Vector = Vector(0, 0), scale: float = 1.0):
+        geom_set = GeometrySet()
+        self.geometry(posn, fp, scale, None, None, geom_set)
+        return geom_set.bounding_box()
+
+    def svg(self, start: Vector, fp: FontParameters, scale: float) -> str:
         self._not_implemented("svg")
 
-    def birdfont_path(self, start, fp, scale):
+    def birdfont_path(self, start: Vector, fp: FontParameters, scale: float) -> list:
         self._not_implemented("birdfont_path")
 
     def advance(self, pos: Vector) -> Vector:

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import math
+from typing import Union
 
 from .compound_stroke import CompoundStroke
 from .font_parameters import FontParameters
@@ -19,7 +20,7 @@ class StrokeLine(Strokeable):
         self.vec = vec
 
     @staticmethod
-    def from_xy(x: float, y: float):
+    def from_xy(x: float, y: float) -> StrokeLine:
         return StrokeLine(Vector(x, y))
 
     @staticmethod
@@ -34,7 +35,7 @@ class StrokeLine(Strokeable):
     def down(length: float) -> StrokeLine:
         return StrokeLine(Vector(0, -length))
 
-    def extend(self, e: StrokeLine) -> StrokeLine:
+    def extend(self, e: Union[Stroke, Vector, float]) -> StrokeLine:
         if isinstance(e, Stroke):
             if e.stroke_type == StrokeType.Extend:
                 return StrokeLine(self.vec + e.vec)
@@ -48,7 +49,7 @@ class StrokeLine(Strokeable):
 
         raise RuntimeError(f"Extension type of {type(e)}.")
 
-    def geometry(self, start: Vector, fp: FontParameters, scale: float, prev: Strokeable, next: Strokeable, geom_set: GeometrySet):
+    def geometry(self, start: Vector, fp: FontParameters, scale: float, before: Strokeable, after: Strokeable, geom_set: GeometrySet) -> Vector:
         unit = self.vec.normalized()
         offset = unit.rotated(90) * fp.pen_thickness * scale
         p1 = start * scale + offset * 0.5
