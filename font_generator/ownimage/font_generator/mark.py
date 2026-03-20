@@ -118,9 +118,9 @@ class Mark:
 
                 if isinstance(curr_item, Stroke):
                     offset_pos = current_pos + nib.direction * (-0.5 * fp.pen_width + start_offset + 0.5 * width)
-                    curr_item.geometry(offset_pos, fpt, scale, prev_item, next_item, geom_set)
+                    curr_item.geometry(fpt, offset_pos, scale, prev_item, next_item, geom_set)
                 elif idx == 0:
-                    curr_item.geometry(current_pos, fp, scale, prev_item, next_item, geom_set)
+                    curr_item.geometry(fp, current_pos, scale, prev_item, next_item, geom_set)
 
                 current_pos = curr_item.advance(current_pos)
 

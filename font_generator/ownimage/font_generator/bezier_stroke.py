@@ -89,15 +89,7 @@ class BezierStroke(Strokeable):
     def start(self) -> Vector:
         return self.bezier.p0
 
-    def geometry(
-            self,
-            start: Vector,
-            fp: FontParameters,
-            scale: float,
-            before: Strokeable,
-            after: Strokeable,
-            geom_set: GeometrySet
-    ) -> Vector:
+    def geometry(self, fp: FontParameters, start: Vector, scale: float, before: Strokeable, after: Strokeable, geom_set: GeometrySet) -> Vector:
         """
         Generate geometry by interpolating the nib along the curve
         and approximating it with short PenStroke segments.

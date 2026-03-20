@@ -37,10 +37,10 @@ class CompoundStroke(Strokeable):
             new_list += cs.strokes
         return CompoundStroke(new_list)
 
-    def geometry(self, start: Vector, fp: FontParameters, scale: float, before: Strokeable, after: Strokeable, geom_set: GeometrySet) -> Vector:
+    def geometry(self, fp: FontParameters, start: Vector, scale: float, before: Strokeable, after: Strokeable, geom_set: GeometrySet) -> Vector:
         current_pos = start
         for stroke in self.strokes:
-            current_pos = stroke.geometry(current_pos, fp, scale, before, after, geom_set)
+            current_pos = stroke.geometry(fp, current_pos, scale, before, after, geom_set)
         return current_pos
 
     def svg(self, start: Vector, fp: FontParameters, scale: float) -> str:
