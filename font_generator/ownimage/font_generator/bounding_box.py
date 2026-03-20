@@ -23,25 +23,38 @@ class BoundingBox:
         """Create BoundingBox from 4 float coordinates."""
         return cls(Vector(left, bottom), Vector(right, top))
     
+    def __sub__(self, other: "BoundingBox") -> "BoundingBox":
+        """Calculate difference of two bounding boxes."""
+        # The difference is defined by the difference of coordinates
+        new_bottom_left = Vector(
+            self.bottom_left.x - other.bottom_left.x,
+            self.bottom_left.y - other.bottom_left.y
+        )
+        new_top_right = Vector(
+            self.top_right.x - other.top_right.x,
+            self.top_right.y - other.top_right.y
+        )
+        return BoundingBox(new_bottom_left, new_top_right)
+    
     @property
     def tl(self) -> Vector:
         """Top-left corner vector."""
-        return Vector(self.left, self.top)
+        return Vector(self.bottom_left.x, self.top_right.y)
     
     @property
     def bl(self) -> Vector:
         """Bottom-left corner vector."""
-        return Vector(self.left, self.bottom)
+        return self.bottom_left
     
     @property
     def tr(self) -> Vector:
         """Top-right corner vector."""
-        return Vector(self.right, self.top)
+        return self.top_right
     
     @property
     def br(self) -> Vector:
         """Bottom-right corner vector."""
-        return Vector(self.right, self.bottom)
+        return Vector(self.top_right.x, self.bottom_left.y)
     
     @property
     def left(self) -> float:
@@ -66,7 +79,10 @@ class BoundingBox:
     @property
     def center(self) -> Vector:
         """Center point as a vector."""
-        return Vector((self.left + self.right) / 2, (self.top + self.bottom) / 2)
+        return Vector(
+            (self.bottom_left.x + self.top_right.x) / 2,
+            (self.bottom_left.y + self.top_right.y) / 2
+        )
     
     @property
     def cx(self) -> float:
