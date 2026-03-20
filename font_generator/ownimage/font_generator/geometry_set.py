@@ -1,3 +1,4 @@
+from .bounding_box import BoundingBox
 from .vector import Vector
 
 
@@ -31,7 +32,7 @@ class GeometrySet:
         self.holes.pop()
         self.add_new_hole(hole)
 
-    def bounding_box(self) -> tuple[Vector, Vector]:
+    def bounding_box(self) -> BoundingBox:
         """Return (bottom_left, top_right) bounding box of all geometry."""
         xs = []
         ys = []
@@ -46,11 +47,11 @@ class GeometrySet:
 
         if not xs:
             # No geometry at all: return a zero box
-            return Vector(0, 0), Vector(0, 0)
+            return BoundingBox.zero()
 
         bl = Vector(min(xs), min(ys))
         tr = Vector(max(xs), max(ys))
-        return bl, tr
+        return BoundingBox(bl, tr)
 
     def left(self) -> float:
         bl, _ = self.bounding_box()

@@ -83,7 +83,7 @@ class Blackletter:
                 .left_at(f_dot.tr(fp).x, fp)
                 )
         m_A5 = (Mark(Stroke.down() + f_i_footer)
-                .left_by(f_dot.tl(fp).x - m_A4.right(fp))
+                .left_by(f_dot.tl(fp).x - m_A4.bounding_box(fp).right)
                 .start_at_bezier(fp, m_A2)
                 .extend_downstroke_to_set_bottom_at(0, b, fp)
                 )
@@ -159,10 +159,10 @@ class Blackletter:
                 )
         m_f3 = am.left_at(m_f1.stroke_tr(0, fp).x, fp)
         s_f4 = (Stroke.right()
-                .make_width(m_f1.width(fp) + m_f3.width(fp), fp)
+                .make_width(m_f1.bounding_box(fp).width + m_f3.bounding_box(fp).width, fp)
                 )
         m_f4 = (Mark(s_f4, Vector(0, t))
-                .left_at(m_f1.left(fp), fp)
+                .left_at(m_f1.bounding_box(fp).left, fp)
                 )
         self.glyph_map['f'] = Glyph([m_f1, m_f3, m_f4], fp)
 
@@ -174,7 +174,7 @@ class Blackletter:
         m_g2 = (Mark(f_dot + Stroke.down() + f_f_footer)
                 .top_at(x, fp)
                 .extend_downstroke_to_set_bottom_at(1, d, fp)
-                .left_at(m_g1.left(fp), fp)
+                .left_at(m_g1.bounding_box(fp).left, fp)
                 )
         self.glyph_map['g'] = Glyph([m_g1, m_g2], fp)
 
@@ -196,7 +196,7 @@ class Blackletter:
                 .extend_downstroke_to_set_bottom_at(0, b, fp)
                 )
         m_i2 = (f_i_dot
-                .centre_at(m_i1.vec.x, fp)
+                .centre_x_at(m_i1.vec.x, fp)
                 )
         self.glyph_map['i'] = Glyph([m_i1, m_i2], fp)
 
@@ -206,7 +206,7 @@ class Blackletter:
                 .extend_downstroke_to_set_bottom_at(0, d, fp)
                 )
         m_j2 = (f_i_dot
-                .centre_at(m_j1.vec.x, fp)
+                .centre_x_at(m_j1.vec.x, fp)
                 )
         self.glyph_map['j'] = Glyph([m_j1, m_j2], fp)
 
@@ -216,7 +216,7 @@ class Blackletter:
                 .extend_downstroke_to_set_bottom_at(0, b, fp)
                 )
         m_k2 = m_e2
-        m_k3 = (Mark(Stroke.right(xm.width(fp)) + Stroke.down() + f_dot)
+        m_k3 = (Mark(Stroke.right(xm.bounding_box(fp).width) + Stroke.down() + f_dot)
                 .top_at(xb2, fp)
                 .extend_downstroke_to_set_bottom_at(1, b, fp)
                 )
@@ -269,8 +269,8 @@ class Blackletter:
                 )
         m_p3 = (Mark(f_dot)
                 .bottom_at(b, fp)
-                .left_at(m_p2.left(fp), fp)
-                .extend_stroke_backwards_to_x(0, -m_i2.width(fp) / 2, fp)
+                .left_at(m_p2.bounding_box(fp).left, fp)
+                .extend_stroke_backwards_to_x(0, -m_i2.bounding_box(fp).width / 2, fp)
                 )
         self.glyph_map['p'] = Glyph([m_p1, m_p2, m_p3], fp)
 
@@ -295,7 +295,7 @@ class Blackletter:
         self.glyph_map['r'] = Glyph([m_r1, m_r2], fp)
 
         # s
-        sw = xm.width(fp)
+        sw = xm.bounding_box(fp).width
         m_s1 = (Mark(Stroke.down(xm.vec.y - xb2) + StrokeLine(Vector(sw, 0)) + Stroke.down() + f_f_footer)
                 .top_at(x, fp)
                 .extend_downstroke_to_set_bottom_at(2, b, fp)
@@ -322,7 +322,7 @@ class Blackletter:
         m_u2 = (Mark(Stroke.down())
                 .top_at(x, fp)
                 .extend_downstroke_to_set_bottom_at(0, m_u1.stroke_br(1, fp).y, fp)
-                .left_at(m_u1.right(fp), fp)
+                .left_at(m_u1.bounding_box(fp).right, fp)
                 )
         self.glyph_map['u'] = Glyph([m_u1, m_u2], fp)
 
@@ -334,7 +334,7 @@ class Blackletter:
         m_v2 = (Mark(Stroke.down() + f_dot)
                 .top_at(x, fp)
                 .extend_downstroke_to_set_bottom_at(0, b, fp)
-                .left_at(m_v1.right(fp), fp)
+                .left_at(m_v1.bounding_box(fp).right, fp)
                 )
         self.glyph_map['v'] = Glyph([m_v1, m_v2], fp)
 
@@ -343,11 +343,11 @@ class Blackletter:
         m_w2 = (Mark(Stroke.down() + f_dot)
                 .top_at(x, fp)
                 .extend_downstroke_to_set_bottom_at(0, b, fp)
-                .left_at(m_w1.right(fp), fp)
+                .left_at(m_w1.bounding_box(fp).right, fp)
                 )
         m_w3 = (Mark(Stroke.down()).top_at(x, fp)
                 .extend_downstroke_to_set_bottom_at(0, m_w2.stroke_br(1, fp).y, fp)
-                .left_at(m_w2.right(fp), fp)
+                .left_at(m_w2.bounding_box(fp).right, fp)
                 )
         m_w4 = (Mark(Stroke.right(), Vector(0, xb2))
                 .left_at(m_w1.stroke_tr(0, fp).x, fp)
@@ -359,7 +359,7 @@ class Blackletter:
         m_x1 = xm
         m_x2 = bp
         m_x3 = (m_u1
-                .left_at(m_w1.right(fp), fp)
+                .left_at(m_w1.bounding_box(fp).right, fp)
                 )
         m_x4 = (xm
                 .left_at(m_x3.stroke_tr(0, fp).x, fp)
@@ -370,12 +370,12 @@ class Blackletter:
         # y
         m_y1 = m_u1
         m_y2 = (m_j1
-                .left_at(m_y1.left(fp), fp)
+                .left_at(m_y1.bounding_box(fp).left, fp)
                 )
         self.glyph_map['y'] = Glyph([m_y1, m_y2], fp)
 
         # z
-        zw = xm.width(fp)
+        zw = xm.bounding_box(fp).width
         m_z1 = (Mark(Stroke.right(zw) + StrokeLine(Vector(-zw, -zw)) + Stroke.right(zw) + Stroke.down() + f_f_footer)
                 .top_at(x, fp)
                 .extend_downstroke_to_set_bottom_at(3, d, fp)
