@@ -4,6 +4,7 @@ from dataclasses import replace
 from typing import List
 
 from .bezier_stroke import BezierStroke
+from .bounding_box import BoundingBox
 from .compound_stroke import CompoundStroke
 from .font_parameters import FontParameters
 from .geometry_set import GeometrySet
@@ -116,7 +117,7 @@ class Mark:
                 prev_item = self.strokes[i - 1] if i > 0 else None
                 next_item = self.strokes[i + 1] if i < len(self.strokes) - 1 else None
 
-                if isinstance(curr_item, Stroke):
+                if isinstance(curr_item, Stroke | BezierStroke):
                     offset_pos = current_pos + nib.direction * (-0.5 * fp.pen_width + start_offset + 0.5 * width)
                     curr_item.geometry(fpt, offset_pos, scale, prev_item, next_item, geom_set)
                 elif idx == 0:
@@ -126,7 +127,17 @@ class Mark:
 
         return geom_set
 
-    def bounding_box(self, fp: FontParameters, start: Vector = Vector(0, 0), scale: float = 1.0):
+    def stroke_bounding_box(self, index: int, fp: FontParameters, start: Vector = Vector(0, 0), scale: float = 1.0) -> BoundingBox:
+        geom_set = GeometrySet()
+        start = start + self.stroke_start(index)
+
+        curr_item = self.strokes[index]
+        prev_item = self.strokes[index - 1] if index > 0 else None
+        next_item = self.strokes[index + 1] if index < len(self.strokes) - 1 else None
+        curr_item.geometry(fp, start, scale, prev_item, next_item, geom_set)
+        return geom_set.bounding_box()
+
+    def bounding_box(self, fp: FontParameters, start: Vector = Vector(0, 0), scale: float = 1.0) -> BoundingBox:
         geom = self.geometry(start, fp, scale)
         return geom.bounding_box()  # -> (bl, tr)
 

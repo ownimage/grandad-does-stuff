@@ -112,6 +112,8 @@ class BezierStroke(Strokeable):
 
         outline = VectorList.from_list_of_tuples(list(outline.exterior.coords))
         geom_set.replace_current_outline(outline)
+        geom_set.add_new_outline()
+        geom_set.add_new_hole()
         return start + self.bezier.p3 - self.bezier.p0
 
     def svg(self, start: Vector, fp: FontParameters, scale: float) -> str:
