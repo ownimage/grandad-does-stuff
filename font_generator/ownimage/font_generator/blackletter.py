@@ -57,16 +57,7 @@ class Blackletter:
         # A
         m_A1 = (
             Mark(
-                Stroke.down(a - t)
-                +
-                BezierStroke.from_four_points(
-                    Vector(0, x / 3),
-                    Vector(0, 0),
-                    Vector(-4 * pen_width, 0),
-                    Vector(-4 * pen_width, x / 3),  # end point
-                    num_samples=20,
-                    debug_visual=True
-                )
+                Stroke.down(a - t) + BezierStroke.from_four_points((0, x / 3), (0, 0), (-4 * pen_width, 0), (-4 * pen_width, x / 3)                                                                   )
             )
             .top_at(a - 2 * pen_width, fp)
             .extend_downstroke_to_set_bottom_at(0, b, fp)
@@ -91,10 +82,32 @@ class Blackletter:
         self.glyph_map['A'] = Glyph([m_A1, m_A2, m_A3, m_A4, m_A5], fp)
 
         # B
-        m_B2 = (Mark(BezierStroke.horizontal_flourish(6 * pen_width, pen_width / 2))
+        m_B1 = (Mark(BezierStroke.horizontal_flourish(2 * pen_width, pen_width / 2))
                 .top_at(a, fp)
                 )
-        self.glyph_map['B'] = Glyph([m_B2], fp)
+        m_B2 = (Mark(BezierStroke.horizontal_flourish(4 * pen_width, pen_width / 2))
+                .bottom_at(b, fp)
+                )
+        m_B3 = (Mark(Stroke.down())
+                .left_at(2 * f_dot.tr(fp).x, fp)
+                .start_at_bezier(fp, m_B1)
+                .extend_downstroke_to_bezier(0, fp, m_B2)
+                )
+        m_B4 = (Mark(BezierStroke.from_four_points((0, a), (4 * pen_width, a), (4 * pen_width, x), (0, x)))
+                .left_at(m_B3.bounding_box(fp).cx, fp)
+                .set_stroke_start(0, m_B1.stroke_end(0))
+                )
+        m_B5 = (Mark(BezierStroke.from_four_points((0, x), (4 * pen_width, x), (4 * pen_width, 0), (0, 0)))
+                .left_at(m_B3.bounding_box(fp).cx, fp)
+                .set_stroke_end(0, m_B2.stroke_end(0))
+                )
+        m_B6 = (Mark(f_v_dot_chain(3))
+                .top_at(x, fp)
+                .right_at(m_B3.bounding_box(fp).left, fp)
+                )
+        m_B6 = m_B6.down_by(m_B6.bounding_box(fp).cy - m_A3.stroke_bounding_box(0, fp).cy)
+        self.glyph_map['B'] = Glyph([m_B1, m_B2, m_B3, m_B4, m_B5, m_B6], fp)
+
         # a
         m_a1 = (Mark(Stroke.down() + f_dot)
                 .top_at(xm.stroke_tl(0, fp).y, fp)

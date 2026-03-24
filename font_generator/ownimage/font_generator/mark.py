@@ -28,7 +28,7 @@ class Mark:
         elif x is not None or y is not None:
             self.vec = Vector(x or 0, y or 0)
         else:
-            self.vec = None
+            self.vec = Vector(0, 0)
 
         # Normalise strokes to a flat list of Strokeable
         if isinstance(strokes, Strokeable):
@@ -40,9 +40,6 @@ class Mark:
         else:
             # Already a list/iterable of Strokeable
             self.strokes = list(strokes)
-
-        if self.vec is None:
-            self.vec = self.strokes[0].start()
 
     def __add__(self, v) -> Mark:
         return Mark(self.strokes, self.vec + v)
@@ -73,10 +70,8 @@ class Mark:
         return self.up_by(shift)
 
     def top_at_bezier(self, fp: FontParameters, mark: Mark, index: int = 0, start: Vector = Vector(0, 0), scale: float = 1.0):
-        beziers = [s for s in mark.strokes if isinstance(s, BezierStroke)]
-        bezier = beziers[0]
         current = self.top(fp, start, scale)
-        target = mark.vec.y + bezier.y_at_x(self.vec.x)[index]
+        target = mark.bezier_y_at_x(index, self.vec.x)
         shift = target - current
         return self.up_by(shift)
 
@@ -144,6 +139,28 @@ class Mark:
     def extend_downstroke_to_set_bottom_at(self, stroke, bottom, fp):
         return self.with_stroke(stroke, lambda s: s.extend(self.bounding_box(fp).bottom - bottom))
 
+    def set_stroke_end(self, i: int, end: Vector):
+        stroke = self.strokes[i]
+        if isinstance(stroke, BezierStroke):
+            return self.with_stroke(i, lambda s, vec=self.vec: replace(s, bezier=replace(s.bezier, p3=end - vec)))
+        raise TypeError(f"Not implemented for {stroke.__class__.__name__}")
+
+    def set_stroke_start(self, i: int, start: Vector):
+        stroke = self.strokes[i]
+        if isinstance(stroke, BezierStroke):
+            return self.with_stroke(i, lambda s, vec=self.vec: replace(s, bezier=replace(s.bezier, p0=start - vec)))
+        raise TypeError(f"Not implemented for {stroke.__class__.__name__}")
+
+    def extend_downstroke_to_bezier(self, stroke, fp: FontParameters, mark: Mark, bezier_index: int = 0):
+        current_end = self.stroke_end(stroke)
+        target = mark.bezier_y_at_x(bezier_index, current_end.x)
+        return self.with_stroke(stroke, lambda s: s.extend(current_end.y - target))
+
+    def bezier_y_at_x(self, i: int, x: float, crossing: int = 0) -> float:
+        beziers = [s for s in self.strokes if isinstance(s, BezierStroke)]
+        bezier = beziers[i]
+        return self.vec.y + bezier.y_at_x(x)[crossing]
+
     def extend_rightstroke_to_set_right_at(self, stroke, right, fp):
         delta = right - self.bounding_box(fp).right
         return self.with_stroke(stroke, lambda s: s.extend(Vector(delta, 0)))
@@ -181,8 +198,12 @@ class Mark:
     def stroke_start(self, i: int) -> Vector:
         start = self.vec
         for s in self.strokes[:i]:
-            start = start + s.vec
+            start = s.advance(start)
         return start
+
+    def stroke_end(self, i: int) -> Vector:
+        start = self.stroke_start(i)
+        return self.strokes[i].advance(start)
 
     def stroke_bl(self, i: int, fp: FontParameters) -> Vector:
         start = self.stroke_start(i)

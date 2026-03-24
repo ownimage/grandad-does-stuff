@@ -96,7 +96,7 @@ class BezierStroke(Strokeable):
         """
 
         def add_start_and_scale(pt: Vector) -> Vector:
-            return Stroke.add_start_and_scale(pt, start - self.bezier.p0, scale)
+            return Stroke.add_start_and_scale(pt, start, scale)
 
         points = self.bezier.sample_points(self.num_samples)
         nib = PenNib.from_font_parameters(fp)
@@ -114,7 +114,7 @@ class BezierStroke(Strokeable):
         geom_set.replace_current_outline(outline)
         geom_set.add_new_outline()
         geom_set.add_new_hole()
-        return start + self.bezier.p3 - self.bezier.p0
+        return start + self.bezier.p3
 
     def svg(self, start: Vector, fp: FontParameters, scale: float) -> str:
         p0 = (start + self.bezier.p0) * scale
