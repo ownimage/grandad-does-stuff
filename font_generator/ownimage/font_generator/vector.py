@@ -9,6 +9,10 @@ class Vector:
     y: float = 0.0
 
     @staticmethod
+    def zero() -> "Vector":
+        return Vector(0, 0)
+
+    @staticmethod
     def of(p) -> "Vector":
         if isinstance(p, Vector):
             return p

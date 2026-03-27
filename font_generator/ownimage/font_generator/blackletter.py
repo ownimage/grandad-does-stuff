@@ -1,4 +1,5 @@
 from .bezier_stroke import BezierStroke
+from .circle_stroke import CircleStroke
 from .compound_stroke import CompoundStroke
 from .font_parameters import FontParameters
 from .glyph import Glyph
@@ -108,6 +109,9 @@ class Blackletter:
         m_B6 = m_B6.down_by(m_B6.bounding_box(fp).cy - m_A3.stroke_bounding_box(0, fp).cy)
         self.glyph_map['B'] = Glyph([m_B1, m_B2, m_B3, m_B4, m_B5, m_B6], fp)
 
+        # C
+        m_C1 = (Mark(CircleStroke(Vector(x, x), x, 45, 315)))
+        self.glyph_map['C'] = Glyph([m_C1], fp)
         # a
         m_a1 = (Mark(Stroke.down() + f_dot)
                 .top_at(xm.stroke_tl(0, fp).y, fp)
