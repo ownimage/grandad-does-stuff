@@ -7,6 +7,7 @@ from typing import List, Tuple
 import numpy as np
 
 from .vector import Vector
+from .vector_list import VectorList
 
 
 def _solve_cubic(a: float, b: float, c: float, d: float) -> List[float]:

@@ -83,38 +83,14 @@ class BezierStroke(Strokeable):
             debug_visual
         )
 
+    def sample_points(self, num_samples: int) -> VectorList:
+        return self.bezier.sample_points(num_samples)
+
     def y_at_x(self, x : float):
         return self.bezier.y_at_x(x)
 
     def start(self) -> Vector:
         return self.bezier.p0
-
-    def geometry(self, fp: FontParameters, start: Vector, scale: float, before: Strokeable, after: Strokeable, geom_set: GeometrySet) -> Vector:
-        """
-        Generate geometry by interpolating the nib along the curve
-        and approximating it with short PenStroke segments.
-        """
-
-        def add_start_and_scale(pt: Vector) -> Vector:
-            return Stroke.add_start_and_scale(pt, start, scale)
-
-        points = self.bezier.sample_points(self.num_samples)
-        nib = PenNib.from_font_parameters(fp)
-        geom_set.add_new_outline()
-        outline = None
-
-        for i in range(len(points) - 1):
-            n1 = nib.at(points[i])
-            n2 = nib.at(points[i + 1])
-            p = [add_start_and_scale(p).xy() for p in n1.corners() + n2.corners()]
-            h = MultiPoint(p).convex_hull
-            outline = unary_union([outline, h])
-
-        outline = VectorList.from_list_of_tuples(list(outline.exterior.coords))
-        geom_set.replace_current_outline(outline)
-        geom_set.add_new_outline()
-        geom_set.add_new_hole()
-        return start + self.bezier.p3
 
     def svg(self, start: Vector, fp: FontParameters, scale: float) -> str:
         p0 = (start + self.bezier.p0) * scale
@@ -131,4 +107,4 @@ class BezierStroke(Strokeable):
         return (p0, f"C {p1.x},{p1.y} {p2.x},{p2.y} {p3.x},{p3.y}")
 
     def advance(self, pos: Vector) -> Vector:
-        return pos + self.bezier.p3 - self.bezier.p0
+        return pos + self.bezier.p3

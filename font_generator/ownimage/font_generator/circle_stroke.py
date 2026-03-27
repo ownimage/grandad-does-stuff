@@ -35,33 +35,6 @@ class CircleStroke(Strokeable):
         if self.to_angle < self.from_angle:
             raise ValueError(f"to_angle must be greater than or equal to from_angle, got from_angle={self.from_angle}, to_angle={self.to_angle}")
 
-    def geometry(self, fp: FontParameters, start: Vector, scale: float, before: Strokeable, after: Strokeable, geom_set: GeometrySet) -> Vector:
-        """
-        Generate geometry by interpolating the nib along the curve
-        and approximating it with short PenStroke segments.
-        """
-
-        def add_start_and_scale(pt: Vector) -> Vector:
-            return Stroke.add_start_and_scale(pt, start, scale)
-
-        points = self.sample_points(20) # TODO
-        nib = PenNib.from_font_parameters(fp)
-        geom_set.add_new_outline()
-        outline = None
-
-        for i in range(len(points) - 1):
-            n1 = nib.at(points[i])
-            n2 = nib.at(points[i + 1])
-            p = [add_start_and_scale(p).xy() for p in n1.corners() + n2.corners()]
-            h = MultiPoint(p).convex_hull
-            outline = unary_union([outline, h])
-
-        outline = VectorList.from_list_of_tuples(list(outline.exterior.coords))
-        geom_set.replace_current_outline(outline)
-        geom_set.add_new_outline()
-        geom_set.add_new_hole()
-        return start # TODO
-
     def advance(self, pos: Vector) -> Vector:
         return  pos + self.offset + self.centre + Vector(self.radius, 0).rotated(self.to_angle)
 
