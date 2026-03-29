@@ -113,7 +113,7 @@ class Mark:
                 prev_item = self.strokes[i - 1] if i > 0 else None
                 next_item = self.strokes[i + 1] if i < len(self.strokes) - 1 else None
 
-                if isinstance(curr_item, Stroke | BezierStroke | CircleStroke): # TODO
+                if isinstance(curr_item, Strokeable):
                     offset_pos = current_pos + nib.direction * (-0.5 * fp.pen_width + start_offset + 0.5 * width)
                     curr_item.geometry(fpt, offset_pos, scale, prev_item, next_item, geom_set)
                 elif idx == 0:
