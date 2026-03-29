@@ -13,39 +13,39 @@ from .vector import Vector
 from .vector_math import VectorMath as VM
 
 
-class StrokeLine(Strokeable):
+class LineStroke(Strokeable):
 
     def __init__(self, vec: Vector):
         super().__init__(StrokeType.Line)
         self.vec = vec
 
     @staticmethod
-    def from_xy(x: float, y: float) -> StrokeLine:
-        return StrokeLine(Vector(x, y))
+    def from_xy(x: float, y: float) -> LineStroke:
+        return LineStroke(Vector(x, y))
 
     @staticmethod
-    def between(start: Vector, end: Vector) -> StrokeLine:
-        return StrokeLine(start - end)
+    def between(start: Vector, end: Vector) -> LineStroke:
+        return LineStroke(start - end)
 
     @staticmethod
-    def right(length: float) -> StrokeLine:
-        return StrokeLine(Vector(length, 0))
+    def right(length: float) -> LineStroke:
+        return LineStroke(Vector(length, 0))
 
     @staticmethod
-    def down(length: float) -> StrokeLine:
-        return StrokeLine(Vector(0, -length))
+    def down(length: float) -> LineStroke:
+        return LineStroke(Vector(0, -length))
 
-    def extend(self, e: Union[Stroke, Vector, float]) -> StrokeLine:
+    def extend(self, e: Union[Stroke, Vector, float]) -> LineStroke:
         if isinstance(e, Stroke):
             if e.stroke_type == StrokeType.Extend:
-                return StrokeLine(self.vec + e.vec)
+                return LineStroke(self.vec + e.vec)
             raise RuntimeError("Can only extend by a Stroke of type Extend.")
 
         if isinstance(e, Vector):
-            return StrokeLine(self.vec + e)
+            return LineStroke(self.vec + e)
 
         if isinstance(e, float):
-            return StrokeLine(self.vec + e * self.vec.normalized())
+            return LineStroke(self.vec + e * self.vec.normalized())
 
         raise RuntimeError(f"Extension type of {type(e)}.")
 

@@ -22,12 +22,12 @@ class Stroke(Strokeable):
         direction = self.vec.normalized()
         object.__setattr__(self, "direction", direction)
 
-    def __add__(self, other: Union[Stroke, 'StrokeLine', 'BezierStroke', 'CompoundStroke']) -> 'CompoundStroke':
+    def __add__(self, other: Union[Stroke, 'LineStroke', 'BezierStroke', 'CompoundStroke']) -> 'CompoundStroke':
         from .bezier_stroke import BezierStroke
         from .compound_stroke import CompoundStroke
-        from .stroke_line import StrokeLine
+        from .line_stroke import LineStroke
 
-        if isinstance(other, (Stroke, StrokeLine, BezierStroke)):
+        if isinstance(other, (Stroke, LineStroke, BezierStroke)):
             return CompoundStroke([self, other])
 
         if isinstance(other, CompoundStroke):
