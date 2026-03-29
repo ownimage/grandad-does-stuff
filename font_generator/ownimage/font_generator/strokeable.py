@@ -13,8 +13,9 @@ from .vector_list import VectorList
 
 class Strokeable:
 
-    def __init__(self, stroke_type: StrokeType = StrokeType.Block):
+    def __init__(self, stroke_type: StrokeType = StrokeType.Block, num_samples: int = 20):
         self.stroke_type = stroke_type
+        self.num_samples = num_samples
 
     def _not_implemented(self, name: str) -> None:
         raise RuntimeError(f"{name}() not implemented in {self.__class__.__name__}")
@@ -22,19 +23,9 @@ class Strokeable:
     def start(self) -> Vector:
         return Vector(0, 0)
 
-    def geometry(self, fp: FontParameters, start: Vector, scale: float, before: 'Strokeable', after: 'Strokeable', geom_set: GeometrySet) -> Vector:
-        self._not_implemented("geometry")
-
-    def bounding_box(self, fp: FontParameters, start: Vector = Vector(0, 0), scale: float = 1.0, before: 'Strokeable' = None, after: 'Strokeable' = None):
-        geom_set = GeometrySet()
-        self.geometry(fp, start, scale, before, after, geom_set)
-        return geom_set.bounding_box()
-
-    def svg(self, start: Vector, fp: FontParameters, scale: float) -> str:
-        self._not_implemented("svg")
-
-    def birdfont_path(self, start: Vector, fp: FontParameters, scale: float) -> list:
-        self._not_implemented("birdfont_path")
+    def sample_points(self, num_samples: int = 20) -> list[Vector]:
+        self._not_implemented("sample_points")
+        return None
 
     def geometry(self, fp: FontParameters, start: Vector, scale: float, before: 'Strokeable', after: 'Strokeable', geom_set: GeometrySet) -> Vector:
         """
@@ -47,7 +38,7 @@ class Strokeable:
             from .stroke import Stroke  
             return Stroke.add_start_and_scale(pt, start, scale)
 
-        points = self.sample_points(20)  # TODO
+        points = self.sample_points(self.num_samples)
         nib = PenNib.from_font_parameters(fp)
         geom_set.add_new_outline()
         outline = None

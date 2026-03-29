@@ -1,19 +1,27 @@
 import math
-from dataclasses import dataclass, field
+from dataclasses import field
 
+from .stroke_type import StrokeType
 from .strokeable import Strokeable
 from .vector import Vector
 
 
-@dataclass(frozen=True)
 class CircleStroke(Strokeable):
-    """Immutable circle stroke representation."""
 
-    centre: Vector
-    radius: float
-    from_angle: float = 0
-    to_angle: float = 360
-    offset: Vector = field(default_factory=Vector.zero)
+    def __init__(self, centre: Vector,
+                 radius: float,
+                 from_angle: float = 0,
+                 to_angle: float = 360,
+                 offset: Vector =Vector.zero(),
+                 stroke_type: StrokeType = StrokeType.Block,
+                 num_samples: int = 20
+                 ):
+        super().__init__(stroke_type, num_samples)
+        self.centre = centre
+        self.radius = radius
+        self.from_angle = from_angle
+        self.to_angle = to_angle
+        self.offset = offset
 
     def __post_init__(self):
         # Validate that angles are in range [0, 360]
@@ -29,18 +37,13 @@ class CircleStroke(Strokeable):
     def advance(self, pos: Vector) -> Vector:
         return pos + self.offset + self.centre + Vector(self.radius, 0).rotated(self.to_angle)
 
-    def sample_points(self, num_samples: int = 20) -> list[Vector]:
-        """Sample points along the circle stroke at evenly spaced angle values.
-        
-        Args:
-            num_samples: Number of sample points to generate
-            
-        Returns:
-            List of vectors representing points on the circle stroke
-        """
+    def sample_points(self, num_samples: int = None) -> list[Vector]:
+        # Use the base class's num_samples if not provided
+        actual_num_samples = num_samples if num_samples is not None else self.num_samples
+
         # Ensure we have at least 2 points (start and end)
-        if num_samples < 2:
-            num_samples = 2
+        if actual_num_samples < 2:
+            actual_num_samples = 2
 
         # Handle case where from_angle equals to_angle
         if self.from_angle == self.to_angle:
@@ -59,9 +62,9 @@ class CircleStroke(Strokeable):
 
         # Generate points at evenly spaced angles
         points = []
-        for i in range(num_samples):
+        for i in range(actual_num_samples):
             # Calculate the current angle
-            t = i / (num_samples - 1) if num_samples > 1 else 0
+            t = i / (actual_num_samples - 1) if actual_num_samples > 1 else 0
             current_angle = self.from_angle + t * angle_diff
 
             # Convert to radians
