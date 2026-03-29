@@ -58,7 +58,7 @@ class MainWindow(QMainWindow):
         pen_stroke_row = QHBoxLayout()
         pen_stroke_row.addWidget(QLabel("Pen Stroke:"))
         self.pen_stroke_combo = QComboBox()
-        self.pen_stroke_combo.addItems(["black", "half_and_two_quarters"])
+        self.pen_stroke_combo.addItems(["black", "half_and_two_quarters", "four_lines"])
         self.pen_stroke_combo.currentTextChanged.connect(self.update_svg)
         pen_stroke_row.addWidget(self.pen_stroke_combo)
         pen_stroke_row.addStretch()
@@ -140,6 +140,12 @@ class MainWindow(QMainWindow):
                 (0, width / 2),
                 ((5 / 8) * width, width / 8),
                 ((7 / 8) * width, width / 8)
+            ],
+            "four_lines": [
+                (0, width / 7),
+                ((2 / 7) * width, width / 7),
+                ((4 / 7) * width, width / 7),
+                ((6 / 7) * width, width / 7)
             ]
         }
 
