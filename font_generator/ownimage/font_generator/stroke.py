@@ -1,12 +1,10 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Union
+from typing import Union, List
 
 from .font_parameters import FontParameters
-from .geometry_set import GeometrySet
 from .pen_nib import PenNib
-from .pen_stroke import PenStroke
 from .stroke_type import StrokeType
 from .strokeable import Strokeable
 from .vector import Vector
@@ -17,6 +15,7 @@ class Stroke(Strokeable):
     vec: Vector
     stroke_type: StrokeType = StrokeType.Block
     direction: Vector = field(init=False)
+    num_samples: int = 2
 
     def __post_init__(self):
         direction = self.vec.normalized()
@@ -25,9 +24,8 @@ class Stroke(Strokeable):
     def __add__(self, other: Union[Stroke, 'LineStroke', 'BezierStroke', 'CompoundStroke']) -> 'CompoundStroke':
         from .bezier_stroke import BezierStroke
         from .compound_stroke import CompoundStroke
-        from .line_stroke import LineStroke
 
-        if isinstance(other, (Stroke, LineStroke, BezierStroke)):
+        if isinstance(other, (Stroke, BezierStroke)):
             return CompoundStroke([self, other])
 
         if isinstance(other, CompoundStroke):
@@ -69,14 +67,12 @@ class Stroke(Strokeable):
 
         raise RuntimeError(f"Extension type of {type(e)}.")
 
-    def geometry(self, fp: FontParameters, start: Vector, scale: float, before: 'Strokeable', after: 'Strokeable', geom_set: GeometrySet) -> Vector:
-        if self.stroke_type == StrokeType.Block or self.stroke_type == StrokeType.Line:
-            start_nib = PenNib.from_font_parameters(fp)
-            end_nib = start_nib.move(self.vec)
-            pen_stroke = PenStroke(start_nib, end_nib)
-            pen_stroke.geometry(start, scale, before, after, geom_set)
-
-        return start + self.vec
+    def sample_points(self, num_samples: int = 20) -> List[Vector]:
+        points = []
+        for i in range(num_samples):
+            t = i / (num_samples - 1)
+            points.append(self.vec * t)
+        return points
 
     def bl(self, fp: FontParameters) -> Vector:
         nib = PenNib.from_font_parameters(fp)

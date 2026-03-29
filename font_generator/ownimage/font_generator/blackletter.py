@@ -6,7 +6,6 @@ from .glyph import Glyph
 from .mark import Mark
 from .pen_nib import PenNib
 from .stroke import Stroke
-from .line_stroke import LineStroke
 from .stroke_type import StrokeType
 from .vector import Vector
 
@@ -58,7 +57,7 @@ class Blackletter:
         # A
         m_A1 = (
             Mark(
-                Stroke.down(a - t) + BezierStroke.from_four_points((0, x / 3), (0, 0), (-4 * pen_width, 0), (-4 * pen_width, x / 3)                                                                   )
+                Stroke.down(a - t) + BezierStroke.from_four_points((0, x / 3), (0, 0), (-4 * pen_width, 0), (-4 * pen_width, x / 3))
             )
             .top_at(a - 2 * pen_width, fp)
             .extend_downstroke_to_set_bottom_at(0, b, fp)
@@ -137,7 +136,7 @@ class Blackletter:
         self.glyph_map['b'] = Glyph([m_b1, m_b2], fp)
 
         # c
-        s_c1 = Stroke(nib.direction * pen_width / 2, StrokeType.Move) + LineStroke(nib.direction * pen_width)
+        s_c1 = Stroke(nib.direction * pen_width / 2, StrokeType.Move) + Stroke(nib.direction * pen_width, stroke_type=StrokeType.Line)
         m_c1 = (Mark(Stroke.down() + f_dot + s_c1)
                 .top_at(xm.stroke_tl(0, fp).y, fp)
                 .extend_downstroke_to_set_bottom_at(0, b, fp)
@@ -159,12 +158,12 @@ class Blackletter:
         self.glyph_map['d'] = Glyph([m_d1, m_d2], fp)
 
         # e
-        s_e1 = Stroke(nib.direction * pen_width / 2, StrokeType.Move) + LineStroke(nib.direction * pen_width)
+        s_e1 = Stroke(nib.direction * pen_width / 2, StrokeType.Move) + Stroke(nib.direction * pen_width, stroke_type=StrokeType.Line)
         m_e1 = (Mark(Stroke.down() + f_dot + s_e1)
                 .top_at(xm.stroke_tl(0, fp).y, fp)
                 .extend_downstroke_to_set_bottom_at(0, b, fp)
                 )
-        m_e2 = (Mark(f_dot + Stroke(nib.direction * -pen_width / 2, StrokeType.Move) + LineStroke(nib.direction * -pen_width))
+        m_e2 = (Mark(f_dot + Stroke(nib.direction * -pen_width / 2, StrokeType.Move) + Stroke(nib.direction * -pen_width, stroke_type=StrokeType.Line))
                 .top_at(x, fp)
                 .left_at(m_a1.stroke_tr(0, fp).x, fp)
                 )
@@ -314,7 +313,7 @@ class Blackletter:
 
         # s
         sw = xm.bounding_box(fp).width
-        m_s1 = (Mark(Stroke.down(xm.vec.y - xb2) + LineStroke(Vector(sw, 0)) + Stroke.down() + f_f_footer)
+        m_s1 = (Mark(Stroke.down(xm.vec.y - xb2) + Stroke(Vector(sw, 0), stroke_type=StrokeType.Line) + Stroke.down() + f_f_footer)
                 .top_at(x, fp)
                 .extend_downstroke_to_set_bottom_at(2, b, fp)
                 )
@@ -394,7 +393,7 @@ class Blackletter:
 
         # z
         zw = xm.bounding_box(fp).width
-        m_z1 = (Mark(Stroke.right(zw) + LineStroke(Vector(-zw, -zw)) + Stroke.right(zw) + Stroke.down() + f_f_footer)
+        m_z1 = (Mark(Stroke.right(zw) + Stroke(Vector(-zw, -zw), stroke_type=StrokeType.Line) + Stroke.right(zw) + Stroke.down() + f_f_footer)
                 .top_at(x, fp)
                 .extend_downstroke_to_set_bottom_at(3, d, fp)
                 )

@@ -77,7 +77,7 @@ class BezierStroke(Strokeable):
             debug_visual
         )
 
-    def sample_points(self, start: Vector, num_samples: int = 20) -> list[Vector]:
+    def sample_points(self, num_samples: int = 20) -> list[Vector]:
         return self.bezier.sample_points(num_samples)
 
     def y_at_x(self, x: float):

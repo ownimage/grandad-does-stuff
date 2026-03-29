@@ -37,7 +37,7 @@ class CircleStroke(Strokeable):
     def advance(self, pos: Vector) -> Vector:
         return pos + self.offset + self.centre + Vector(self.radius, 0).rotated(self.to_angle)
 
-    def sample_points(self, start : Vector, num_samples: int = None) -> list[Vector]:
+    def sample_points(self, num_samples: int = 20) -> list[Vector]:
         # Use the base class's num_samples if not provided
         actual_num_samples = num_samples if num_samples is not None else self.num_samples
 
