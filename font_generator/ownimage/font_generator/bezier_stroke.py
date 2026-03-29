@@ -3,14 +3,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Union, Tuple
 
-from shapely.geometry.multipoint import MultiPoint
-from shapely.ops import unary_union
-
 from .cubic_bezier import CubicBezier
 from .font_parameters import FontParameters
-from .geometry_set import GeometrySet
-from .pen_nib import PenNib
-from .stroke import Stroke
 from .stroke_type import StrokeType
 from .strokeable import Strokeable
 from .vector import Vector
@@ -86,7 +80,7 @@ class BezierStroke(Strokeable):
     def sample_points(self, num_samples: int) -> VectorList:
         return self.bezier.sample_points(num_samples)
 
-    def y_at_x(self, x : float):
+    def y_at_x(self, x: float):
         return self.bezier.y_at_x(x)
 
     def start(self) -> Vector:
