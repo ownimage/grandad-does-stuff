@@ -23,22 +23,17 @@ class Strokeable:
     def start(self) -> Vector:
         return Vector(0, 0)
 
-    def sample_points(self, num_samples: int = 20) -> list[Vector]:
+    def sample_points(self, start: Vector, num_samples: int = 20) -> list[Vector]:
         self._not_implemented("sample_points")
         return None
 
     def geometry(self, fp: FontParameters, start: Vector, scale: float, before: 'Strokeable', after: 'Strokeable', geom_set: GeometrySet) -> Vector:
-        """
-        Generate geometry by interpolating the nib along the curve
-        and approximating it with short PenStroke segments.
-        """
-
         def add_start_and_scale(pt: Vector) -> Vector:
             # Import Stroke here to avoid circular import issues
             from .stroke import Stroke  
             return Stroke.add_start_and_scale(pt, start, scale)
 
-        points = self.sample_points(self.num_samples)
+        points = self.sample_points(start, self.num_samples)
         nib = PenNib.from_font_parameters(fp)
         geom_set.add_new_outline()
         outline = None

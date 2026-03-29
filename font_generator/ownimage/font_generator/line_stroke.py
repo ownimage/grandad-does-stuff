@@ -1,16 +1,11 @@
 from __future__ import annotations
 
-import math
-from typing import Union
+from typing import Union, List
 
-from .compound_stroke import CompoundStroke
-from .font_parameters import FontParameters
-from .geometry_set import GeometrySet
 from .stroke import Stroke
 from .stroke_type import StrokeType
 from .strokeable import Strokeable
 from .vector import Vector
-from .vector_math import VectorMath as VM
 
 
 class LineStroke(Strokeable):
@@ -49,14 +44,9 @@ class LineStroke(Strokeable):
 
         raise RuntimeError(f"Extension type of {type(e)}.")
 
-    def geometry(self, fp: FontParameters, start: Vector, scale: float, before: Strokeable, after: Strokeable, geom_set: GeometrySet) -> Vector:
-        unit = self.vec.normalized()
-        offset = unit.rotated(90) * fp.pen_thickness * scale
-        p1 = start * scale + offset * 0.5
-        p2 = (start + self.vec) * scale + offset * 0.5
-        p3 = p2 - offset
-        p4 = p1 - offset
-        geom_set.replace_current_outline([p3, p4, p1, p2])
-        geom_set.add_new_outline()
-        geom_set.add_new_hole()
-        return start + self.vec
+    def sample_points(self, start: Vector, num_samples: int = 20) -> List[Vector]:
+        points = []
+        for i in range(num_samples):
+            t = i / (num_samples - 1)
+            points.append(start + self.vec * t)
+        return points
