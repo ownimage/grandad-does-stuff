@@ -5,7 +5,7 @@ from shapely.ops import unary_union
 
 from .font_parameters import FontParameters
 from .geometry_set import GeometrySet
-from .pen_nib import PenNib
+from .nib import Nib
 from .stroke_type import StrokeType
 from .vector import Vector
 from .vector_list import VectorList
@@ -34,14 +34,14 @@ class Strokeable:
             return Stroke.add_start_and_scale(pt, start, scale)
 
         points = self.sample_points(self.num_samples)
-        nib = PenNib.from_font_parameters(fp)
+        nib = Nib.from_font_parameters(fp)
         geom_set.add_new_outline()
         outline = None
 
         for i in range(len(points) - 1):
             n1 = nib.at(points[i])
             n2 = nib.at(points[i + 1])
-            p = [add_start_and_scale(p).xy() for p in n1.corners() + n2.corners()]
+            p = [add_start_and_scale(p).xy() for p in n1.outline() + n2.outline()]
             h = MultiPoint(p).convex_hull
             outline = unary_union([outline, h])
 

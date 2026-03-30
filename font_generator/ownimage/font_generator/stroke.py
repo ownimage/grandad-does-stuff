@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 from typing import Union, List
 
 from .font_parameters import FontParameters
-from .pen_nib import PenNib
+from .nib import Nib
 from .stroke_type import StrokeType
 from .strokeable import Strokeable
 from .vector import Vector
@@ -75,19 +75,19 @@ class Stroke(Strokeable):
         return points
 
     def bl(self, fp: FontParameters) -> Vector:
-        nib = PenNib.from_font_parameters(fp)
+        nib = Nib.from_font_parameters(fp)
         return self.vec + nib.bl
 
     def tr(self, fp: FontParameters) -> Vector:
-        nib = PenNib.from_font_parameters(fp)
+        nib = Nib.from_font_parameters(fp)
         return nib.tr
 
     def tl(self, fp: FontParameters) -> Vector:
-        nib = PenNib.from_font_parameters(fp)
+        nib = Nib.from_font_parameters(fp)
         return nib.tl
 
     def br(self, fp: FontParameters) -> Vector:
-        nib = PenNib.from_font_parameters(fp)
+        nib = Nib.from_font_parameters(fp)
         return self.vec + nib.br
 
     def make_width(self, width: float, fp: FontParameters) -> Stroke:

@@ -4,7 +4,7 @@ from .compound_stroke import CompoundStroke
 from .font_parameters import FontParameters
 from .glyph import Glyph
 from .mark import Mark
-from .pen_nib import PenNib
+from .nib import Nib
 from .stroke import Stroke
 from .stroke_type import StrokeType
 from .vector import Vector
@@ -23,7 +23,7 @@ class Blackletter:
         b = fp.baseline
         d = fp.descender
 
-        nib = PenNib.from_font_parameters(fp)
+        nib = Nib.from_font_parameters(fp)
         f_dot = Stroke(nib.normal * (pen_thickness - pen_width))
 
         def f_v_dot_chain(n: int):
