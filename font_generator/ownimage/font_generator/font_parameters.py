@@ -3,6 +3,7 @@ from dataclasses import dataclass
 
 @dataclass(frozen=True)
 class FontParameters:
+    nib_type: str
     pen_width: float
     pen_thickness: float
     pen_angle: float

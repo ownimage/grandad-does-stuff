@@ -112,6 +112,7 @@ class MainWindow(QMainWindow):
     def get_font_parameters(self):
         width = self._width()
         return FontParameters(
+            nib_type="Circle",
             pen_width=width,
             pen_thickness=self._thickness(),
             pen_angle=self.pen_angle.value() / 2,

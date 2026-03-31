@@ -10,6 +10,7 @@ from .compound_stroke import CompoundStroke
 from .font_parameters import FontParameters
 from .geometry_set import GeometrySet
 from .nib import Nib
+from .pen_nib import PenNib
 from .stroke import Stroke, Strokeable
 from .vector import Vector
 
@@ -100,12 +101,12 @@ class Mark:
         return self.right_by(shift)
 
     def geometry(self, start: Vector, fp: FontParameters, scale: float = 1) -> GeometrySet:
-        nib = Nib.from_font_parameters(fp)
+        nib = PenNib.from_font_parameters(fp)
         start = start + self.vec
         geom_set = GeometrySet()
 
         for idx, (start_offset, width) in enumerate(fp.pen_stroke):
-            fpt = replace(fp, pen_width=width)
+            fpt = replace(fp, pen_width=width, nib_type="Circle")
             current_pos = start
 
             for i in range(len(self.strokes)):

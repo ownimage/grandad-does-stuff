@@ -1,3 +1,5 @@
+from dataclasses import replace
+
 from .bezier_stroke import BezierStroke
 from .circle_stroke import CircleStroke
 from .compound_stroke import CompoundStroke
@@ -13,6 +15,7 @@ from .vector import Vector
 class Blackletter:
     def __init__(self, fp: FontParameters):
         self.fp = fp
+        fp = replace(fp, nib_type="Pen")
 
         # calculated values
         pen_width = fp.pen_width
@@ -76,7 +79,7 @@ class Blackletter:
         m_A4 = m_A4.down_by(m_A4.bounding_box(fp).cy - m_A3.stroke_bounding_box(0, fp).cy)
         m_A5 = (Mark(Stroke.down() + f_i_footer)
                 .left_by(f_dot.tl(fp).x - m_A3.bounding_box(fp).right)
-                .start_at_bezier(fp, m_A2)
+                # .start_at_bezier(fp, m_A2)
                 .extend_downstroke_to_set_bottom_at(0, b, fp)
                 )
         self.glyph_map['A'] = Glyph([m_A1, m_A2, m_A3, m_A4, m_A5], fp)

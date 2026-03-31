@@ -1,11 +1,13 @@
 from dataclasses import dataclass, field
 from math import cos, sin, radians
 
+from .font_parameters import FontParameters
+from .nib import Nib
 from .vector import Vector
 
 
 @dataclass(frozen=True)
-class PenNib:
+class PenNib(Nib):
     width: float
     thickness: float
     angle: float  # degrees, 0° = horizontal
@@ -25,6 +27,10 @@ class PenNib:
         nx = -dy
         ny = dx
         object.__setattr__(self, "normal", Vector(nx, ny).normalized())
+
+    @staticmethod
+    def from_font_parameters(fp: FontParameters) -> "PenNib":
+        return PenNib(fp.pen_width, fp.pen_thickness, fp.pen_angle)
 
     def at(self, pos: Vector) -> "PenNib":
         return PenNib(
