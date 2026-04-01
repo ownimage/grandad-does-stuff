@@ -33,22 +33,23 @@ class Strokeable:
             from .stroke import Stroke  
             return Stroke.add_start_and_scale(pt, start, scale)
 
-        points = self.sample_points(self.num_samples)
-        nib = Nib.from_font_parameters(fp)
-        geom_set.add_new_outline()
-        outline = None
+        if self.stroke_type not in {StrokeType.Move, StrokeType.Extend}:
+            points = self.sample_points(self.num_samples)
+            nib = Nib.from_font_parameters(fp)
+            geom_set.add_new_outline()
+            outline = None
 
-        for i in range(len(points) - 1):
-            n1 = nib.at(points[i])
-            n2 = nib.at(points[i + 1])
-            p = [add_start_and_scale(p).xy() for p in n1.outline() + n2.outline()]
-            h = MultiPoint(p).convex_hull
-            outline = unary_union([outline, h])
+            for i in range(len(points) - 1):
+                n1 = nib.at(points[i])
+                n2 = nib.at(points[i + 1])
+                p = [add_start_and_scale(p).xy() for p in n1.outline() + n2.outline()]
+                h = MultiPoint(p).convex_hull
+                outline = unary_union([outline, h])
 
-        outline = VectorList.from_list_of_tuples(list(outline.exterior.coords))
-        geom_set.replace_current_outline(outline)
-        geom_set.add_new_outline()
-        geom_set.add_new_hole()
+            outline = VectorList.from_list_of_tuples(list(outline.exterior.coords))
+            geom_set.replace_current_outline(outline)
+            geom_set.add_new_outline()
+            geom_set.add_new_hole()
         return self.advance(start)
 
     def advance(self, pos: Vector) -> Vector:
