@@ -7,6 +7,7 @@ from .font_parameters import FontParameters
 from .glyph import Glyph
 from .mark import Mark
 from .nib import Nib
+from .nib_type import NibType
 from .stroke import Stroke
 from .stroke_type import StrokeType
 from .vector import Vector
@@ -15,7 +16,7 @@ from .vector import Vector
 class Blackletter:
     def __init__(self, fp: FontParameters):
         self.fp = fp
-        fp = replace(fp, nib_type="Pen")
+        fp = replace(fp, nib_type=NibType.Pen)
 
         # calculated values
         pen_width = fp.pen_width

@@ -106,7 +106,7 @@ class Mark:
         geom_set = GeometrySet()
 
         for idx, (start_offset, width) in enumerate(fp.pen_stroke):
-            fpt = replace(fp, pen_width=width, nib_type="Circle")
+            fpt = replace(fp, pen_width=width)
             current_pos = start
 
             for i in range(len(self.strokes)):

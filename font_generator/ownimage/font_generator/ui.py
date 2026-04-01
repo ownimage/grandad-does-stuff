@@ -9,6 +9,7 @@ from PySide6.QtWidgets import (
 from .birdfont_reader import BirdfontReader
 from .blackletter import Blackletter
 from .font_parameters import FontParameters
+from .nib_type import NibType
 from .vector import Vector
 
 
@@ -55,10 +56,19 @@ class MainWindow(QMainWindow):
         self.pen_thickness = self.create_slider(panel_pen, 0, 100, 10, "Pen Thickness")
         self.pen_angle = self.create_slider(panel_pen, 0, 180, 90, "Pen Angle")
 
+        pen_type_row = QHBoxLayout()
+        pen_type_row.addWidget(QLabel("Pen Type:"))
+        self.pen_type_combo = QComboBox()
+        self.pen_type_combo.addItems([n.value for n in NibType])
+        self.pen_type_combo.currentTextChanged.connect(self.update_svg)
+        pen_type_row.addWidget(self.pen_type_combo)
+        pen_type_row.addStretch()
+        panel_pen.addLayout(pen_type_row)
+
         pen_stroke_row = QHBoxLayout()
         pen_stroke_row.addWidget(QLabel("Pen Stroke:"))
         self.pen_stroke_combo = QComboBox()
-        self.pen_stroke_combo.addItems(["black", "half_and_two_quarters", "four_lines"])
+        self.pen_stroke_combo.addItems(list(self._pen_stroke_options().keys()))
         self.pen_stroke_combo.currentTextChanged.connect(self.update_svg)
         pen_stroke_row.addWidget(self.pen_stroke_combo)
         pen_stroke_row.addStretch()
@@ -112,7 +122,7 @@ class MainWindow(QMainWindow):
     def get_font_parameters(self):
         width = self._width()
         return FontParameters(
-            nib_type="Pen",
+            nib_type=NibType.of(self.pen_type_combo.currentText()),
             pen_width=width,
             pen_thickness=self._thickness(),
             pen_angle=self.pen_angle.value() / 2,
