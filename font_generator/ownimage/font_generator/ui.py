@@ -44,6 +44,8 @@ class MainWindow(QMainWindow):
         panel_general.addLayout(filled_row)
 
         self.scale = self.create_slider(panel_general, 10, 400, 40, "Scale")
+        self.bezier_samples = self.create_slider(panel_general, 3, 50, 20, "Bezier Samples")
+        self.circle_samples = self.create_slider(panel_general, 3, 50, 20, "Circle Samples")
 
         general_widget = QWidget()
         general_widget.setLayout(panel_general)
@@ -133,7 +135,9 @@ class MainWindow(QMainWindow):
             baseline=0,
             descender=-self.descender.value() / 100,
             padding=self.padding.value() * width / 100,
-            pen_stroke=self._pen_stroke()
+            pen_stroke=self._pen_stroke(),
+            bezier_samples=self.bezier_samples.value(),
+            circle_samples = self.circle_samples.value()
         )
 
     def _width(self) -> float:

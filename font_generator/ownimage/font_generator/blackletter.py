@@ -61,12 +61,12 @@ class Blackletter:
         # A
         m_A1 = (
             Mark(
-                Stroke.down(a - t) + BezierStroke.from_four_points((0, x / 3), (0, 0), (-4 * pen_width, 0), (-4 * pen_width, x / 3))
+                Stroke.down(a - t) + BezierStroke.from_four_points((0, x / 3), (0, 0), (-4 * pen_width, 0), (-4 * pen_width, x / 3), fp)
             )
             .top_at(a - 2 * pen_width, fp)
             .extend_downstroke_to_set_bottom_at(0, b, fp)
         )
-        m_A2 = (Mark(BezierStroke.horizontal_flourish(6 * pen_width, pen_width / 2, -pen_width * 3))
+        m_A2 = (Mark(BezierStroke.horizontal_flourish(6 * pen_width, pen_width / 2, -pen_width * 3, fp=fp))
                 .top_at(a, fp)
                 )
         m_A3 = (Mark(f_dot)
@@ -86,10 +86,10 @@ class Blackletter:
         self.glyph_map['A'] = Glyph([m_A1, m_A2, m_A3, m_A4, m_A5], fp)
 
         # B
-        m_B1 = (Mark(BezierStroke.horizontal_flourish(2 * pen_width, pen_width / 2))
+        m_B1 = (Mark(BezierStroke.horizontal_flourish(2 * pen_width, pen_width / 2, fp=fp))
                 .top_at(a, fp)
                 )
-        m_B2 = (Mark(BezierStroke.horizontal_flourish(4 * pen_width, pen_width / 2))
+        m_B2 = (Mark(BezierStroke.horizontal_flourish(4 * pen_width, pen_width / 2, fp=fp))
                 .bottom_at(b, fp)
                 )
         m_B3 = (Mark(Stroke.down())
@@ -97,11 +97,11 @@ class Blackletter:
                 .start_at_bezier(fp, m_B1)
                 .extend_downstroke_to_bezier(0, fp, m_B2)
                 )
-        m_B4 = (Mark(BezierStroke.from_four_points((0, a), (4 * pen_width, a), (4 * pen_width, x), (0, x)))
+        m_B4 = (Mark(BezierStroke.from_four_points((0, a), (4 * pen_width, a), (4 * pen_width, x), (0, x), fp))
                 .left_at(m_B3.bounding_box(fp).cx, fp)
                 .set_stroke_start(0, m_B1.stroke_end(0))
                 )
-        m_B5 = (Mark(BezierStroke.from_four_points((0, x), (4 * pen_width, x), (4 * pen_width, 0), (0, 0)))
+        m_B5 = (Mark(BezierStroke.from_four_points((0, x), (4 * pen_width, x), (4 * pen_width, 0), (0, 0), fp))
                 .left_at(m_B3.bounding_box(fp).cx, fp)
                 .set_stroke_end(0, m_B2.stroke_end(0))
                 )
@@ -113,7 +113,7 @@ class Blackletter:
         self.glyph_map['B'] = Glyph([m_B1, m_B2, m_B3, m_B4, m_B5, m_B6], fp)
 
         # C
-        m_C1 = (Mark(CircleStroke(Vector(x, x), x, 45, 315)))
+        m_C1 = (Mark(CircleStroke(Vector(x, x), x, 45, 315, fp=fp)))
         self.glyph_map['C'] = Glyph([m_C1], fp)
         # a
         m_a1 = (Mark(Stroke.down() + f_dot)

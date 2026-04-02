@@ -1,6 +1,7 @@
 import math
 from dataclasses import field
 
+from .font_parameters import FontParameters
 from .stroke_type import StrokeType
 from .strokeable import Strokeable
 from .vector import Vector
@@ -14,8 +15,9 @@ class CircleStroke(Strokeable):
                  to_angle: float = 360,
                  offset: Vector =Vector.zero(),
                  stroke_type: StrokeType = StrokeType.Block,
-                 num_samples: int = 20
+                 fp: FontParameters = None
                  ):
+        num_samples = 20 if fp is None else fp.circle_samples
         super().__init__(stroke_type, num_samples)
         self.centre = centre
         self.radius = radius

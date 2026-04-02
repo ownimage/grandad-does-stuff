@@ -17,4 +17,6 @@ class FontParameters:
     descender: float
     padding: float
     pen_stroke: list[tuple[float, float]]
+    bezier_samples: int
+    circle_samples: int
 
