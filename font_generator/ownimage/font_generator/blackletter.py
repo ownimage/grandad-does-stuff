@@ -61,7 +61,7 @@ class Blackletter:
         # A
         m_A1 = (
             Mark(
-                Stroke.down(a - t) + BezierStroke.from_four_points((0, x / 3), (0, 0), (-4 * pen_width, 0), (-4 * pen_width, x / 3), fp)
+                Stroke.down(a - t) + BezierStroke.from_four_points((0, 0), (0, -x / 3), (-4 * pen_width, -x / 3), (-4 * pen_width, 0), fp)
             )
             .top_at(a - 2 * pen_width, fp)
             .extend_downstroke_to_set_bottom_at(0, b, fp)
@@ -80,7 +80,7 @@ class Blackletter:
         m_A4 = m_A4.down_by(m_A4.bounding_box(fp).cy - m_A3.stroke_bounding_box(0, fp).cy)
         m_A5 = (Mark(Stroke.down() + f_i_footer)
                 .left_by(f_dot.tl(fp).x - m_A3.bounding_box(fp).right)
-                # .start_at_bezier(fp, m_A2)
+                .start_at_bezier(fp, m_A2)
                 .extend_downstroke_to_set_bottom_at(0, b, fp)
                 )
         self.glyph_map['A'] = Glyph([m_A1, m_A2, m_A3, m_A4, m_A5], fp)
