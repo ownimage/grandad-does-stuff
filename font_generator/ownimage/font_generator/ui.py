@@ -33,6 +33,26 @@ class MainWindow(QMainWindow):
 
         # ---------------- PANEL 1: GENERAL ----------------
         panel_general = QVBoxLayout()
+        self.show_all_chars = QCheckBox()
+        self.show_all_chars.setChecked(True)
+        self.show_all_chars.stateChanged.connect(self.update_svg)
+
+        show_all_chars_row = QHBoxLayout()
+        show_all_chars_row.addWidget(QLabel("Show all characters:"))
+        show_all_chars_row.addWidget(self.show_all_chars)
+        show_all_chars_row.addStretch()
+        panel_general.addLayout(show_all_chars_row)
+
+        self.sample_text = QComboBox()
+        self.sample_text.setEditable(True)
+        self.sample_text.lineEdit().setPlaceholderText("Enter characters of interest")
+        self.sample_text.currentTextChanged.connect(self.update_sample_text)
+        chars_of_interest_row = QHBoxLayout()
+        chars_of_interest_row.addWidget(QLabel("Characters of interest:"))
+        chars_of_interest_row.addWidget(self.sample_text)
+        chars_of_interest_row.addStretch()
+        panel_general.addLayout(chars_of_interest_row)
+
         self.filled = QCheckBox()
         self.filled.setChecked(True)
         self.filled.stateChanged.connect(self.update_svg)
@@ -116,6 +136,10 @@ class MainWindow(QMainWindow):
 
         return slider
 
+    def update_sample_text(self):
+        if not self.show_all_chars.isChecked():
+            self.update_svg()
+
     def update_svg(self):
         radius = float(self.scale.value())
         svg_data = self.make_svg(radius)
@@ -187,10 +211,17 @@ class MainWindow(QMainWindow):
             <line x1="0" y1="{fp.x_height * scale}" x2="{self.svg_width}" y2="{fp.x_height * scale}" stroke="black" stroke-width="1" />
             <line x1="0" y1="{fp.baseline * scale}" x2="{self.svg_width}" y2="{fp.baseline * scale}" stroke="black" stroke-width="1" />
             <line x1="0" y1="{fp.descender * scale}" x2="{self.svg_width}" y2="{fp.descender * scale}" stroke="black" stroke-width="1" />
-            {self.blackletter.svg_known(Vector(1, 0), scale, True)}
+            {self.svg(Vector(1, 0), scale, True)}
         </g>
     </svg>
     """
+
+    def svg(self, start: Vector, scale: float, char_lines: bool) -> str:
+        if self.show_all_chars.isChecked():
+            return self.blackletter.svg_known(start, scale, char_lines)
+        else:
+            chars = ''.join(c for c in self.sample_text.currentText() if c in self.blackletter.known_glyphs())
+            return self.blackletter.svg(start, chars, scale, char_lines)
 
     def create_menu(self):
         menu_bar = self.menuBar()

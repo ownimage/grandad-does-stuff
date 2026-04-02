@@ -429,8 +429,10 @@ class Blackletter:
         return svg
 
     def svg_known(self, start: Vector, scale: float, char_lines: bool = False):
-        chars = ''.join(self.glyph_map.keys())
-        return self.svg(start, chars, scale, char_lines)
+        return self.svg(start, self.known_glyphs(), scale, char_lines)
+
+    def known_glyphs(self) -> str:
+        return ''.join(self.glyph_map.keys())
 
     def birdfont_path(self, key, scale: float):
         g = self.glyph_map[key]
