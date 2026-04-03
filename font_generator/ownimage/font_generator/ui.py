@@ -1,4 +1,4 @@
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QSettings
 from PySide6.QtGui import QAction
 from PySide6.QtSvgWidgets import QSvgWidget
 from PySide6.QtWidgets import (
@@ -16,6 +16,13 @@ from .vector import Vector
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+
+        # Load previous window geometry
+        self.settings = QSettings("YourCompany", "YourAppName")
+        geometry = self.settings.value("windowGeometry")
+
+        if geometry is not None:
+            self.restoreGeometry(geometry)
 
         self.create_menu()
         self.setWindowTitle("Font Generator")
@@ -121,6 +128,11 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(central)
 
         self.update_svg()
+
+    def closeEvent(self, event):
+        # Save window geometry on exit
+        self.settings.setValue("windowGeometry", self.saveGeometry())
+        super().closeEvent(event)
 
     def create_slider(self, layout, min, max, value, name):
         slider = QSlider(Qt.Horizontal)
