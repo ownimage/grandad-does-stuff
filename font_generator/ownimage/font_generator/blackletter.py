@@ -113,8 +113,15 @@ class Blackletter:
         self.glyph_map['B'] = Glyph([m_B1, m_B2, m_B3, m_B4, m_B5, m_B6], fp)
 
         # C
-        m_C1 = (Mark(CircleStroke(Vector(x, x), x, 45, 315, fp=fp)))
+        m_C1 = (Mark(CircleStroke.fill_height(a, b, 135, 315, x_factor=0.5, fp=fp)))
+        # m_C1 = (Mark(BezierStroke.bezier_through((3 * pen_width, a), (0, a / 2), (3 * pen_width, b), (6 * pen_width, x / 4), fp))
+        #         )
         self.glyph_map['C'] = Glyph([m_C1], fp)
+
+        # C2
+        m_C21 = (Mark(CircleStroke.fill_height(a, b, 0, 359, x_factor=0.5, fp=fp)))
+        self.glyph_map['D'] = Glyph([m_C21], fp)
+
         # a
         m_a1 = (Mark(Stroke.down() + f_dot)
                 .top_at(xm.stroke_tl(0, fp).y, fp)

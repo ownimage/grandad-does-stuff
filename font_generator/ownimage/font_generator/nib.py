@@ -12,3 +12,9 @@ class Nib:
             return PenNib.from_font_parameters(fp)
         else:
             return CircleNib.from_font_parameters(fp)
+
+    def height(self) -> float:
+        raise NotImplementedError()
+
+    def below(self) -> float:
+        raise NotImplementedError()

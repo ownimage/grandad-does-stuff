@@ -27,7 +27,7 @@ class Strokeable:
         self._not_implemented("sample_points")
         return None
 
-    def geometry(self, fp: FontParameters, start: Vector, scale: float, before: 'Strokeable', after: 'Strokeable', geom_set: GeometrySet) -> Vector:
+    def geometry(self, fp: FontParameters, start: Vector, scale: float, before: 'Strokeable | None', after: 'Strokeable | None', geom_set: GeometrySet) -> Vector:
         def add_start_and_scale(pt: Vector) -> Vector:
             # Import Stroke here to avoid circular import issues
             from .stroke import Stroke  

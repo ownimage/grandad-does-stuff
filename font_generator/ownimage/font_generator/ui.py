@@ -3,7 +3,7 @@ from PySide6.QtGui import QAction
 from PySide6.QtSvgWidgets import QSvgWidget
 from PySide6.QtWidgets import (
     QVBoxLayout, QHBoxLayout,
-    QCheckBox, QSlider, QLabel, QMainWindow, QWidget, QFileDialog, QComboBox
+    QCheckBox, QSlider, QLabel, QMainWindow, QWidget, QFileDialog, QComboBox, QPushButton
 )
 
 from .birdfont_reader import BirdfontReader
@@ -40,6 +40,14 @@ class MainWindow(QMainWindow):
 
         # ---------------- PANEL 1: GENERAL ----------------
         panel_general = QVBoxLayout()
+
+        btn = QPushButton("Restart App")
+        btn.clicked.connect(self.restart_app)
+        restart_row = QHBoxLayout()
+        restart_row.addWidget(btn)
+        restart_row.addStretch()
+        panel_general.addLayout(restart_row)
+
         self.show_all_chars = QCheckBox()
         self.show_all_chars.setChecked(True)
         self.show_all_chars.stateChanged.connect(self.update_svg)
@@ -173,8 +181,35 @@ class MainWindow(QMainWindow):
             padding=self.padding.value() * width / 100,
             pen_stroke=self._pen_stroke(),
             bezier_samples=self.bezier_samples.value(),
-            circle_samples = self.circle_samples.value()
+            circle_samples=self.circle_samples.value()
         )
+
+    def restart_app(self):
+        import sys, subprocess
+        from pathlib import Path
+
+        script = Path(sys.argv[0]).resolve()
+        cwd = script.parent
+
+        log = cwd / "restart_log.txt"
+
+        with open(log, "w") as f:
+            f.write("Launching:\n")
+            f.write(f"{sys.executable} {script}\n\n")
+            f.flush()
+
+            subprocess.Popen(
+                [sys.executable, str(script)],
+                cwd=str(cwd),
+                stdout=f,
+                stderr=f
+            )
+
+        self.close()
+        sys.exit(0)
+
+        self.close()
+        sys.exit(0)
 
     def _width(self) -> float:
         return self.pen_width.value() / 100

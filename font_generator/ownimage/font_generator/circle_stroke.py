@@ -1,7 +1,8 @@
 import math
-from dataclasses import field
 
 from .font_parameters import FontParameters
+from .geometry_set import GeometrySet
+from .nib import Nib
 from .stroke_type import StrokeType
 from .strokeable import Strokeable
 from .vector import Vector
@@ -9,21 +10,40 @@ from .vector import Vector
 
 class CircleStroke(Strokeable):
 
-    def __init__(self, centre: Vector,
+    def __init__(self, centre: Vector | tuple[float, float],
                  radius: float,
                  from_angle: float = 0,
                  to_angle: float = 360,
-                 offset: Vector =Vector.zero(),
+                 offset: Vector = Vector.zero(),
+                 x_factor: float = 1,
                  stroke_type: StrokeType = StrokeType.Block,
                  fp: FontParameters = None
                  ):
         num_samples = 20 if fp is None else fp.circle_samples
         super().__init__(stroke_type, num_samples)
-        self.centre = centre
+        self.centre = Vector.of(centre)
         self.radius = radius
         self.from_angle = from_angle
         self.to_angle = to_angle
         self.offset = offset
+        self.x_factor = x_factor
+
+    @staticmethod
+    def fill_height(
+            top: float,
+            bottom: float,
+            from_angle: float = 0,
+            to_angle: float = 360,
+            x_factor: float = 1,
+            stroke_type: StrokeType = StrokeType.Block,
+            fp: FontParameters = None
+    ) -> "CircleStroke":
+        gs = GeometrySet()
+        cs = CircleStroke(Vector.zero(), 1, from_angle, to_angle, fp=fp)
+        cs.geometry(fp, Vector.zero(), 1, None, None, geom_set=gs)
+        nib = Nib.from_font_parameters(fp)
+        radius = (top - bottom - nib.height()) / (gs.bounding_box().height - nib.height())
+        return CircleStroke((0, bottom + radius + nib.below()), radius, from_angle, to_angle, x_factor=x_factor, stroke_type=stroke_type, fp=fp)
 
     def __post_init__(self):
         # Validate that angles are in range [0, 360]
@@ -73,7 +93,7 @@ class CircleStroke(Strokeable):
             rad = current_angle * math.pi / 180
 
             # Calculate the point on circle
-            x = self.centre.x + self.offset.x + self.radius * math.cos(rad)
+            x = self.centre.x + self.offset.x + self.radius * math.cos(rad) * self.x_factor
             y = self.centre.y + self.offset.y + self.radius * math.sin(rad)
 
             points.append(Vector(x, y))

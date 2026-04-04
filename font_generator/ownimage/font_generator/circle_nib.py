@@ -33,6 +33,12 @@ class CircleNib(Nib):
             for i in range(self.num_samples)
         ]
 
+    def height(self) -> float:
+        return self.size * 2
+
+    def below(self) -> float:
+        return -self.size
+
     # Named points (top-left, left, bottom-left, bottom, bottom-right, right, top-right, top)
     @property
     def tl(self): return self.pos + Vector.tl(self.size)

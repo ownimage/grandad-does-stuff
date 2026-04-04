@@ -32,6 +32,14 @@ class PenNib(Nib):
     def from_font_parameters(fp: FontParameters) -> "PenNib":
         return PenNib(fp.pen_width, fp.pen_thickness, fp.pen_angle)
 
+    def height(self) -> float:
+        y_corners = [self.tl.y, self.tr.y, self.br.y, self.bl.y]
+        return max(y_corners) - min(y_corners)
+
+    def below(self) -> float:
+        y_corners = [self.tl.y, self.tr.y, self.br.y, self.bl.y]
+        return -min(y_corners) + self.pos.y
+
     def at(self, pos: Vector) -> "PenNib":
         return PenNib(
             width=self.width,
