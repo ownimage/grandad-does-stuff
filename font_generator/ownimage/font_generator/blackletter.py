@@ -1,10 +1,14 @@
+from dataclasses import replace
+
+from .bezier_stroke import BezierStroke
+from .circle_stroke import CircleStroke
 from .compound_stroke import CompoundStroke
 from .font_parameters import FontParameters
 from .glyph import Glyph
 from .mark import Mark
-from .pen_nib import PenNib
+from .nib import Nib
+from .nib_type import NibType
 from .stroke import Stroke
-from .stroke_line import StrokeLine
 from .stroke_type import StrokeType
 from .vector import Vector
 
@@ -12,6 +16,7 @@ from .vector import Vector
 class Blackletter:
     def __init__(self, fp: FontParameters):
         self.fp = fp
+        fp = replace(fp, nib_type=NibType.Pen)
 
         # calculated values
         pen_width = fp.pen_width
@@ -22,8 +27,15 @@ class Blackletter:
         b = fp.baseline
         d = fp.descender
 
-        nib = PenNib.from_font_parameters(fp)
+        nib = Nib.from_font_parameters(fp)
         f_dot = Stroke(nib.normal * (pen_thickness - pen_width))
+
+        def f_v_dot_chain(n: int):
+            link = f_dot + Stroke(Vector(0, f_dot.bl(fp).y - f_dot.tr(fp).y) - f_dot.vec, StrokeType.Move)
+            r = link
+            for i in range(n - 1):
+                r = r + link
+            return r
 
         am = Mark(f_dot).top_at(a, fp)
         xm = Mark(f_dot).top_at(x, fp)
@@ -45,6 +57,70 @@ class Blackletter:
 
         # glyphs
         self.glyph_map = {}
+
+        # A
+        m_A1 = (
+            Mark(
+                Stroke.down(a - t) + BezierStroke.from_four_points((0, 0), (0, -x / 3), (-4 * pen_width, -x / 3), (-4 * pen_width, 0), fp)
+            )
+            .top_at(a - 2 * pen_width, fp)
+            .extend_downstroke_to_set_bottom_at(0, b, fp)
+        )
+        m_A2 = (Mark(BezierStroke.horizontal_flourish(6 * pen_width, pen_width / 2, -pen_width * 3, fp=fp))
+                .top_at(a, fp)
+                )
+        m_A3 = (Mark(f_dot)
+                .top_at(x, fp)
+                .left_at(f_dot.tr(fp).x, fp)
+                )
+        m_A4 = (Mark(f_v_dot_chain(3))
+                .top_at(x, fp)
+                .right_at(f_dot.tl(fp).x, fp)
+                )
+        m_A4 = m_A4.down_by(m_A4.bounding_box(fp).cy - m_A3.stroke_bounding_box(0, fp).cy)
+        m_A5 = (Mark(Stroke.down() + f_i_footer)
+                .left_by(f_dot.tl(fp).x - m_A3.bounding_box(fp).right)
+                .start_at_bezier(fp, m_A2)
+                .extend_downstroke_to_set_bottom_at(0, b, fp)
+                )
+        self.glyph_map['A'] = Glyph([m_A1, m_A2, m_A3, m_A4, m_A5], fp)
+
+        # B
+        m_B1 = (Mark(BezierStroke.horizontal_flourish(2 * pen_width, pen_width / 2, fp=fp))
+                .top_at(a, fp)
+                )
+        m_B2 = (Mark(BezierStroke.horizontal_flourish(4 * pen_width, pen_width / 2, fp=fp))
+                .bottom_at(b, fp)
+                )
+        m_B3 = (Mark(Stroke.down())
+                .left_at(2 * f_dot.tr(fp).x, fp)
+                .start_at_bezier(fp, m_B1)
+                .extend_downstroke_to_bezier(0, fp, m_B2)
+                )
+        m_B4 = (Mark(BezierStroke.from_four_points((0, a), (4 * pen_width, a), (4 * pen_width, x), (0, x), fp))
+                .left_at(m_B3.bounding_box(fp).cx, fp)
+                .set_stroke_start(0, m_B1.stroke_end(0))
+                )
+        m_B5 = (Mark(BezierStroke.from_four_points((0, x), (4 * pen_width, x), (4 * pen_width, 0), (0, 0), fp))
+                .left_at(m_B3.bounding_box(fp).cx, fp)
+                .set_stroke_end(0, m_B2.stroke_end(0))
+                )
+        m_B6 = (Mark(f_v_dot_chain(3))
+                .top_at(x, fp)
+                .right_at(m_B3.bounding_box(fp).left, fp)
+                )
+        m_B6 = m_B6.down_by(m_B6.bounding_box(fp).cy - m_A3.stroke_bounding_box(0, fp).cy)
+        self.glyph_map['B'] = Glyph([m_B1, m_B2, m_B3, m_B4, m_B5, m_B6], fp)
+
+        # C
+        m_C1 = (Mark(CircleStroke.fill_height(a, b, 135, 315, x_factor=0.5, fp=fp)))
+        # m_C1 = (Mark(BezierStroke.bezier_through((3 * pen_width, a), (0, a / 2), (3 * pen_width, b), (6 * pen_width, x / 4), fp))
+        #         )
+        self.glyph_map['C'] = Glyph([m_C1], fp)
+
+        # C2
+        m_C21 = (Mark(CircleStroke.fill_height(a, b, 0, 359, x_factor=0.5, fp=fp)))
+        self.glyph_map['D'] = Glyph([m_C21], fp)
 
         # a
         m_a1 = (Mark(Stroke.down() + f_dot)
@@ -71,7 +147,7 @@ class Blackletter:
         self.glyph_map['b'] = Glyph([m_b1, m_b2], fp)
 
         # c
-        s_c1 = Stroke(nib.direction * pen_width / 2, StrokeType.Move) + StrokeLine(nib.direction * pen_width)
+        s_c1 = Stroke(nib.direction * pen_width / 2, StrokeType.Move) + Stroke(nib.direction * pen_width, stroke_type=StrokeType.Line)
         m_c1 = (Mark(Stroke.down() + f_dot + s_c1)
                 .top_at(xm.stroke_tl(0, fp).y, fp)
                 .extend_downstroke_to_set_bottom_at(0, b, fp)
@@ -93,12 +169,12 @@ class Blackletter:
         self.glyph_map['d'] = Glyph([m_d1, m_d2], fp)
 
         # e
-        s_e1 = Stroke(nib.direction * pen_width / 2, StrokeType.Move) + StrokeLine(nib.direction * pen_width)
+        s_e1 = Stroke(nib.direction * pen_width / 2, StrokeType.Move) + Stroke(nib.direction * pen_width, stroke_type=StrokeType.Line)
         m_e1 = (Mark(Stroke.down() + f_dot + s_e1)
                 .top_at(xm.stroke_tl(0, fp).y, fp)
                 .extend_downstroke_to_set_bottom_at(0, b, fp)
                 )
-        m_e2 = (Mark(f_dot + Stroke(nib.direction * -pen_width / 2, StrokeType.Move) + StrokeLine(nib.direction * -pen_width))
+        m_e2 = (Mark(f_dot + Stroke(nib.direction * -pen_width / 2, StrokeType.Move) + Stroke(nib.direction * -pen_width, stroke_type=StrokeType.Line))
                 .top_at(x, fp)
                 .left_at(m_a1.stroke_tr(0, fp).x, fp)
                 )
@@ -111,10 +187,10 @@ class Blackletter:
                 )
         m_f3 = am.left_at(m_f1.stroke_tr(0, fp).x, fp)
         s_f4 = (Stroke.right()
-                .make_width(m_f1.width(fp) + m_f3.width(fp), fp)
+                .make_width(m_f1.bounding_box(fp).width + m_f3.bounding_box(fp).width, fp)
                 )
         m_f4 = (Mark(s_f4, Vector(0, t))
-                .left_at(m_f1.left(fp), fp)
+                .left_at(m_f1.bounding_box(fp).left, fp)
                 )
         self.glyph_map['f'] = Glyph([m_f1, m_f3, m_f4], fp)
 
@@ -126,7 +202,7 @@ class Blackletter:
         m_g2 = (Mark(f_dot + Stroke.down() + f_f_footer)
                 .top_at(x, fp)
                 .extend_downstroke_to_set_bottom_at(1, d, fp)
-                .left_at(m_g1.left(fp), fp)
+                .left_at(m_g1.bounding_box(fp).left, fp)
                 )
         self.glyph_map['g'] = Glyph([m_g1, m_g2], fp)
 
@@ -148,7 +224,7 @@ class Blackletter:
                 .extend_downstroke_to_set_bottom_at(0, b, fp)
                 )
         m_i2 = (f_i_dot
-                .centre_at(m_i1.vec.x, fp)
+                .centre_x_at(m_i1.vec.x, fp)
                 )
         self.glyph_map['i'] = Glyph([m_i1, m_i2], fp)
 
@@ -158,7 +234,7 @@ class Blackletter:
                 .extend_downstroke_to_set_bottom_at(0, d, fp)
                 )
         m_j2 = (f_i_dot
-                .centre_at(m_j1.vec.x, fp)
+                .centre_x_at(m_j1.vec.x, fp)
                 )
         self.glyph_map['j'] = Glyph([m_j1, m_j2], fp)
 
@@ -168,7 +244,7 @@ class Blackletter:
                 .extend_downstroke_to_set_bottom_at(0, b, fp)
                 )
         m_k2 = m_e2
-        m_k3 = (Mark(Stroke.right(xm.width(fp)) + Stroke.down() + f_dot)
+        m_k3 = (Mark(Stroke.right(xm.bounding_box(fp).width) + Stroke.down() + f_dot)
                 .top_at(xb2, fp)
                 .extend_downstroke_to_set_bottom_at(1, b, fp)
                 )
@@ -221,8 +297,8 @@ class Blackletter:
                 )
         m_p3 = (Mark(f_dot)
                 .bottom_at(b, fp)
-                .left_at(m_p2.left(fp), fp)
-                .extend_stroke_backwards_to_x(0, -m_i2.width(fp) / 2, fp)
+                .left_at(m_p2.bounding_box(fp).left, fp)
+                .extend_stroke_backwards_to_x(0, -m_i2.bounding_box(fp).width / 2, fp)
                 )
         self.glyph_map['p'] = Glyph([m_p1, m_p2, m_p3], fp)
 
@@ -247,8 +323,8 @@ class Blackletter:
         self.glyph_map['r'] = Glyph([m_r1, m_r2], fp)
 
         # s
-        sw = xm.width(fp)
-        m_s1 = (Mark(Stroke.down(xm.vec.y - xb2) + StrokeLine(Vector(sw, 0)) + Stroke.down() + f_f_footer)
+        sw = xm.bounding_box(fp).width
+        m_s1 = (Mark(Stroke.down(xm.vec.y - xb2) + Stroke(Vector(sw, 0), stroke_type=StrokeType.Line) + Stroke.down() + f_f_footer)
                 .top_at(x, fp)
                 .extend_downstroke_to_set_bottom_at(2, b, fp)
                 )
@@ -274,7 +350,7 @@ class Blackletter:
         m_u2 = (Mark(Stroke.down())
                 .top_at(x, fp)
                 .extend_downstroke_to_set_bottom_at(0, m_u1.stroke_br(1, fp).y, fp)
-                .left_at(m_u1.right(fp), fp)
+                .left_at(m_u1.bounding_box(fp).right, fp)
                 )
         self.glyph_map['u'] = Glyph([m_u1, m_u2], fp)
 
@@ -286,7 +362,7 @@ class Blackletter:
         m_v2 = (Mark(Stroke.down() + f_dot)
                 .top_at(x, fp)
                 .extend_downstroke_to_set_bottom_at(0, b, fp)
-                .left_at(m_v1.right(fp), fp)
+                .left_at(m_v1.bounding_box(fp).right, fp)
                 )
         self.glyph_map['v'] = Glyph([m_v1, m_v2], fp)
 
@@ -295,11 +371,11 @@ class Blackletter:
         m_w2 = (Mark(Stroke.down() + f_dot)
                 .top_at(x, fp)
                 .extend_downstroke_to_set_bottom_at(0, b, fp)
-                .left_at(m_w1.right(fp), fp)
+                .left_at(m_w1.bounding_box(fp).right, fp)
                 )
         m_w3 = (Mark(Stroke.down()).top_at(x, fp)
                 .extend_downstroke_to_set_bottom_at(0, m_w2.stroke_br(1, fp).y, fp)
-                .left_at(m_w2.right(fp), fp)
+                .left_at(m_w2.bounding_box(fp).right, fp)
                 )
         m_w4 = (Mark(Stroke.right(), Vector(0, xb2))
                 .left_at(m_w1.stroke_tr(0, fp).x, fp)
@@ -311,7 +387,7 @@ class Blackletter:
         m_x1 = xm
         m_x2 = bp
         m_x3 = (m_u1
-                .left_at(m_w1.right(fp), fp)
+                .left_at(m_w1.bounding_box(fp).right, fp)
                 )
         m_x4 = (xm
                 .left_at(m_x3.stroke_tr(0, fp).x, fp)
@@ -322,26 +398,26 @@ class Blackletter:
         # y
         m_y1 = m_u1
         m_y2 = (m_j1
-                .left_at(m_y1.left(fp), fp)
+                .left_at(m_y1.bounding_box(fp).left, fp)
                 )
         self.glyph_map['y'] = Glyph([m_y1, m_y2], fp)
 
         # z
-        zw = xm.width(fp)
-        m_z1 = (Mark(Stroke.right(zw) + StrokeLine(Vector(-zw, -zw)) + Stroke.right(zw) + Stroke.down() + f_f_footer)
+        zw = xm.bounding_box(fp).width
+        m_z1 = (Mark(Stroke.right(zw) + Stroke(Vector(-zw, -zw), stroke_type=StrokeType.Line) + Stroke.right(zw) + Stroke.down() + f_f_footer)
                 .top_at(x, fp)
                 .extend_downstroke_to_set_bottom_at(3, d, fp)
                 )
         self.glyph_map['z'] = Glyph([m_z1], fp)
 
-    def svg(self, posn: Vector, chars: str, scale: float, char_lines: bool = False):
+    def svg(self, start: Vector, chars: str, scale: float, char_lines: bool = False):
 
         def _char_line(x: float, scale: float) -> str:
             xs = x * scale
             return f'<line x1="{xs}" y1="{self.fp.descender * scale}" x2="{xs}" y2="{self.fp.ascender * scale}" stroke="black" stroke-width="1" />\n'
 
         svg = ""
-        start = posn
+        start = start
         for c in chars:
             g: Glyph = self.glyph_map[c]
             svg += f"<!-- char {c} -->\n"
@@ -359,9 +435,11 @@ class Blackletter:
         print(f"svg={svg}")
         return svg
 
-    def svg_known(self, posn: Vector, scale: float, char_lines: bool = False):
-        chars = ''.join(self.glyph_map.keys())
-        return self.svg(posn, chars, scale, char_lines)
+    def svg_known(self, start: Vector, scale: float, char_lines: bool = False):
+        return self.svg(start, self.known_glyphs(), scale, char_lines)
+
+    def known_glyphs(self) -> str:
+        return ''.join(self.glyph_map.keys())
 
     def birdfont_path(self, key, scale: float):
         g = self.glyph_map[key]

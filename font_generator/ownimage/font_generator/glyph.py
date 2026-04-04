@@ -4,20 +4,23 @@ from .font_parameters import FontParameters
 from .mark import Mark
 from .vector import Vector
 
+
 class Glyph:
     def __init__(self, marks: List[Mark], fp: FontParameters):
         self.marks = marks
 
-        left = min([mark.left(fp) for mark in marks])
-        right = max([mark.right(fp) for mark in marks])
+        union = None
+        for m in self.marks:
+            bb = m.bounding_box(fp)
+            union = bb if union is None else union.union(bb)
 
-        self.vec = Vector(-left,0)
-        self.width = right - left
+        self.vec = Vector(-union.left , 0)
+        self.width = union.width
 
-    def svg(self, posn: Vector, fp: FontParameters, scale: float):
+    def svg(self, start: Vector, fp: FontParameters, scale: float):
         svg = ""
         for mark in self.marks:
-            svg += mark.svg(fp, Vector(posn.x + self.vec.x, posn.y + self.vec.y), scale)
+            svg += mark.svg(fp, Vector(start.x + self.vec.x, start.y + self.vec.y), scale)
         return svg
 
     def birdfont_path(self, fp: FontParameters, scale: float):

@@ -4,6 +4,8 @@ from PySide6.QtWidgets import QApplication
 
 from ownimage.font_generator.ui import MainWindow
 
+print("LAUNCHED:", __file__)
+
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = MainWindow()

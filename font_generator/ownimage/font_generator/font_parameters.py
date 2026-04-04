@@ -1,8 +1,11 @@
 from dataclasses import dataclass
 
+from ownimage.font_generator.nib_type import NibType
+
 
 @dataclass(frozen=True)
 class FontParameters:
+    nib_type: NibType
     pen_width: float
     pen_thickness: float
     pen_angle: float
@@ -14,4 +17,6 @@ class FontParameters:
     descender: float
     padding: float
     pen_stroke: list[tuple[float, float]]
+    bezier_samples: int
+    circle_samples: int
 

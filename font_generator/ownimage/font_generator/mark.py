@@ -3,9 +3,13 @@ from __future__ import annotations
 from dataclasses import replace
 from typing import List
 
+from .bezier_stroke import BezierStroke
+from .bounding_box import BoundingBox
+from .circle_stroke import CircleStroke
 from .compound_stroke import CompoundStroke
 from .font_parameters import FontParameters
 from .geometry_set import GeometrySet
+from .nib import Nib
 from .pen_nib import PenNib
 from .stroke import Stroke, Strokeable
 from .vector import Vector
@@ -57,34 +61,48 @@ class Mark:
     def down_by(self, amount: float):
         return Mark(self.strokes, Vector(self.vec.x, self.vec.y - amount))
 
-    def bottom_at(self, target: float, fp: FontParameters, posn: Vector = Vector(0, 0), scale: float = 1.0):
-        current = self.bottom(fp, posn, scale)
+    def bottom_at(self, target: float, fp: FontParameters, start: Vector = Vector(0, 0), scale: float = 1.0):
+        current = self.bounding_box(fp, start, scale).bottom
         shift = target - current
         return self.up_by(shift)
 
-    def top_at(self, target: float, fp: FontParameters, posn: Vector = Vector(0, 0), scale: float = 1.0):
-        current = self.top(fp, posn, scale)
+    def top_at(self, target: float, fp: FontParameters, start: Vector = Vector(0, 0), scale: float = 1.0):
+        current = self.bounding_box(fp, start, scale).top
         shift = target - current
         return self.up_by(shift)
 
-    def left_at(self, target: float, fp: FontParameters, posn: Vector = Vector(0, 0), scale: float = 1.0):
-        current = self.left(fp, posn, scale)
+    def top_at_bezier(self, fp: FontParameters, mark: Mark, index: int = 0, start: Vector = Vector(0, 0), scale: float = 1.0):
+        current = self.top(fp, start, scale)
+        target = mark.bezier_y_at_x(index, self.vec.x)
+        shift = target - current
+        return self.up_by(shift)
+
+    def start_at_bezier(self, fp: FontParameters, mark: Mark, index: int = 0, start: Vector = Vector(0, 0), scale: float = 1.0):
+        beziers = [s for s in mark.strokes if isinstance(s, BezierStroke)]
+        bezier = beziers[0]
+        current = self.vec.y
+        target = mark.vec.y + bezier.y_at_x(self.vec.x)[index]
+        shift = target - current
+        return self.up_by(shift)
+
+    def left_at(self, target: float, fp: FontParameters, start: Vector = Vector(0, 0), scale: float = 1.0):
+        current = self.bounding_box(fp, start, scale).left
         shift = target - current
         return self.right_by(shift)
 
-    def centre_at(self, target: float, fp: FontParameters, posn: Vector = Vector(0, 0), scale: float = 1.0):
-        current = self.centre(fp, posn, scale)
+    def centre_x_at(self, target: float, fp: FontParameters, start: Vector = Vector(0, 0), scale: float = 1.0):
+        current = self.bounding_box(fp, start, scale).cx
         shift = target - current
         return self.right_by(shift)
 
-    def right_at(self, target: float, fp: FontParameters, posn: Vector = Vector(0, 0), scale: float = 1.0):
-        current = self.right(fp, posn, scale)
+    def right_at(self, target: float, fp: FontParameters, start: Vector = Vector(0, 0), scale: float = 1.0):
+        current = self.bounding_box(fp, start, scale).right
         shift = target - current
         return self.right_by(shift)
 
-    def geometry(self, posn: Vector, fp: FontParameters, scale: float = 1) -> GeometrySet:
+    def geometry(self, start: Vector, fp: FontParameters, scale: float = 1) -> GeometrySet:
         nib = PenNib.from_font_parameters(fp)
-        start = posn + self.vec
+        start = start + self.vec
         geom_set = GeometrySet()
 
         for idx, (start_offset, width) in enumerate(fp.pen_stroke):
@@ -96,51 +114,57 @@ class Mark:
                 prev_item = self.strokes[i - 1] if i > 0 else None
                 next_item = self.strokes[i + 1] if i < len(self.strokes) - 1 else None
 
-                if isinstance(curr_item, Stroke):
+                if isinstance(curr_item, Strokeable):
                     offset_pos = current_pos + nib.direction * (-0.5 * fp.pen_width + start_offset + 0.5 * width)
-                    curr_item.get_geom(offset_pos, fpt, scale, prev_item, next_item, geom_set)
+                    curr_item.geometry(fpt, offset_pos, scale, prev_item, next_item, geom_set)
                 elif idx == 0:
-                    curr_item.get_geom(current_pos, fp, scale, prev_item, next_item, geom_set)
+                    curr_item.geometry(fp, current_pos, scale, prev_item, next_item, geom_set)
 
                 current_pos = curr_item.advance(current_pos)
 
         return geom_set
 
-    def bounding_box(self, fp: FontParameters, posn: Vector(0, 0), scale: float):
-        geom = self.geometry(posn, fp, scale)
+    def stroke_bounding_box(self, index: int, fp: FontParameters, start: Vector = Vector(0, 0), scale: float = 1.0) -> BoundingBox:
+        geom_set = GeometrySet()
+        start = start + self.stroke_start(index)
+
+        curr_item = self.strokes[index]
+        prev_item = self.strokes[index - 1] if index > 0 else None
+        next_item = self.strokes[index + 1] if index < len(self.strokes) - 1 else None
+        curr_item.geometry(fp, start, scale, prev_item, next_item, geom_set)
+        return geom_set.bounding_box()
+
+    def bounding_box(self, fp: FontParameters, start: Vector = Vector(0, 0), scale: float = 1.0) -> BoundingBox:
+        geom = self.geometry(start, fp, scale)
         return geom.bounding_box()  # -> (bl, tr)
 
-    def left(self, fp: FontParameters, posn: Vector = Vector(0, 0), scale: float = 1.0) -> float:
-        bl, _ = self.bounding_box(fp, posn, scale)
-        return bl.x
-
-    def centre(self, fp: FontParameters, posn: Vector = Vector(0, 0), scale: float = 1.0) -> float:
-        bl, tr = self.bounding_box(fp, posn, scale)
-        return (bl.x + tr.x) / 2
-
-    def right(self, fp: FontParameters, posn: Vector = Vector(0, 0), scale: float = 1.0) -> float:
-        _, tr = self.bounding_box(fp, posn, scale)
-        return tr.x
-
-    def bottom(self, fp: FontParameters, posn: Vector = Vector(0, 0), scale: float = 1.0) -> float:
-        bl, _ = self.bounding_box(fp, posn, scale)
-        return bl.y
-
-    def top(self, fp: FontParameters, posn: Vector = Vector(0, 0), scale: float = 1.0) -> float:
-        _, tr = self.bounding_box(fp, posn, scale)
-        return tr.y
-
-    def width(self, fp: FontParameters, posn: Vector = Vector(0, 0), scale: float = 1.0) -> float:
-        return self.right(fp, posn, scale) - self.left(fp, posn, scale)
-
-    def height(self, fp: FontParameters, posn: Vector = Vector(0, 0), scale: float = 1.0) -> float:
-        return self.top(fp, posn, scale) - self.bottom(fp, posn, scale)
-
     def extend_downstroke_to_set_bottom_at(self, stroke, bottom, fp):
-        return self.with_stroke(stroke, lambda s: s.extend(self.bottom(fp) - bottom))
+        return self.with_stroke(stroke, lambda s: s.extend(self.bounding_box(fp).bottom - bottom))
+
+    def set_stroke_end(self, i: int, end: Vector):
+        stroke = self.strokes[i]
+        if isinstance(stroke, BezierStroke):
+            return self.with_stroke(i, lambda s, vec=self.vec: replace(s, bezier=replace(s.bezier, p3=end - vec)))
+        raise TypeError(f"Not implemented for {stroke.__class__.__name__}")
+
+    def set_stroke_start(self, i: int, start: Vector):
+        stroke = self.strokes[i]
+        if isinstance(stroke, BezierStroke):
+            return self.with_stroke(i, lambda s, vec=self.vec: replace(s, bezier=replace(s.bezier, p0=start - vec)))
+        raise TypeError(f"Not implemented for {stroke.__class__.__name__}")
+
+    def extend_downstroke_to_bezier(self, stroke, fp: FontParameters, mark: Mark, bezier_index: int = 0):
+        current_end = self.stroke_end(stroke)
+        target = mark.bezier_y_at_x(bezier_index, current_end.x)
+        return self.with_stroke(stroke, lambda s: s.extend(current_end.y - target))
+
+    def bezier_y_at_x(self, i: int, x: float, crossing: int = 0) -> float:
+        beziers = [s for s in self.strokes if isinstance(s, BezierStroke)]
+        bezier = beziers[i]
+        return self.vec.y + bezier.y_at_x(x)[crossing]
 
     def extend_rightstroke_to_set_right_at(self, stroke, right, fp):
-        delta = right - self.right(fp)
+        delta = right - self.bounding_box(fp).right
         return self.with_stroke(stroke, lambda s: s.extend(Vector(delta, 0)))
 
     def extend_stroke_backwards_to_x(self, stroke, x, fp):
@@ -156,8 +180,8 @@ class Mark:
         else:
             return self.with_stroke(stroke, lambda s: s.extend(delta))
 
-    def svg(self, fp: FontParameters, posn: Vector, scale: float) -> str:
-        return self.geometry(posn, fp, scale).svg(fp.filled) + "\n"
+    def svg(self, fp: FontParameters, start: Vector, scale: float) -> str:
+        return self.geometry(start, fp, scale).svg(fp.filled) + "\n"
 
     def birdfont_path(self, fp: FontParameters, scale: float):
         start = self.vec
@@ -176,8 +200,12 @@ class Mark:
     def stroke_start(self, i: int) -> Vector:
         start = self.vec
         for s in self.strokes[:i]:
-            start = start + s.vec
+            start = s.advance(start)
         return start
+
+    def stroke_end(self, i: int) -> Vector:
+        start = self.stroke_start(i)
+        return self.strokes[i].advance(start)
 
     def stroke_bl(self, i: int, fp: FontParameters) -> Vector:
         start = self.stroke_start(i)

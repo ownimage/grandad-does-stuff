@@ -1,3 +1,4 @@
+from .bounding_box import BoundingBox
 from .vector import Vector
 
 
@@ -31,7 +32,7 @@ class GeometrySet:
         self.holes.pop()
         self.add_new_hole(hole)
 
-    def bounding_box(self) -> tuple[Vector, Vector]:
+    def bounding_box(self) -> BoundingBox:
         """Return (bottom_left, top_right) bounding box of all geometry."""
         xs = []
         ys = []
@@ -46,11 +47,11 @@ class GeometrySet:
 
         if not xs:
             # No geometry at all: return a zero box
-            return Vector(0, 0), Vector(0, 0)
+            return BoundingBox.zero()
 
         bl = Vector(min(xs), min(ys))
         tr = Vector(max(xs), max(ys))
-        return bl, tr
+        return BoundingBox(bl, tr)
 
     def left(self) -> float:
         bl, _ = self.bounding_box()
@@ -73,9 +74,18 @@ class GeometrySet:
 
         if not filled:
             svg += self.svg_writer(self.holes, "white")
+
+        svg += self.svg_writer(self.graffiti, "red", close_path=False, fill=False, stroke_width=1.2)
         return svg
 
-    def svg_writer(self, paths: list[list[Vector]], colour: str):
+    def svg_writer(
+            self,
+            paths: list[list[Vector]],
+            colour: str,
+            close_path: bool = True,
+            fill: bool = True,
+            stroke_width: float = 1.0,
+    ):
         svg = ""
         for path in paths:
             path = [p for p in path if p is not None]
@@ -89,7 +99,14 @@ class GeometrySet:
             svg += f"""<path d ="M{p0.x} {p0.y} """
             for p in path[1:]:
                 svg += f"""L{p.x} {p.y} """
-            svg += f"""Z" fill="{colour}" />\n"""
+
+            if close_path:
+                svg += "Z"
+
+            if fill:
+                svg += f"""" fill="{colour}" />\n"""
+            else:
+                svg += f"""" fill="none" stroke="{colour}" stroke-width="{stroke_width}" />\n"""
         return svg
 
     def __add__(self, other: "GeometrySet") -> "GeometrySet":
