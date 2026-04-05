@@ -79,14 +79,11 @@ class BezierStroke(Strokeable):
             debug_visual
         )
 
-    def sample_points(self, num_samples: int = 20) -> list[Vector]:
-        return self.bezier.sample_points(num_samples)
+    def point_at(self, t: float) -> Vector:
+        return self.bezier.point_at(t)
 
     def y_at_x(self, x: float):
         return self.bezier.y_at_x(x)
-
-    def start(self) -> Vector:
-        return self.bezier.p0
 
     def svg(self, start: Vector, fp: FontParameters, scale: float) -> str:
         p0 = (start + self.bezier.p0) * scale

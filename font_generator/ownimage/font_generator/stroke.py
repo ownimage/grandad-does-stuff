@@ -55,12 +55,9 @@ class Stroke(Strokeable):
 
         raise RuntimeError(f"Extension type of {type(e)}.")
 
-    def sample_points(self, num_samples: int = 20) -> List[Vector]:
-        points = []
-        for i in range(num_samples):
-            t = i / (num_samples - 1)
-            points.append(self.vec * t)
-        return points
+
+    def point_at(self, t: float) -> Vector:
+        return self.vec * t
 
     def bl(self, fp: FontParameters) -> Vector:
         nib = Nib.from_font_parameters(fp)

@@ -57,29 +57,6 @@ class CircleStroke(Strokeable):
         if self.to_angle < self.from_angle:
             raise ValueError(f"to_angle must be greater than or equal to from_angle, got from_angle={self.from_angle}, to_angle={self.to_angle}")
 
-    def advance(self, pos: Vector) -> Vector:
-        return pos + self.end() - self.start()
-
-    def start(self) -> Vector:
-        return self.point_at(0)
-
-    def end(self) -> Vector:
-        return self.point_at(1)
-
-    def sample_points(self, num_samples: int = 20) -> list[Vector]:
-        actual_num_samples = num_samples if num_samples is not None else self.num_samples
-
-        if actual_num_samples < 2:
-            actual_num_samples = 2
-
-        points = []
-        for i in range(actual_num_samples):
-            t = i / (actual_num_samples - 1) if actual_num_samples > 1 else 0
-            v = self.point_at(t)
-            points.append(v)
-
-        return points
-
     def point_at(self, t: float) -> Vector:
         angle_diff = self.to_angle - self.from_angle
         angle = self.from_angle + t * angle_diff
