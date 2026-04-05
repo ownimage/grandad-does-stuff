@@ -14,7 +14,7 @@ class CircleStroke(Strokeable):
                  radius: float,
                  from_angle: float = 0,
                  to_angle: float = 360,
-                 offset: Vector = Vector.zero(),
+                 offset: Vector = None,
                  x_factor: float = 1,
                  stroke_type: StrokeType = StrokeType.Block,
                  fp: FontParameters = None
@@ -25,8 +25,9 @@ class CircleStroke(Strokeable):
         self.radius = radius
         self.from_angle = from_angle
         self.to_angle = to_angle
-        self.offset = offset
         self.x_factor = x_factor
+        self.offset = offset if offset is not None else Vector(0, 0)
+
 
     @staticmethod
     def fill_height(
@@ -57,45 +58,32 @@ class CircleStroke(Strokeable):
             raise ValueError(f"to_angle must be greater than or equal to from_angle, got from_angle={self.from_angle}, to_angle={self.to_angle}")
 
     def advance(self, pos: Vector) -> Vector:
-        return pos + self.offset + self.centre + Vector(self.radius, 0).rotated(self.to_angle)
+        return pos + self.end() - self.start()
+
+    def start(self) -> Vector:
+        return self.point_at(0)
+
+    def end(self) -> Vector:
+        return self.point_at(1)
 
     def sample_points(self, num_samples: int = 20) -> list[Vector]:
-        # Use the base class's num_samples if not provided
         actual_num_samples = num_samples if num_samples is not None else self.num_samples
 
-        # Ensure we have at least 2 points (start and end)
         if actual_num_samples < 2:
             actual_num_samples = 2
 
-        # Handle case where from_angle equals to_angle
-        if self.from_angle == self.to_angle:
-            # Return the center point with offset
-            return [self.centre + self.offset]
-
-        # Calculate angle difference (handle 360 wraparound)
-        angle_diff = self.to_angle - self.from_angle
-        if angle_diff <= 0:
-            angle_diff += 360
-
-        # Handle case where from_angle equals to_angle after adjustment
-        if angle_diff == 0:
-            # Return the center point with offset
-            return [self.centre + self.offset]
-
-        # Generate points at evenly spaced angles
         points = []
         for i in range(actual_num_samples):
-            # Calculate the current angle
             t = i / (actual_num_samples - 1) if actual_num_samples > 1 else 0
-            current_angle = self.from_angle + t * angle_diff
-
-            # Convert to radians
-            rad = current_angle * math.pi / 180
-
-            # Calculate the point on circle
-            x = self.centre.x + self.offset.x + self.radius * math.cos(rad) * self.x_factor
-            y = self.centre.y + self.offset.y + self.radius * math.sin(rad)
-
-            points.append(Vector(x, y))
+            v = self.point_at(t)
+            points.append(v)
 
         return points
+
+    def point_at(self, t: float) -> Vector:
+        angle_diff = self.to_angle - self.from_angle
+        angle = self.from_angle + t * angle_diff
+        rad = math.radians(angle)
+        x = self.centre.x + self.offset.x + self.radius * math.cos(rad) * self.x_factor
+        y = self.centre.y + self.offset.y + self.radius * math.sin(rad)
+        return Vector(x, y)

@@ -5,13 +5,11 @@ from typing import List
 
 from .bezier_stroke import BezierStroke
 from .bounding_box import BoundingBox
-from .circle_stroke import CircleStroke
 from .compound_stroke import CompoundStroke
 from .font_parameters import FontParameters
 from .geometry_set import GeometrySet
-from .nib import Nib
 from .pen_nib import PenNib
-from .stroke import Stroke, Strokeable
+from .stroke import Strokeable
 from .vector import Vector
 
 
@@ -48,6 +46,16 @@ class Mark:
 
     def __sub__(self, v) -> Mark:
         return Mark(self.strokes, self.vec - v)
+
+    def start(self) -> Vector:
+        return self.vec + self.strokes[0].point_at(0)
+
+    def end(self):
+        end = self.vec + self.strokes[0].start()
+        for stroke in self.strokes:
+            end = stroke.advance(end)
+        return end
+
 
     def left_by(self, amount: float):
         return Mark(self.strokes, Vector(self.vec.x - amount, self.vec.y))

@@ -21,18 +21,6 @@ class Stroke(Strokeable):
         direction = self.vec.normalized()
         object.__setattr__(self, "direction", direction)
 
-    def __add__(self, other: Union[Stroke, 'BezierStroke', 'CompoundStroke']) -> 'CompoundStroke':
-        from .bezier_stroke import BezierStroke
-        from .compound_stroke import CompoundStroke
-
-        if isinstance(other, (Stroke, BezierStroke)):
-            return CompoundStroke([self, other])
-
-        if isinstance(other, CompoundStroke):
-            return CompoundStroke([self] + other.strokes)
-
-        raise NotImplementedError(f"Cannot add {type(other)} to Stroke")
-
     @staticmethod
     def from_xy(x: float, y: float, stroke_type: StrokeType = StrokeType.Block) -> Stroke:
         return Stroke(Vector(x, y), stroke_type)

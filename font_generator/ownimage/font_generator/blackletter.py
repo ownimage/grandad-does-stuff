@@ -114,12 +114,11 @@ class Blackletter:
 
         # C
         m_C1 = (Mark(CircleStroke.fill_height(a, b, 135, 315, x_factor=0.5, fp=fp)))
-        # m_C1 = (Mark(BezierStroke.bezier_through((3 * pen_width, a), (0, a / 2), (3 * pen_width, b), (6 * pen_width, x / 4), fp))
-        #         )
-        self.glyph_map['C'] = Glyph([m_C1], fp)
+        m_C2 = Mark(Stroke(m_C1.end() - m_C1.start()), m_C1.start())
+        self.glyph_map['C'] = Glyph([m_C1, m_C2], fp)
 
         # C2
-        m_C21 = (Mark(CircleStroke.fill_height(a, b, 0, 359, x_factor=0.5, fp=fp)))
+        m_C21 = (Mark(CircleStroke.fill_height(a, b, 0, 350, x_factor=0.5, fp=fp)))
         self.glyph_map['D'] = Glyph([m_C21], fp)
 
         # a

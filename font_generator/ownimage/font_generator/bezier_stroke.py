@@ -8,7 +8,6 @@ from .font_parameters import FontParameters
 from .stroke_type import StrokeType
 from .strokeable import Strokeable
 from .vector import Vector
-from .vector_list import VectorList
 
 
 @dataclass(frozen=True)

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Union
+
 from shapely.geometry.multipoint import MultiPoint
 from shapely.ops import unary_union
 
@@ -17,6 +19,19 @@ class Strokeable:
         self.stroke_type = stroke_type
         self.num_samples = num_samples
 
+    def __add__(self, other: Union['Stroke', 'BezierStroke', 'CompoundStroke']) -> 'CompoundStroke':
+        from .stroke import Stroke
+        from .bezier_stroke import BezierStroke
+        from .compound_stroke import CompoundStroke
+
+        if isinstance(other, (Stroke, BezierStroke)):
+            return CompoundStroke([self, other])
+
+        if isinstance(other, CompoundStroke):
+            return CompoundStroke([self] + other.strokes)
+
+        raise NotImplementedError(f"Cannot add {type(other)} to Strokeable")
+
     def _not_implemented(self, name: str) -> None:
         raise RuntimeError(f"{name}() not implemented in {self.__class__.__name__}")
 
@@ -25,6 +40,10 @@ class Strokeable:
 
     def sample_points(self, num_samples: int = 20) -> list[Vector]:
         self._not_implemented("sample_points")
+        return None
+
+    def point_at(self, t: float) -> Vector:
+        self._not_implemented("point_at")
         return None
 
     def geometry(self, fp: FontParameters, start: Vector, scale: float, before: 'Strokeable | None', after: 'Strokeable | None', geom_set: GeometrySet) -> Vector:
