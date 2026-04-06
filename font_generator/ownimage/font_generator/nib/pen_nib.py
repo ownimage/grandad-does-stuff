@@ -1,9 +1,8 @@
 from dataclasses import dataclass, field
 from math import cos, sin, radians
 
-from ownimage.font_generator.font_parameters import FontParameters
-from ownimage.font_generator.nib import Nib
-from ownimage.font_generator.vector import Vector
+from ..nib import Nib
+from ..vector import Vector
 
 
 @dataclass(frozen=True)
@@ -29,7 +28,7 @@ class PenNib(Nib):
         object.__setattr__(self, "normal", Vector(nx, ny).normalized())
 
     @staticmethod
-    def from_font_parameters(fp: FontParameters) -> "PenNib":
+    def from_font_parameters(fp: "FontParameters") -> "PenNib":
         return PenNib(fp.pen_width, fp.pen_thickness, fp.pen_angle)
 
     def height(self) -> float:

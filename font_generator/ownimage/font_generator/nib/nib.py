@@ -17,3 +17,6 @@ class Nib:
 
     def below(self) -> float:
         raise NotImplementedError()
+
+    def below(self) -> float:
+        raise NotImplementedError()

@@ -1,9 +1,8 @@
 from dataclasses import dataclass, replace
 from math import cos, sin, radians
 
-from ownimage.font_generator.font_parameters import FontParameters
-from ownimage.font_generator.nib import Nib
-from ownimage.font_generator.vector import Vector
+from ..nib import Nib
+from ..vector import Vector
 
 
 @dataclass(frozen=True)
@@ -13,7 +12,7 @@ class CircleNib(Nib):
     num_samples: int = 20
 
     @staticmethod
-    def from_font_parameters(fp: FontParameters) -> "CircleNib":
+    def from_font_parameters(fp: "FontParameters") -> "CircleNib":
         return CircleNib(fp.pen_width / 2)
 
     def moved_to(self, x: float, y: float) -> "CircleNib":
