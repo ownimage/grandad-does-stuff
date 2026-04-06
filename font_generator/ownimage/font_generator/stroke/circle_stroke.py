@@ -42,7 +42,7 @@ class CircleStroke(Strokeable):
         gs = GeometrySet()
         cs = CircleStroke(Vector.zero(), 1, from_angle, to_angle, fp=fp)
         cs.geometry(fp, Vector.zero(), 1, None, None, geom_set=gs)
-        nib = Nib.from_font_parameters(fp)
+        nib = fp.nib
         radius = (top - bottom - nib.height()) / (gs.bounding_box().height - nib.height())
         return CircleStroke((0, bottom + radius + nib.below()), radius, from_angle, to_angle, x_factor=x_factor, stroke_type=stroke_type, fp=fp)
 

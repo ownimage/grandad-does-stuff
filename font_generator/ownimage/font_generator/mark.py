@@ -108,7 +108,6 @@ class Mark:
         return self.right_by(shift)
 
     def geometry(self, start: Vector, fp: FontParameters, scale: float = 1) -> GeometrySet:
-        nib = PenNib.from_font_parameters(fp)
         start = start + self.vec
         geom_set = GeometrySet()
 
@@ -122,6 +121,7 @@ class Mark:
                 next_item = self.strokes[i + 1] if i < len(self.strokes) - 1 else None
 
                 if isinstance(curr_item, Strokeable):
+                    nib = fp.pen_nib
                     offset_pos = current_pos + nib.direction * (-0.5 * fp.pen_width + start_offset + 0.5 * width)
                     curr_item.geometry(fpt, offset_pos, scale, prev_item, next_item, geom_set)
                 elif idx == 0:

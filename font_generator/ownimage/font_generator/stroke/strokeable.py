@@ -44,7 +44,7 @@ class Strokeable:
 
         if self.stroke_type not in {StrokeType.Move, StrokeType.Extend}:
             points = self.sample_points(self.num_samples)
-            nib = Nib.from_font_parameters(fp)
+            nib = fp.nib
             geom_set.add_new_outline()
             outline = None
 

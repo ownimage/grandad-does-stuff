@@ -60,19 +60,19 @@ class Stroke(Strokeable):
         return self.vec * t
 
     def bl(self, fp: FontParameters) -> Vector:
-        nib = Nib.from_font_parameters(fp)
+        nib = fp.nib
         return self.vec + nib.bl
 
     def tr(self, fp: FontParameters) -> Vector:
-        nib = Nib.from_font_parameters(fp)
+        nib = fp.nib
         return nib.tr
 
     def tl(self, fp: FontParameters) -> Vector:
-        nib = Nib.from_font_parameters(fp)
+        nib = fp.nib
         return nib.tl
 
     def br(self, fp: FontParameters) -> Vector:
-        nib = Nib.from_font_parameters(fp)
+        nib = fp.nib
         return self.vec + nib.br
 
     def make_width(self, width: float, fp: FontParameters) -> Stroke:

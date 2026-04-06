@@ -27,7 +27,7 @@ class Blackletter:
         b = fp.baseline
         d = fp.descender
 
-        nib = Nib.from_font_parameters(fp)
+        nib = fp.nib
         f_dot = Stroke(nib.normal * (pen_thickness - pen_width))
 
         def f_v_dot_chain(n: int):
