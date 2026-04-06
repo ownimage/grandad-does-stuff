@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from functools import cached_property
 from math import cos, sin, radians
 
 from ..nib import Nib
@@ -62,29 +63,29 @@ class PenNib(Nib):
         return self.pos + self.direction * dx + self.normal * dy
 
     # Named points (top-left, left, bottom-left, bottom, bottom-right, right, top-right, top)
-    @property
-    def tl(self): return self._offset(-self.width / 2, self.thickness / 2)
+    @cached_property
+    def tl(self) -> Vector: return self._offset(-self.width / 2, self.thickness / 2)
 
-    @property
-    def l(self):  return self._offset(-self.width / 2, 0)
+    @cached_property
+    def l(self)-> Vector:  return self._offset(-self.width / 2, 0)
 
-    @property
-    def bl(self): return self._offset(-self.width / 2, -self.thickness / 2)
+    @cached_property
+    def bl(self)-> Vector: return self._offset(-self.width / 2, -self.thickness / 2)
 
-    @property
-    def b(self):  return self._offset(0, -self.thickness / 2)
+    @cached_property
+    def b(self)-> Vector:  return self._offset(0, -self.thickness / 2)
 
-    @property
-    def t(self):  return self._offset(0, self.thickness / 2)
+    @cached_property
+    def t(self)-> Vector:  return self._offset(0, self.thickness / 2)
 
-    @property
-    def br(self): return self._offset(self.width / 2, -self.thickness / 2)
+    @cached_property
+    def br(self)-> Vector: return self._offset(self.width / 2, -self.thickness / 2)
 
-    @property
-    def r(self):  return self._offset(self.width / 2, 0)
+    @cached_property
+    def r(self)-> Vector:  return self._offset(self.width / 2, 0)
 
-    @property
-    def tr(self): return self._offset(self.width / 2, self.thickness / 2)
+    @cached_property
+    def tr(self)-> Vector: return self._offset(self.width / 2, self.thickness / 2)
 
     # --- Move / copy --------------------------------------------------------
 
@@ -92,6 +93,7 @@ class PenNib(Nib):
         """Return a new nib at a new position."""
         return PenNib(self.width, self.thickness, self.angle, Vector(x, y))
 
+    @cached_property
     def outline(self) -> list[Vector]:
         """Return an array of vectors for the nib corners in order: tl, bl, br, tr."""
         return [self.tl, self.bl, self.br, self.tr]

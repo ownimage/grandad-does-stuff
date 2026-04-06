@@ -51,7 +51,7 @@ class Strokeable:
             for i in range(len(points) - 1):
                 n1 = nib.at(points[i])
                 n2 = nib.at(points[i + 1])
-                p = [add_start_and_scale(p).xy() for p in n1.outline() + n2.outline()]
+                p = [add_start_and_scale(p).xy() for p in n1.outline + n2.outline]
                 h = MultiPoint(p).convex_hull
                 outline = unary_union([outline, h])
 
