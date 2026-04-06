@@ -3,13 +3,13 @@ from __future__ import annotations
 from dataclasses import replace
 from typing import List
 
-from .bezier_stroke import BezierStroke
+from ownimage.font_generator.nib.pen_nib import PenNib
+from ownimage.font_generator.stroke.bezier_stroke import BezierStroke
+from ownimage.font_generator.stroke.compound_stroke import CompoundStroke
+from ownimage.font_generator.stroke.stroke import Strokeable
 from .bounding_box import BoundingBox
-from .compound_stroke import CompoundStroke
 from .font_parameters import FontParameters
 from .geometry_set import GeometrySet
-from .pen_nib import PenNib
-from .stroke import Strokeable
 from .vector import Vector
 
 
@@ -55,7 +55,6 @@ class Mark:
         for stroke in self.strokes:
             end = stroke.advance(end)
         return end
-
 
     def left_by(self, amount: float):
         return Mark(self.strokes, Vector(self.vec.x - amount, self.vec.y))

@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Union, List
+from typing import Union
 
-from .font_parameters import FontParameters
-from .nib import Nib
+from ownimage.font_generator.font_parameters import FontParameters
+from ownimage.font_generator.nib.nib import Nib
 from .stroke_type import StrokeType
 from .strokeable import Strokeable
-from .vector import Vector
+from ownimage.font_generator.vector import Vector
 
 
 @dataclass(frozen=True)

@@ -1,15 +1,15 @@
 from dataclasses import replace
 
-from .bezier_stroke import BezierStroke
-from .circle_stroke import CircleStroke
-from .compound_stroke import CompoundStroke
+from ownimage.font_generator.stroke.bezier_stroke import BezierStroke
+from ownimage.font_generator.stroke.circle_stroke import CircleStroke
+from ownimage.font_generator.stroke.compound_stroke import CompoundStroke
 from .font_parameters import FontParameters
 from .glyph import Glyph
 from .mark import Mark
-from .nib import Nib
-from .nib_type import NibType
-from .stroke import Stroke
-from .stroke_type import StrokeType
+from ownimage.font_generator.nib.nib import Nib
+from ownimage.font_generator.nib.nib_type import NibType
+from ownimage.font_generator.stroke.stroke import Stroke
+from ownimage.font_generator.stroke.stroke_type import StrokeType
 from .vector import Vector
 
 

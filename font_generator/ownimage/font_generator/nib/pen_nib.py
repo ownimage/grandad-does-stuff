@@ -1,9 +1,9 @@
 from dataclasses import dataclass, field
 from math import cos, sin, radians
 
-from .font_parameters import FontParameters
-from .nib import Nib
-from .vector import Vector
+from ownimage.font_generator.font_parameters import FontParameters
+from ownimage.font_generator.nib import Nib
+from ownimage.font_generator.vector import Vector
 
 
 @dataclass(frozen=True)

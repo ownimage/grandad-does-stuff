@@ -5,12 +5,12 @@ from typing import Union
 from shapely.geometry.multipoint import MultiPoint
 from shapely.ops import unary_union
 
-from .font_parameters import FontParameters
-from .geometry_set import GeometrySet
-from .nib import Nib
+from ownimage.font_generator.font_parameters import FontParameters
+from ownimage.font_generator.geometry_set import GeometrySet
+from ownimage.font_generator.nib.nib import Nib
 from .stroke_type import StrokeType
-from .vector import Vector
-from .vector_list import VectorList
+from ownimage.font_generator.vector import Vector
+from ownimage.font_generator.vector_list import VectorList
 
 
 class Strokeable:

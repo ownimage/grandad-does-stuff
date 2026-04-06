@@ -2,13 +2,12 @@ from __future__ import annotations
 
 from typing import List, Union
 
-from .font_parameters import FontParameters
-from .geometry_set import GeometrySet
-from .stroke import Stroke
-from .stroke_type import StrokeType
-from .strokeable import Strokeable
-from .vector import Vector
-from .vector_math import VectorMath as VM
+from ownimage.font_generator.font_parameters import FontParameters
+from ownimage.font_generator.geometry_set import GeometrySet
+from ownimage.font_generator.stroke.stroke import Stroke
+from ownimage.font_generator.stroke.stroke_type import StrokeType
+from ownimage.font_generator.stroke.strokeable import Strokeable
+from ownimage.font_generator.vector import Vector
 
 
 class CompoundStroke(Strokeable):

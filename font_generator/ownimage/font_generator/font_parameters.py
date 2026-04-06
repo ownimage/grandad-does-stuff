@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from ownimage.font_generator.nib_type import NibType
+from ownimage.font_generator.nib.nib_type import NibType
 
 
 @dataclass(frozen=True)

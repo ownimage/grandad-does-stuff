@@ -9,7 +9,7 @@ from PySide6.QtWidgets import (
 from .birdfont_reader import BirdfontReader
 from .blackletter import Blackletter
 from .font_parameters import FontParameters
-from .nib_type import NibType
+from ownimage.font_generator.nib.nib_type import NibType
 from .vector import Vector
 
 

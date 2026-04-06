@@ -4,10 +4,10 @@ from dataclasses import dataclass, field
 from typing import Union, Tuple
 
 from .cubic_bezier import CubicBezier
-from .font_parameters import FontParameters
+from ownimage.font_generator.font_parameters import FontParameters
 from .stroke_type import StrokeType
 from .strokeable import Strokeable
-from .vector import Vector
+from ownimage.font_generator.vector import Vector
 
 
 @dataclass(frozen=True)

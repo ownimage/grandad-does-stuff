@@ -1,11 +1,11 @@
 import math
 
-from .font_parameters import FontParameters
-from .geometry_set import GeometrySet
-from .nib import Nib
+from ownimage.font_generator.font_parameters import FontParameters
+from ownimage.font_generator.geometry_set import GeometrySet
+from ownimage.font_generator.nib.nib import Nib
 from .stroke_type import StrokeType
 from .strokeable import Strokeable
-from .vector import Vector
+from ownimage.font_generator.vector import Vector
 
 
 class CircleStroke(Strokeable):
