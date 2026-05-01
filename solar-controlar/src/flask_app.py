@@ -6,6 +6,7 @@ app = Flask(__name__)
 app.secret_key = os.urandom(24)
 
 SETTINGS_FILE = os.path.join(os.path.dirname(os.path.dirname(__file__)), "settings.json")
+LOG_FILE = os.path.join(os.path.dirname(os.path.dirname(__file__)), "config_apply.log")
 
 SETTINGS = [
     {
@@ -129,6 +130,18 @@ def index():
 
     settings = load_settings()
     return render_template("index.html", settings=settings, fields=SETTINGS)
+
+@app.route("/api/logs")
+def api_logs():
+    count = request.args.get('count', 200, type=int)
+    try:
+        if not os.path.exists(LOG_FILE):
+            return "Log file not found.", 404
+        with open(LOG_FILE, "r", errors="replace") as f:
+            lines = f.readlines()
+        return "".join(lines[-count:])
+    except Exception as e:
+        return f"Error reading log: {str(e)}", 500
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
