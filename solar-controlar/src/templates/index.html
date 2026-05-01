@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solar Controlar Settings</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f5f7fa; color: #333; padding: 2rem; }
+        .container { max-width: 1100px; margin: 0 auto; }
+        h1 { font-size: 1.5rem; margin-bottom: 1.5rem; color: #1a202c; }
+        table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        th, td { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid #e2e8f0; }
+        th { background: #2d3748; color: #fff; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover { background: #f7fafc; }
+        td:first-child { font-weight: 600; color: #2d3748; width: 18%; }
+        td:nth-child(2) { width: 18%; }
+        td:nth-child(3) { width: 14%; }
+        td:nth-child(4) { color: #718096; }
+        input[type="text"], input[type="number"] { width: 100%; padding: 0.4rem 0.6rem; border: 1px solid #cbd5e0; border-radius: 4px; font-size: 0.9rem; }
+        input:focus { outline: none; border-color: #4299e1; box-shadow: 0 0 0 2px rgba(66,153,225,0.3); }
+        input[readonly] { background: #edf2f7; color: #718096; cursor: not-allowed; }
+        .badge { display: inline-block; padding: 0.15rem 0.5rem; border-radius: 9999px; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; }
+        .badge-ro { background: #e2e8f0; color: #4a5568; }
+        .badge-rw { background: #c6f6d5; color: #276749; }
+        .badge-changed { background: #fbd38d; color: #744210; }
+        .actions { margin-top: 1.5rem; text-align: right; }
+        button { background: #3182ce; color: #fff; border: none; padding: 0.6rem 1.5rem; border-radius: 6px; font-size: 0.9rem; cursor: pointer; font-weight: 600; }
+        button:hover { background: #2b6cb0; }
+        .flash { padding: 0.75rem 1rem; margin-bottom: 1rem; border-radius: 6px; }
+        .flash-success { background: #c6f6d5; color: #276749; border: 1px solid #9ae6b4; }
+        .flash-error { background: #fed7d7; color: #9b2c2c; border: 1px solid #fc8181; }
+        .slider-container { display: flex; align-items: center; gap: 0.5rem; }
+        input[type="range"] { flex: 1; }
+        .slider-val { min-width: 3rem; text-align: right; font-weight: 600; font-size: 0.9rem; }
+        .was-text { font-size: 0.75rem; color: #e53e3e; display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Solar Controlar Settings</h1>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+            <div class="flash flash-{{ category }}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('index') }}" id="settingsForm">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Setting</th>
+                        <th>Value</th>
+                        <th>Access</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for field in fields %}
+                    <tr data-key="{{ field.key }}" data-original="{{ settings.get(field.key, '') }}">
+                        <td>{{ field.label }}</td>
+                        <td>
+                            {% if field.readonly %}
+                                <input type="{{ field.type }}" name="{{ field.key }}" value="{{ settings.get(field.key, '') }}" readonly>
+                            {% elif field.slider %}
+                                <div class="slider-container">
+                                    <input type="range"
+                                           id="slider-{{ field.key }}"
+                                           min="{{ field.slider.min }}"
+                                           max="{{ field.slider.max }}"
+                                           step="{{ field.slider.step }}"
+                                           value="{{ settings.get(field.key, '') }}">
+                                    <output id="output-{{ field.key }}" class="slider-val">{{ settings.get(field.key, '') }}</output>
+                                </div>
+                                <input type="hidden" name="{{ field.key }}" id="hidden-{{ field.key }}" value="{{ settings.get(field.key, '') }}">
+                            {% else %}
+                                <input type="{{ field.type }}" name="{{ field.key }}" value="{{ settings.get(field.key, '') }}" step="any">
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if field.readonly %}
+                                <span class="access-badge badge badge-ro">Read Only</span>
+                            {% else %}
+                                <span class="access-badge badge badge-rw">Read/Write</span>
+                            {% endif %}
+                            <span class="was-text">Was: <strong class="was-val"></strong></span>
+                        </td>
+                        <td>{{ field.description }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="actions">
+                <button type="submit">Save Changes</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var rows = document.querySelectorAll('tr[data-key]');
+            rows.forEach(function(row) {
+                var key = row.dataset.key;
+                var original = row.dataset.original;
+                var badge = row.querySelector('.access-badge');
+                var wasText = row.querySelector('.was-text');
+                var wasVal = row.querySelector('.was-val');
+
+                if (!badge) return;
+
+                // Store original on was-val
+                wasVal.textContent = original;
+
+                // For readonly fields, skip
+                var hiddenInput = document.getElementById('hidden-' + key);
+                var visibleInput = row.querySelector('input[name="' + key + '"]:not([type="hidden"])');
+
+                if (visibleInput && visibleInput.readOnly) return;
+
+                function checkChange() {
+                    var current;
+                    if (hiddenInput) {
+                        current = hiddenInput.value;
+                    } else if (visibleInput) {
+                        current = visibleInput.value;
+                    } else {
+                        return;
+                    }
+
+                    if (current != original) {
+                        badge.className = 'access-badge badge badge-changed';
+                        badge.textContent = 'Changed';
+                        wasText.style.display = 'inline';
+                    } else {
+                        badge.className = 'access-badge badge badge-rw';
+                        badge.textContent = 'Read/Write';
+                        wasText.style.display = 'none';
+                    }
+                }
+
+                // Handle slider
+                var slider = document.getElementById('slider-' + key);
+                if (slider) {
+                    slider.addEventListener('input', function() {
+                        var val = this.value;
+                        document.getElementById('output-' + key).textContent = val;
+                        document.getElementById('hidden-' + key).value = val;
+                        checkChange();
+                    });
+                } else if (visibleInput && !visibleInput.readOnly) {
+                    visibleInput.addEventListener('input', checkChange);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
