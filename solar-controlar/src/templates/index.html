@@ -75,6 +75,7 @@
 
         <div id="tab-settings" class="tab-content active">
             <form method="POST" action="{{ url_for('index') }}" id="settingsForm">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <table>
                     <thead>
                         <tr>
@@ -136,6 +137,7 @@
 
         <div id="tab-config" class="tab-content">
             <form method="POST" action="{{ url_for('update_config') }}" id="configForm">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <table>
                     <thead>
                         <tr>
