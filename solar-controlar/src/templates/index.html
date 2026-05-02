@@ -70,6 +70,7 @@
         <div class="tabs">
             <button class="tab-btn active" onclick="switchTab('settings')">Settings</button>
             <button class="tab-btn" onclick="switchTab('logs')">Logs</button>
+            <button class="tab-btn" onclick="switchTab('config')">Config</button>
         </div>
 
         <div id="tab-settings" class="tab-content active">
@@ -131,6 +132,46 @@
                 <button type="button" onclick="fetchLogs()">Fetch</button>
             </div>
             <div id="log-output">Click Fetch to load logs</div>
+        </div>
+
+        <div id="tab-config" class="tab-content">
+            <form method="POST" action="{{ url_for('update_config') }}" id="configForm">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Setting</th>
+                            <th>Value</th>
+                            <th>Access</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-key="charge_to_percentage" data-original="{{ config.get('charge_to_percentage', '') }}">
+                            <td>Charge To Percentage</td>
+                            <td>
+                                <div class="slider-container">
+                                    <input type="range"
+                                           id="slider-charge_to_percentage"
+                                           min="0"
+                                           max="100"
+                                           step="1"
+                                           value="{{ config.get('charge_to_percentage', '') }}">
+                                    <output id="output-charge_to_percentage" class="slider-val">{{ config.get('charge_to_percentage', '') }}%</output>
+                                </div>
+                                <input type="hidden" name="charge_to_percentage" id="hidden-charge_to_percentage" value="{{ config.get('charge_to_percentage', '') }}">
+                            </td>
+                            <td>
+                                <span class="access-badge badge badge-rw">Read/Write</span>
+                                <span class="was-text">Was: <strong class="was-val"></strong>%</span>
+                            </td>
+                            <td>Target battery percentage for overnight charging (applied between 02:00–05:00)</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="actions">
+                    <button type="submit">Save Changes</button>
+                </div>
+            </form>
         </div>
     </div>
 

@@ -6,6 +6,7 @@ app = Flask(__name__)
 app.secret_key = os.urandom(24)
 
 SETTINGS_FILE = os.path.join(os.path.dirname(os.path.dirname(__file__)), "settings.json")
+CONFIG_FILE = os.path.join(os.path.dirname(os.path.dirname(__file__)), "config.json")
 LOG_FILE = os.path.join(os.path.dirname(os.path.dirname(__file__)), "config_apply.log")
 
 SETTINGS = [
@@ -102,6 +103,14 @@ def save_settings(data):
     with open(SETTINGS_FILE, "w") as f:
         json.dump(data, f, indent=4)
 
+def load_config():
+    with open(CONFIG_FILE, "r") as f:
+        return json.load(f)
+
+def save_config(data):
+    with open(CONFIG_FILE, "w") as f:
+        json.dump(data, f, indent=4)
+
 @app.route("/", methods=["GET", "POST"])
 def index():
     if request.method == "POST":
@@ -129,7 +138,22 @@ def index():
         return redirect(url_for("index"))
 
     settings = load_settings()
-    return render_template("index.html", settings=settings, fields=SETTINGS)
+    config = load_config()
+    return render_template("index.html", settings=settings, fields=SETTINGS, config=config)
+
+@app.route("/api/config", methods=["POST"])
+def update_config():
+    config = load_config()
+    try:
+        value = request.form.get("charge_to_percentage")
+        if value is not None:
+            value = int(value)
+            config["charge_to_percentage"] = value
+        save_config(config)
+        flash("Config saved successfully.")
+    except Exception as e:
+        flash(f"Error saving config: {str(e)}", "error")
+    return redirect(url_for("index"))
 
 @app.route("/api/logs")
 def api_logs():
