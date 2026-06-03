@@ -5,5 +5,6 @@ services:
       dockerfile: Dockerfile
     container_name: solarcontrolar
     volumes:
-      - .:/solarcontrolar
+      - .:/app
     command: ["cron", "-f"]
+
