@@ -7,14 +7,14 @@ import pytz
 from tenacity import retry, stop_after_attempt, wait_fixed
 
 from common.json_store import JsonStore
-from solarcontrolar.givenergy import GivEnergy
+from solarcontrolar.givenergybase import GivEnergyBase
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 
 
 class ConfigApply:
-    def __init__(self, config=JsonStore("config.json"), os=os, json=json, GivEnergy=GivEnergy, pytz=pytz, datetime=datetime, logger=logger):
+    def __init__(self, config=JsonStore("config.json"), os=os, json=json, GivEnergy=GivEnergyBase, pytz=pytz, datetime=datetime, logger=logger):
         self.__config = config
         self.__os = os
         self.__json = json

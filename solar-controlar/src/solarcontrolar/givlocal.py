@@ -1,40 +1,22 @@
-import requests
-import os
-from datetime import date, datetime, timedelta
 from collections import defaultdict
+from datetime import datetime, timedelta
+
+import requests
+
+from .givenergybase import GivEnergyBase
 
 
-class GivEnergy:
-    def __init__(self, api_key=None, inverter_id=None, requests=requests, os=os):
+class GivLocal(GivEnergyBase):
+    def __init__(self, base_url, inverter_id, requests=requests):
+        super().__init__(inverter_id, requests)
+        if (base_url is None) or (inverter_id is None):
+            raise ValueError(f"You must provide both an base_url and an inverter_id. \n base_url={base_url}\ninverter_id={inverter_id}")
 
-        self.api_key = api_key if api_key is not None else os.getenv('GIVENERGY_API_KEY')
-        self.inverter_id = inverter_id if inverter_id is not None else os.getenv('GIVENERGY_INVERTER_ID')
-
-        self.requests = requests
-
-        self.base_url = "https://api.givenergy.cloud/v1"
+        self.base_url = base_url
 
         self.headers = {
-            "Authorization": f"Bearer {self.api_key}",
             "Accept": "application/json"
         }
-
-    def get(self, url, payload=None):
-        # Set up headers with authorization
-        response = self.requests.request("GET", url, headers=self.headers, json=payload)
-
-        if response.status_code == 200:
-            return response.json()
-        else:
-            raise BaseException(response.status_code, response.text)
-
-    def post(self, url, payload=None):
-        response = self.requests.post(url, headers=self.headers, json=payload)
-
-        if response.status_code == 200 or response.status_code == 201:
-            return response.json()
-        else:
-            raise BaseException(response.status_code, response.text)
 
     def events(self):
         return self.get(f"{self.base_url}/inverter/{self.inverter_id}/events")
@@ -59,33 +41,6 @@ class GivEnergy:
     def setting_write(self, setting_id, value):
         payload = {"value": value}
         return self.post(f"{self.base_url}/inverter/{self.inverter_id}/settings/{setting_id}/write", payload)
-
-    def setting_write_validate(self, setting_id, value, function_name):
-        current_value = self.setting_read(setting_id)['data']['value']
-        if current_value == value:
-            return False
-        else:
-            print(f'{function_name} current_value {current_value} being set to {value}')
-            self.setting_write(setting_id, value)
-            updated_value = self.setting_read(setting_id)['data']['value']
-            if isinstance(value, bool):
-                updated_value = bool(updated_value)
-            if updated_value != value:
-                raise RuntimeError(f'Givnergy::{function_name}({value}) failed, updated_value={updated_value} != value={value}')
-            print(f'{function_name} updated_value {updated_value}')
-            return True
-
-    def get_timed_charge(self):
-        return self.setting_read(66)
-
-    def set_timed_charge(self, value):
-        return self.setting_write_validate(66, value, 'set_enable_ac_charge')
-
-    def get_timed_export(self):
-        return self.setting_read(56)
-
-    def set_timed_export(self, value):
-        return self.setting_write_validate(56, value, 'set_enable_dc_discharge')
 
     def get_day_usage(self, days_ago):
         today = datetime.today()
@@ -146,5 +101,19 @@ class GivEnergy:
 
         return dict(weekly_usage)
 
+    def get_minute_data(self):
+        raw = self.get(f"{self.base_url}/inverter/{self.inverter_id}/meter-data-latest")["data"]
+
+        # split timestamp
+        dt = datetime.fromisoformat(raw["time"])
+        date_str = dt.date().isoformat()
+        time_str = dt.time().isoformat()
+
+        # extract values
+        solar_total = raw["total"]["solar"]
+        usage_total = raw["total"]["consumption"]
+
+        return date_str, time_str, solar_total, usage_total
+
     def battery_level(self):
-        return self.get(f"{self.base_url}/inverter/{self.inverter_id}/system-data/latest")['data']['battery']['percent']
+        return self.get(f"{self.base_url}/inverter/{self.inverter_id}/system-data-latest")['data']['battery']['percent']

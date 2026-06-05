@@ -28,6 +28,7 @@ class SolarForecastGenerator:
     # TODO need to be able to inject SolCast
     def fetch_forecast(self):
         solcast = SolCast(self.api_key, self.site_id)
+        print(f"{solcast.forecast()}")
         return solcast.forecast()
 
     def check_already_exists(self, forecast) -> bool:

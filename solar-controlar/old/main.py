@@ -1,6 +1,6 @@
 import os
 
-from solarcontrolar.givenergy import GivEnergy
+from solarcontrolar.givenergybase import GivEnergyBase
 
 # solcast = SolCast(os.getenv("SOLCAST_API_KEY"), os.getenv("SOLCAST_SITE_ID"))
 # formatted_json = json.dumps(solcast.forecast(), indent=4, sort_keys=True)
@@ -8,7 +8,7 @@ from solarcontrolar.givenergy import GivEnergy
 
 api_key = os.getenv("GIVENERGY_API_KEY")
 inverter_id = "FD2325G412"
-givenergy = GivEnergy(api_key, inverter_id)
+givenergy = GivEnergyBase(api_key, inverter_id)
 # setting_write = givenergy.setting_write(41, "00:00")
 value = givenergy.battery_level()
 print(value)
