@@ -64,6 +64,11 @@ crontab crontab_file
 python -m unittest discover -s tests
 ```
 
+## Running Web app
+
+```python src/flask_app.py```
+Then open http://solarcontrolar.local:5000 in your browser.
+
 ## Getting a Forcast
 
 ```shell

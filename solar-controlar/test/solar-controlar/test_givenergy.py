@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 from unittest.mock import MagicMock
 
-from solarcontrolar.givenergy import GivEnergy
+from solarcontrolar.givenergybase import GivEnergyBase
 
 
 class TestGivenergy(unittest.TestCase):
@@ -28,7 +28,7 @@ class TestGivenergy(unittest.TestCase):
         mock_requests = MagicMock()
         mock_requests.post.side_effect = [mock_response_1, mock_response_2, mock_response_3]
 
-        subject = GivEnergy('API_KEY', 'INVERTER_ID', mock_requests)
+        subject = GivEnergyBase('API_KEY', 'INVERTER_ID', mock_requests)
         # WHEN
         actual = subject.setting_write_validate(setting_id, True, 'function_name')
         # THEN

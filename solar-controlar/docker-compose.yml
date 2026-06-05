@@ -4,6 +4,9 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: solarcontrolar
+    ports:
+      - "5000:5000"
     volumes:
-      - .:/solarcontrolar
+      - .:/app
     command: ["cron", "-f"]
+

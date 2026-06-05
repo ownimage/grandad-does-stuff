@@ -9,4 +9,5 @@ class Filenames(Enum):
     USAGE_ACTUALS = "usage_actuals.json"
     USAGE_BASELINE_FILE = "usage_baseline.json"
     USAGE_FORECAST_FILE = "usage_forecast.json"
+    MINUTE_TOTALS_FILE = "minute_totals.json"
 

@@ -6,7 +6,7 @@ from dateutil import parser
 from common.json_store import JsonStore
 from filenames import Filenames
 from settings import Settings
-from solarcontrolar.givenergy import GivEnergy
+from solarcontrolar.givenergybase import GivEnergyBase
 
 logger = logging.getLogger(__name__)
 
@@ -52,7 +52,7 @@ class UsageActuals:
 
     def fetch(self, date_str):
         logger.info('Fetching usage actuals for date: %s', date_str)
-        data = GivEnergy().get_meter_data(date_str)
+        data = GivEnergyBase().get_meter_data(date_str)
         summary = {
             datetime.fromisoformat(entry["time"])
             .astimezone(self.timezone)
